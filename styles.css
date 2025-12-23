@@ -1,0 +1,34 @@
+body {
+    margin: 0;
+    height: 100vh;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #ffffff;
+    /* unique diagonal wave gradient background */
+    background-color: black;
+    background-image: 
+        radial-gradient(ellipse at 20% 30%, rgba(19, 19, 37, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(27, 13, 27, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, black 0%, rgb(22,22,22) 50%, rgb(18,18,18) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ctext x='15' y='35' font-size='28' fill='rgba(255,255,255,0.08)' font-family='monospace' font-weight='bold'%3E%2B%3C/text%3E%3C/svg%3E");
+    background-repeat: repeat;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    background-color: #080808;
+    border-bottom: 1px solid #1d1d1d;
+}
+
+nav a {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    padding-left: 10px;
+}
+
+ul {
+    display: flex;
+}
