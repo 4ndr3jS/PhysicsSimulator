@@ -7,8 +7,8 @@ body {
     /* unique diagonal wave gradient background */
     background-color: black;
     background-image: 
-        radial-gradient(ellipse at 20% 30%, rgba(19, 19, 37, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 70%, rgba(27, 13, 27, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 30%, rgba(21, 21, 43, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(41, 20, 41, 0.3) 0%, transparent 50%),
         linear-gradient(135deg, black 0%, rgb(22,22,22) 50%, rgb(18,18,18) 100%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ctext x='15' y='35' font-size='28' fill='rgba(255,255,255,0.08)' font-family='monospace' font-weight='bold'%3E%2B%3C/text%3E%3C/svg%3E");
     background-repeat: repeat;
@@ -17,18 +17,101 @@ body {
 nav {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background-color: #080808;
     border-bottom: 1px solid #1d1d1d;
+    padding: 1rem 2rem;
 }
 
-nav a {
+nav > a {
     text-decoration: none;
     font-size: 20px;
     font-weight: bold;
     color: #fff;
-    padding-left: 10px;
 }
 
 ul {
     display: flex;
+    list-style: none;
+    gap: 4rem;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+ul a {
+    text-decoration: none;
+    font-size: 18px;
+    color: #fff;
+    transition: color 0.3s;
+}
+
+ul a:hover {
+    color: #888;
+}
+
+.heroSection {
+    display: flex;
+    height: clamp(300px, 50vh, 300px);
+    background: linear-gradient(135deg, rgba(40,40,80,0.4), rgba(60,30,60,0.4));
+    border: 1px solid rgba(255,255,255,0.1);
+    margin: 10vh auto 0;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 16px;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem;
+}
+
+.title{
+    font-size: 38px;
+    color: #fffffff8;
+    margin-bottom: 40px;
+}
+
+.intro{
+    text-align: center;
+    font-size: 18px;
+    color: #ffffffab;
+}
+
+.explore{
+    margin-top: 50px;
+    height: 50px;
+    width: 220px;
+    border: 1px solid rgba(255, 255, 255, 0.137);
+    border-radius: 26px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: bold;
+    background: linear-gradient(135deg, rgba(80,80,160,0.8), rgba(120,60,120,0.8));
+}
+
+.container{
+    display: flex;
+    justify-content: center;
+    gap: 140px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.stat{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat label{
+    font-size: 50px;
+    font-weight: bold;
+    color: #ffffffe1;
+}
+
+.stat h3{
+    font-size: 15px;
+    color: #ffffffa2;
 }
