@@ -9,7 +9,7 @@ buttons.forEach((button, index) =>{
 
         if(index === 0){
             sections.forEach(section => {
-                section.style.display - 'block';
+                section.style.display = 'block';
             });
         }else{
             sections.forEach(section => {
