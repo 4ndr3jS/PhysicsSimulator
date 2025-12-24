@@ -260,3 +260,93 @@ ul a:hover {
 .active{
     background-color: #2b2b49;
 }
+
+.line{
+    height: 1px;
+    border: none;
+    background-color: #34355f;
+    width: 100%;
+    justify-self: center;
+}
+
+.law{
+    background-color: #291b28;
+    padding: 18px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border-left: 3px solid #944c95;
+}
+
+.law b{
+    color: #f673f8;
+}
+
+.nameOfLaws{
+    margin: 0;
+}
+
+.lawTitle{
+    margin-top: 0;
+}
+
+.formulaDiv {
+    padding: 18px;
+    border-radius: 6px;
+    border-left: 3px solid #4664aa;
+    background-color: #191929;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.formulaEquation {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 500;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    letter-spacing: 2px;
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.formulaEquation sup {
+    font-size: 18px;
+    vertical-align: super;
+}
+
+.formulaEquation sub {
+    font-size: 16px;
+    vertical-align: sub;
+}
+
+.formulaExplanation {
+    text-align: center;
+    font-size: 14px;
+    color: #b8c0ff;
+    margin-top: 10px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.formulaTitle {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.formulaSubtitle {
+    font-size: 13px;
+    color: #b8c0ff;
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+.formulaDetails {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 14px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 1.6;
+}
