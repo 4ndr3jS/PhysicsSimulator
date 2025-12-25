@@ -20,20 +20,20 @@
     <div class="sim-container">
         <div class="sim-header">
             <h1>🌊 Wave Interference</h1>
-            <p>Explore constructve and destructive interference patterns</p>
+            <p>Explore constructive and destructive interference patterns in water waves</p>
             <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
         </div>
-        
+
         <div class="sim-layout">
             <div class="sim-canvas-section">
                 <div class="sim-canvas-wrapper">
                     <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
-                
+                    
                     <div class="sim-controls">
                         <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
-                        <button class="sim-btn sim-btn-secondary" id="pauseBtn" onclick="pauseSimulation()">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
                         <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
-                        <button class="sim-btn sim-btn-secondary" onclick="addSource()">➕ Add Source</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="clearSources()">🗑️ Clear Sources</button>
                     </div>
                 </div>
 
@@ -42,25 +42,21 @@
                         <span class="sim-panel-icon">📐</span>
                         <span>Physics Formulas</span>
                     </div>
-
                     <div class="sim-formula">
                         <div class="sim-formula-equation">y = A sin(kx - ωt + φ)</div>
-                        <div class="sim-formula-description">Wave Equation</div>
+                        <div class="sim-formula-description">Wave equation</div>
                     </div>
-                    
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">λ = v / f</div>
-                        <div class="sim-formula-description">Wavelength</div>
+                        <div class="sim-formula-equation">Δφ = 2πΔd/λ</div>
+                        <div class="sim-formula-description">Phase difference</div>
                     </div>
-
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">Δφ = 2π(Δr / λ)</div>
-                        <div class="sim-formula-description">Phase Difference</div>
+                        <div class="sim-formula-equation">Constructive: Δd = nλ</div>
+                        <div class="sim-formula-description">In phase (bright)</div>
                     </div>
-
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">I ∝ A₁² + A₂² + 2A₁A₂cos(Δφ)</div>
-                        <div class="sim-formula-description">Interference Intensity</div>
+                        <div class="sim-formula-equation">Destructive: Δd = (n+½)λ</div>
+                        <div class="sim-formula-description">Out of phase (dark)</div>
                     </div>
                 </div>
 
@@ -92,12 +88,14 @@
                     </ul>
                 </div>
             </div>
+
             <div class="sim-sidebar">
                 <div class="sim-panel">
                     <div class="sim-panel-header">
                         <span class="sim-panel-icon">⚙️</span>
                         <span>Wave Parameters</span>
                     </div>
+
                     <div class="sim-control-group">
                         <div class="sim-control-label">
                             <span>Frequency</span>
@@ -109,9 +107,9 @@
                     <div class="sim-control-group">
                         <div class="sim-control-label">
                             <span>Amplitude</span>
-                            <span class="sim-control-value"><span id="val-amplitude">30</span> px</span>
+                            <span class="sim-control-value"><span id="val-amplitude">30</span></span>
                         </div>
-                        <input type="range" id="slider-amplitude" min="10" max="50" step="5" value="30" oninput="updateParameter('amplitude', this.value)">
+                        <input type="range" id="slider-amplitude" min="10" max="50" value="30" oninput="updateParameter('amplitude', this.value)">
                     </div>
 
                     <div class="sim-control-group">
@@ -119,55 +117,265 @@
                             <span>Wave Speed</span>
                             <span class="sim-control-value"><span id="val-speed">80</span> px/s</span>
                         </div>
-                        <input type="range" id="slider-speed" min="40" max="120" step="10" value="80" oninput="updateParameter('speed', this.value)">
+                        <input type="range" id="slider-speed" min="40" max="150" value="80" oninput="updateParameter('speed', this.value)">
                     </div>
 
                     <div class="sim-control-group">
                         <div class="sim-control-label">
-                            <span>Phase Shift (Source 2)</span>
-                            <span class="sim-control-value"><span id="val-phase">0</span>°</span>
+                            <span>Damping</span>
+                            <span class="sim-control-value"><span id="val-damping">0.002</span></span>
                         </div>
-                        <input type="range" id="slider-phase" min="0" max="360" step="15" value="0" oninput="updateParameter('phase', this.value)">
+                        <input type="range" id="slider-damping" min="0" max="0.005" step="0.0001" value="0.002" oninput="updateParameter('damping', this.value)">
                     </div>
 
                     <div class="sim-divider"></div>
 
                     <div class="sim-toggle">
-                        <span>Show Wavefronts</span>
-                        <div class="sim-toggle-switch active" id="toggle-wavefronts" onclick="toggleWavefronts()"></div>
+                        <span>Show Sources</span>
+                        <div class="sim-toggle-switch active" id="toggle-sources" onclick="toggleSources()"></div>
                     </div>
 
                     <div class="sim-toggle">
-                        <span>Show Intensity Map</span>
-                        <div class="sim-toggle-switch active" id="toggle-intensity" onclick="toggleIntensity()"></div>
-                    </div>
-
-                    <div class="sim-toggle">
-                        <span>Show Grid</span>
-                        <div class="sim-toggle-switch" id="toggle-grid" onclick="toggleGrid()"></div>
+                        <span>Color Mode</span>
+                        <div class="sim-toggle-switch" id="toggle-color" onclick="toggleColor()"></div>
                     </div>
                 </div>
 
                 <div class="sim-stats">
                     <div class="sim-stat-card">
-                        <div class="sim-stat-value blue" id="stat-wavelength">0.0</div>
+                        <div class="sim-stat-value blue" id="stat-wavelength">0</div>
                         <div class="sim-stat-label">Wavelength (px)</div>
                     </div>
                     <div class="sim-stat-card">
-                        <div class="sim-stat-value green" id="stat-sources">2</div>
+                        <div class="sim-stat-value green" id="stat-sources">0</div>
                         <div class="sim-stat-label">Active Sources</div>
                     </div>
                     <div class="sim-stat-card">
-                        <div class="sim-stat-value purple" id="stat-maxamp">0.0</div>
-                        <div class="sim-stat-label">Max Amplitude</div>
+                        <div class="sim-stat-value purple" id="stat-period">0.0</div>
+                        <div class="sim-stat-label">Period (s)</div>
                     </div>
                     <div class="sim-stat-card">
-                        <div class="sim-stat-value orange" id="stat-period">0.0</div>
-                        <div class="sim-stat-label">Period (s)</div>
+                        <div class="sim-stat-value orange" id="stat-time">0.0</div>
+                        <div class="sim-stat-label">Time (s)</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = 800, H = 500;
+        
+        let running = false, aid = null, lt = 0;
+        let showSrc = true, colorMode = false;
+        
+        let time = 0;
+        let sources = [];
+        
+        let params = {
+            frequency: 2.0,
+            amplitude: 30,
+            speed: 80,
+            damping: 0.002
+        };
+
+        const grid = 4;
+        const cols = Math.floor(W / grid);
+        const rows = Math.floor(H / grid);
+
+        canvas.addEventListener('click', (e) => {
+            if (sources.length >= 5) {
+                alert('Maximum 5 sources allowed!');
+                return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            sources.push({ x, y });
+            document.getElementById('stat-sources').textContent = sources.length;
+            if (!running) draw();
+        });
+
+        function updateParameter(p, v) {
+            document.getElementById(`val-${p}`).textContent = v;
+            params[p] = parseFloat(v);
+            updateStats();
+            if (!running) draw();
+        }
+
+        function updateStats() {
+            const wavelength = params.speed / params.frequency;
+            const period = 1 / params.frequency;
+            document.getElementById('stat-wavelength').textContent = wavelength.toFixed(1);
+            document.getElementById('stat-period').textContent = period.toFixed(2);
+            document.getElementById('stat-sources').textContent = sources.length;
+        }
+
+        function draw() {
+            const imageData = ctx.createImageData(W, H);
+            const data = imageData.data;
+            
+            const k = (2 * Math.PI * params.frequency) / params.speed;
+            const omega = 2 * Math.PI * params.frequency;
+            
+            for (let y = 0; y < H; y += grid) {
+                for (let x = 0; x < W; x += grid) {
+                    let totalAmp = 0;
+                    
+                    for (let src of sources) {
+                        const dx = x - src.x;
+                        const dy = y - src.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < 1) continue;
+                        
+                        const damping = Math.exp(-params.damping * dist);
+                        const phase = k * dist - omega * time;
+                        const amp = (params.amplitude / Math.sqrt(dist)) * Math.sin(phase) * damping;
+                        
+                        totalAmp += amp;
+                    }
+                    
+                    let intensity = Math.max(0, Math.min(255, 128 + totalAmp * 4));
+                    
+                    let r, g, b;
+                    if (colorMode) {
+                        if (totalAmp > 0) {
+                            r = Math.floor(255 * (intensity / 255));
+                            g = Math.floor(100 * (intensity / 255));
+                            b = Math.floor(50 * (intensity / 255));
+                        } else {
+                            r = Math.floor(50 * (intensity / 255));
+                            g = Math.floor(100 * (intensity / 255));
+                            b = Math.floor(255 * (intensity / 255));
+                        }
+                    } else {
+                        r = g = b = intensity;
+                    }
+                    
+                    for (let dy = 0; dy < grid && y + dy < H; dy++) {
+                        for (let dx = 0; dx < grid && x + dx < W; dx++) {
+                            const idx = ((y + dy) * W + (x + dx)) * 4;
+                            data[idx] = r;
+                            data[idx + 1] = g;
+                            data[idx + 2] = b;
+                            data[idx + 3] = 255;
+                        }
+                    }
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            
+            if (showSrc) {
+                sources.forEach((src, i) => {
+                    ctx.fillStyle = '#ffeb6b';
+                    ctx.beginPath();
+                    ctx.arc(src.x, src.y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText(`S${i + 1}`, src.x + 10, src.y - 10);
+                });
+            }
+            
+            document.getElementById('stat-time').textContent = time.toFixed(2);
+        }
+
+        function update(dt) {
+            time += dt;
+        }
+
+        function anim(t) {
+            if (!running) return;
+            if (lt === 0) lt = t;
+            const dt = (t - lt) / 1000;
+            lt = t;
+            if (dt < 0.1) {
+                update(dt);
+                draw();
+            }
+            aid = requestAnimationFrame(anim);
+        }
+
+        function startSimulation() {
+            if (sources.length === 0) {
+                alert('Click on the canvas to add wave sources first!');
+                return;
+            }
+            if (!running) {
+                running = true;
+                lt = 0;
+                document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = true);
+                anim(0);
+            }
+        }
+
+        function pauseSimulation() {
+            if (running) {
+                running = false;
+                cancelAnimationFrame(aid);
+                document.getElementById('pauseBtn').textContent = '▶️ Play';
+                document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = false);
+            } else if (sources.length > 0) {
+                running = true;
+                lt = 0;
+                document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+                document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = true);
+                anim(0);
+            }
+        }
+
+        function resetSimulation() {
+            running = false;
+            cancelAnimationFrame(aid);
+            time = 0;
+            lt = 0;
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            document.getElementById('stat-time').textContent = '0.0';
+            document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = false);
+            draw();
+        }
+
+        function clearSources() {
+            running = false;
+            cancelAnimationFrame(aid);
+            sources = [];
+            time = 0;
+            lt = 0;
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            document.getElementById('stat-sources').textContent = '0';
+            document.getElementById('stat-time').textContent = '0.0';
+            document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = false);
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, W, H);
+        }
+
+        function toggleSources() {
+            showSrc = !showSrc;
+            document.getElementById('toggle-sources').classList.toggle('active');
+            draw();
+        }
+
+        function toggleColor() {
+            colorMode = !colorMode;
+            document.getElementById('toggle-color').classList.toggle('active');
+            draw();
+        }
+
+        updateStats();
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, W, H);
+        
+        ctx.fillStyle = '#333';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Click to add wave sources', W / 2, H / 2);
+    </script>
 </body>
 </html>
