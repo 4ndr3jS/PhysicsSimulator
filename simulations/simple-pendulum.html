@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Pendulum - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="guide.html">Guide</a>
+            <a href="theory.html">Theory</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>⏱️ Simple Pendulum</h1>
+            <p>Explore simple harmonic motion and energy conservation with an interactive pendulum</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-easy">● Easy</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startPendulum()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pausePendulum()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetPendulum()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">T ≈ 2π√(L/g)</div>
+                        <div class="sim-formula-description">Period of pendulum (small angles)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F = -mg sin(θ)</div>
+                        <div class="sim-formula-description">Restoring force</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">E = mgh + ½mv²</div>
+                        <div class="sim-formula-description">Total mechanical energy</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Period is independent of mass</li>
+                        <li>Period increases with length</li>
+                        <li>Energy is conserved (no damping)</li>
+                        <li>Simple harmonic motion for small angles</li>
+                        <li>Maximum velocity at lowest point</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Double the length - what happens to period?</li>
+                        <li>Change mass - does period change?</li>
+                        <li>Try very small vs large angles</li>
+                        <li>Simulate Moon gravity (1.6 m/s²)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Rope Length</span>
+                            <span class="sim-control-value"><span id="val-length">250</span> px</span>
+                        </div>
+                        <input type="range" id="slider-length" min="100" max="350" value="250" oninput="updateParameter('length', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Ball Mass</span>
+                            <span class="sim-control-value"><span id="val-mass">10</span> kg</span>
+                        </div>
+                        <input type="range" id="slider-mass" min="5" max="30" value="10" oninput="updateParameter('mass', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Initial Angle</span>
+                            <span class="sim-control-value"><span id="val-angle">45</span>°</span>
+                        </div>
+                        <input type="range" id="slider-angle" min="5" max="85" value="45" oninput="updateParameter('angle', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Gravity</span>
+                            <span class="sim-control-value"><span id="val-gravity">1.0</span> m/s²</span>
+                        </div>
+                        <input type="range" id="slider-gravity" min="0.2" max="2.0" step="0.1" value="1.0" oninput="updateParameter('gravity', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Velocity Vector</span>
+                        <div class="sim-toggle-switch active" id="toggle-vector" onclick="toggleVector()"></div>
+                    </div>
+                </div>
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-period">0.00</div>
+                        <div class="sim-stat-label">Period (s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-currentAngle">0.0</div>
+                        <div class="sim-stat-label">Angle (°)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-velocity">0.00</div>
+                        <div class="sim-stat-label">Velocity (m/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-energy">0.00</div>
+                        <div class="sim-stat-label">Energy (J)</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { Engine, Render, World, Bodies, Constraint, Mouse, MouseConstraint, Runner, Body, Events } = Matter;
+        
+        const canvas = document.getElementById('simCanvas');
+        const canvasWidth = 800;
+        const canvasHeight = 500;
+        
+        let engine, render, runner, pendulum, anchor, constraint, mouseConstraint;
+        let isRunning = false;
+        let lastCrossing = 0;
+        let period = 0;
+        let showVector = true;
+        
+        let simState = {
+            length: 250,
+            mass: 10,
+            angle: 45,
+            gravity: 1.0
+        };
+
+        function init() {
+            engine = Engine.create();
+            engine.gravity.y = simState.gravity;
+            
+            render = Render.create({
+                canvas: canvas,
+                engine: engine,
+                options: {
+                    width: canvasWidth,
+                    height: canvasHeight,
+                    wireframes: false,
+                    background: '#0a0a0a'
+                }
+            });
+            
+            createPendulum();
+            
+            const mouse = Mouse.create(render.canvas);
+            mouseConstraint = MouseConstraint.create(engine, {
+                mouse: mouse,
+                constraint: {
+                    stiffness: 0.2,
+                    render: { visible: false }
+                }
+            });
+            
+            World.add(engine.world, mouseConstraint);
+            
+            Render.run(render);
+            runner = Runner.create();
+            
+            Events.on(engine, 'afterUpdate', updateStats);
+            
+            calculateTheoreticalPeriod();
+        }
+
+        function createPendulum() {
+            if (pendulum) {
+                World.remove(engine.world, [pendulum, anchor, constraint]);
+            }
+            
+            const anchorX = canvasWidth / 2;
+            const anchorY = 50;
+            
+            anchor = Bodies.circle(anchorX, anchorY, 8, {
+                isStatic: true,
+                render: { fillStyle: '#6b9eff' }
+            });
+            
+            const angleRad = (simState.angle * Math.PI) / 180;
+            const bobX = anchorX + simState.length * Math.sin(angleRad);
+            const bobY = anchorY + simState.length * Math.cos(angleRad);
+            
+            const bobRadius = Math.max(15, Math.min(25, simState.mass));
+            
+            pendulum = Bodies.circle(bobX, bobY, bobRadius, {
+                mass: simState.mass,
+                friction: 0,
+                frictionAir: 0.001,
+                restitution: 1,
+                render: { fillStyle: '#ff6b6b' }
+            });
+            
+            constraint = Constraint.create({
+                bodyA: anchor,
+                bodyB: pendulum,
+                length: simState.length,
+                stiffness: 1,
+                render: {
+                    strokeStyle: '#6b9eff',
+                    lineWidth: 3
+                }
+            });
+            
+            World.add(engine.world, [anchor, pendulum, constraint]);
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            simState[param] = parseFloat(value);
+            
+            if (param === 'gravity') {
+                engine.gravity.y = simState.gravity;
+            } else if (!isRunning) {
+                createPendulum();
+            }
+            
+            calculateTheoreticalPeriod();
+        }
+
+        function toggleVector() {
+            showVector = !showVector;
+            document.getElementById('toggle-vector').classList.toggle('active');
+        }
+
+        function startPendulum() {
+            if (!isRunning) {
+                Runner.run(runner, engine);
+                isRunning = true;
+                lastCrossing = 0;
+                
+                document.querySelectorAll('input[type="range"]').forEach(slider => {
+                    slider.disabled = true;
+                });
+            }
+        }
+
+        function pausePendulum() {
+            if (isRunning) {
+                Runner.stop(runner);
+                isRunning = false;
+                document.getElementById('pauseBtn').textContent = '▶️ Play';
+                
+                document.querySelectorAll('input[type="range"]').forEach(slider => {
+                    slider.disabled = false;
+                });
+            } else if (engine.timing.timestamp > 0) {
+                Runner.run(runner, engine);
+                isRunning = true;
+                document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+                
+                document.querySelectorAll('input[type="range"]').forEach(slider => {
+                    slider.disabled = true;
+                });
+            }
+        }
+
+        function resetPendulum() {
+            if (isRunning) {
+                Runner.stop(runner);
+                isRunning = false;
+            }
+            
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            lastCrossing = 0;
+            period = 0;
+            document.getElementById('stat-period').textContent = '0.00';
+            
+            Engine.clear(engine);
+            World.clear(engine.world);
+            
+            engine.timing.timestamp = 0;
+            
+            createPendulum();
+            
+            const mouse = Mouse.create(render.canvas);
+            mouseConstraint = MouseConstraint.create(engine, {
+                mouse: mouse,
+                constraint: {
+                    stiffness: 0.2,
+                    render: { visible: false }
+                }
+            });
+            
+            World.add(engine.world, mouseConstraint);
+            
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                slider.disabled = false;
+            });
+            
+            calculateTheoreticalPeriod();
+        }
+
+        function updateStats() {
+            if (!pendulum || !anchor) return;
+            
+            const angle = Math.atan2(
+                pendulum.position.x - anchor.position.x,
+                pendulum.position.y - anchor.position.y
+            ) * (180 / Math.PI);
+            
+            document.getElementById('stat-currentAngle').textContent = angle.toFixed(1) + '°';
+            
+            const velocity = Math.sqrt(
+                pendulum.velocity.x ** 2 + pendulum.velocity.y ** 2
+            );
+            document.getElementById('stat-velocity').textContent = velocity.toFixed(2);
+            
+            const height = anchor.position.y - pendulum.position.y;
+            
+            if (Math.abs(angle) < 1 && pendulum.velocity.x < 0) {
+                if (lastCrossing > 0) {
+                    const currentTime = engine.timing.timestamp;
+                    const periodTime = (currentTime - lastCrossing) / 1000;
+                    if (periodTime > 0.5 && periodTime < 10) {
+                        period = periodTime * 2;
+                        document.getElementById('stat-period').textContent = period.toFixed(2);
+                    }
+                }
+                lastCrossing = engine.timing.timestamp;
+            }
+            
+            drawVector();
+        }
+
+        let smoothedVelocity = { x: 0, y: 0 };
+        const smoothingFactor = 0.15;
+
+        function drawVector() {
+            const ctx = render.context;
+            
+            if (showVector && pendulum && isRunning) {
+                smoothedVelocity.x += (pendulum.velocity.x - smoothedVelocity.x) * smoothingFactor;
+                smoothedVelocity.y += (pendulum.velocity.y - smoothedVelocity.y) * smoothingFactor;
+                
+                const scale = 12;
+                
+                ctx.strokeStyle = '#ffeb6b';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(pendulum.position.x, pendulum.position.y);
+                ctx.lineTo(
+                    pendulum.position.x + smoothedVelocity.x * scale,
+                    pendulum.position.y + smoothedVelocity.y * scale
+                );
+                ctx.stroke();
+            }
+        }
+
+        function calculateTheoreticalPeriod() {
+            const lengthMeters = simState.length / 100;
+            const gravityReal = simState.gravity * 9.8;
+            const theoreticalPeriod = 2 * Math.PI * Math.sqrt(lengthMeters / gravityReal);
+        }
+
+        init();
+    </script>
+</body>
+</html>
