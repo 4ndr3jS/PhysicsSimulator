@@ -19,11 +19,329 @@
     </ul>
 </nav>
 
-<div class="sim-container">
-    <div class="sim-header">
-        <h1>🌀 Circular Motion</h1>
-        <p>Explore velocity and centripetal force in uniform circular motion</p>
-        <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🌀 Circular Motion</h1>
+            <p>Explore velocity and centripetal force in uniform circular motion</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <!-- FORMULAS -->
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">v = ωr</div>
+                        <div class="sim-formula-description">Tangential Velocity</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">a = v² / r</div>
+                        <div class="sim-formula-description">Centripetal Acceleration</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F = mv² / r</div>
+                        <div class="sim-formula-description">Centripetal Force</div>
+                    </div>
+                </div>
+
+                <!-- CONCEPTS -->
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Velocity is always tangent to the circle</li>
+                        <li>Centripetal force points toward the center</li>
+                        <li>Speed can be constant while velocity changes</li>
+                        <li>Smaller radius → larger centripetal acceleration</li>
+                        <li>Force increases with speed squared</li>
+                    </ul>
+                </div>
+
+                <!-- TRY THIS -->
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Increase speed and observe force growth</li>
+                        <li>Reduce radius and compare acceleration</li>
+                        <li>Toggle force and velocity vectors</li>
+                        <li>Pause and inspect vector directions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Object Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Mass</span>
+                            <span class="sim-control-value"><span id="val-mass1">5</span> kg</span>
+                        </div>
+                        <input type="range" id="slider-mass1" min="1" max="20" value="5" oninput="updateParameter('mass1', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Radius</span>
+                            <span class="sim-control-value"><span id="val-radius">120</span> px</span>
+                        </div>
+                        <input type="range" id="slider-radius" min="60" max="200" value="120" oninput="updateParameter('radius', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Angular Speed</span>
+                            <span class="sim-control-value"><span id="val-speed">0.04</span> rad/s</span>
+                        </div>
+                        <input type="range" id="slider-speed" min="0.01" max="0.1" step="0.01" value="0.04" oninput="updateParameter('speed', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Velocity Vector</span>
+                        <div class="sim-toggle-switch active" id="toggle-vector" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Centripetal Force</span>
+                        <div class="sim-toggle-switch active" id="toggle-force" onclick="toggleForce()"></div>
+                    </div>
+                </div>
+
+                <!-- STATS -->
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-speed">0.0</div>
+                        <div class="sim-stat-label">Speed (m/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-acc">0.0</div>
+                        <div class="sim-stat-label">Centripetal Acceleration</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value red" id="stat-force">0.0</div>
+                        <div class="sim-stat-label">Centripetal Force</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        const { Engine, Render, World, Bodies, Body, Events, Runner } = Matter;
+
+        const canvas = document.getElementById("simCanvas");
+
+        const engine = Engine.create();
+        engine.gravity.y = 0;
+
+        const render = Render.create({
+            canvas: canvas,
+            engine: engine,
+            options: {
+                width: 800,
+                height: 500,
+                wireframes: false,
+                background: "#0a0a0a"
+            }
+        });
+
+        Render.run(render);
+
+        const runner = Runner.create();
+
+        const center = { x: 400, y: 250 };
+
+        let simState = {
+            mass1: 5,
+            radius: 120,
+            speed: 0.04
+        };
+
+        let angle = 0;
+        let isRunning = false;
+        let showVectors = true;
+        let showForce = true;
+
+        const particle = Bodies.circle(
+            center.x + simState.radius,
+            center.y,
+            10,
+            {
+                inertia: Infinity,
+                friction: 0,
+                frictionAir: 0,
+                restitution: 1,
+                render: { fillStyle: "#ffffff" }
+            }
+        );
+
+        World.add(engine.world, particle);
+
+        let lastPosition = {
+            x: particle.position.x,
+            y: particle.position.y
+        };
+
+        function drawArrow(ctx, x1, y1, x2, y2, color) {
+            const head = 10;
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(
+                x2 - head * Math.cos(angle - Math.PI / 6),
+                y2 - head * Math.sin(angle - Math.PI / 6)
+            );
+            ctx.lineTo(
+                x2 - head * Math.cos(angle + Math.PI / 6),
+                y2 - head * Math.sin(angle + Math.PI / 6)
+            );
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        Events.on(engine, "beforeUpdate", () => {
+            if (!isRunning) return;
+
+            angle += simState.speed;
+
+            const x = center.x + simState.radius * Math.cos(angle);
+            const y = center.y + simState.radius * Math.sin(angle);
+
+            Body.setPosition(particle, { x, y });
+            lastPosition = { x, y };
+
+            const v = simState.speed * simState.radius;
+            const a = (v * v) / simState.radius;
+            const F = simState.mass1 * a;
+
+            document.getElementById("stat-speed").textContent = v.toFixed(2);
+            document.getElementById("stat-acc").textContent = a.toFixed(2);
+            document.getElementById("stat-force").textContent = F.toFixed(2);
+        });
+
+
+        Events.on(render, "afterRender", () => {
+            const ctx = render.context;
+            const { x, y } = lastPosition;
+
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, simState.radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (showVectors) {
+                const vx = -Math.sin(angle) * 60;
+                const vy =  Math.cos(angle) * 60;
+                drawArrow(ctx, x, y, x + vx, y + vy, "#ffeb6b");
+            }
+
+            if (showForce) {
+                drawArrow(ctx, x, y, center.x, center.y, "#ff6b6b");
+            }
+        });
+
+        function startSimulation() {
+            if (!isRunning) {
+                Runner.run(runner, engine);
+                isRunning = true;
+            }
+        }
+
+        function pauseSimulation() {
+            if (isRunning) {
+                Runner.stop(runner);
+                isRunning = false;
+                document.getElementById("pauseBtn").textContent = "▶️ Play";
+            } else {
+                Runner.run(runner, engine);
+                isRunning = true;
+                document.getElementById("pauseBtn").textContent = "⏸️ Pause";
+            }
+        }
+
+        function resetSimulation() {
+            Runner.stop(runner);
+            isRunning = false;
+            angle = 0;
+
+            const x = center.x + simState.radius;
+            const y = center.y;
+
+            Body.setPosition(particle, { x, y });
+            lastPosition = { x, y };
+
+            document.getElementById("pauseBtn").textContent = "⏸️ Pause";
+        }
+
+        function updateParameter(param, value) {
+            value = parseFloat(value);
+
+            if (param === "mass1") {
+                simState.mass1 = value;
+                document.getElementById("val-mass1").textContent = value;
+            }
+
+            if (param === "radius") {
+                simState.radius = value;
+                document.getElementById("val-radius").textContent = value;
+            }
+
+            if (param === "speed") {
+                simState.speed = value;
+                document.getElementById("val-speed").textContent = value;
+            }
+        }
+
+        function toggleVectors() {
+            showVectors = !showVectors;
+            document.getElementById("toggle-vector").classList.toggle("active");
+        }
+
+        function toggleForce() {
+            showForce = !showForce;
+            document.getElementById("toggle-force").classList.toggle("active");
+        }
+    </script>
 </body>
 </html>
