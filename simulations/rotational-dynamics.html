@@ -24,7 +24,181 @@
             <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-hard">● Hard</span></p>
         </div>
 
-        
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="applyImpulse()">⚡Apply Torque</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">τ = r × F</div>
+                        <div class="sim-formula-description">Torque</div>
+                    </div>
+                    
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">I = Σ m × r²</div>
+                        <div class="sim-formula-description">Moment of Inertia</div>
+                    </div>
+
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">L = I × ω</div>
+                        <div class="sim-formula-description">Angular Momentum</div>
+                    </div>
+
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">α = τ / I</div>
+                        <div class="sim-formula-description">Angular Acceleration</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Torque causes angular acceleration</li>
+                        <li>Mass farther from center = higher inertia</li>
+                        <li>Angular momentum is conserverd</li>
+                        <li>Friction opposes rotational motion</li>
+                        <li>Energy converts between rotational and translational</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div classs="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Add masses at different radii</li>
+                        <li>Compare rotation with masses near vs far</li>
+                        <li>Apply torque and observe acceleration</li>
+                        <li>Try with aand without friction</li>
+                        <li>Watch inertia change with distribution</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>System Parameters</span>
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Disk Radius</span>
+                            <span class="sim-control-value"><span id="val-radius">100</span> px</span>
+                        </div>
+                        <input type="range" id="slider-radius" min="60" max="150" value="100" oninput="updateParameter('radius', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Initial ω</span>
+                            <span class="sim-control-value"><span id="val-omega">1.0</span> rad/s</span>
+                        </div>
+                        <input type="range" id="slider-omega" min="0" max="5" step="0.1" value="1.0" oninput="updateParameter('omega', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Friction</span>
+                            <span class="sim-control-value"><span id="val-friction">0.05</span></span>
+                        </div>
+                        <input type="range" id="slider-friction" min="0" max="0.2" step="0.01" value="0.05" oninput="updateParameter('friction', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-panel-header" style="margin-top: 1rem;">
+                        <span class="sim-panel-icon">⚪</span>
+                        <span>Point Masses</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Mass 1 (Red)</span>
+                            <span class="sim-control-value"><span id="val-mass1">5</span> kg</span>
+                        </div>
+                        <input type="range" id="slider-mass1" min="0" max="10" step="0.5" value="5" oninput="updateParameter('mass1', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Distance 1</span>
+                            <span class="sim-control-value"><span id="val-dist1">0.7</span> × R</span>
+                        </div>
+                        <input type="range" id="slider-dist1" min="0.3" max="0.9" step="0.1" value="0.7" oninput="updateParameter('dist1', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Mass 2 (Blue)</span>
+                            <span class="sim-control-value"><span id="val-mass2">5</span> kg</span>
+                        </div>
+                        <input type="range" id="slider-mass2" min="0" max="10" step="0.5" value="5" oninput="updateParameter('mass2', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Distance 2</span>
+                            <span class="sim-control-value"><span id="val-dist2">0.7</span> × R</span>
+                        </div>
+                        <input type="range" id="slider-dist2" min="0.3" max="0.9" step="0.1" value="0.7" oninput="updateParameter('dist2', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Velocity Vectors</span>
+                        <div class="sim-toggle-switch active" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Angular Momentum</span>
+                        <div class="sim-toggle-switch active" id="toggle-momentum" onclick="toggleMomentum()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Trail</span>
+                        <div class="sim-toggle-switch" id="toggle-trail" onclick="toggleTrail()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-omega">0.0</div>
+                        <div class="sim-stat-label">Angular Velocity (rad/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-inertia">0.0</div>
+                        <div class="sim-stat-label">Moment of Inertia (kg·m²)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-momentum">0.0</div>
+                        <div class="sim-stat-label">Angular Momentum (kg·m²/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-energy">0.0</div>
+                        <div class="sim-stat-label">Rotational KE (J)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
