@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile Motion - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="guide.html">Guide</a>
+            <a href="theory.html">Theory</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🎯 Projectile Motion</h1>
+            <p>Launch projectiles at different angles and velocities to explore parabolic trajectories</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-easy">● Easy</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="launchProjectile()">🚀 Launch</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">x = v₀ cos(θ) · t</div>
+                        <div class="sim-formula-description">Horizontal position</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">y = v₀ sin(θ) · t − ½gt²</div>
+                        <div class="sim-formula-description">Vertical position</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Range = v₀² sin(2θ) / g</div>
+                        <div class="sim-formula-description">Maximum horizontal distance</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>45° angle gives maximum range on flat ground</li>
+                        <li>Trajectory is always parabolic</li>
+                        <li>Horizontal velocity remains constant</li>
+                        <li>Vertical motion has constant acceleration</li>
+                        <li>Time to peak equals time from peak to ground</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Compare 30° vs 60° angles - same range?</li>
+                        <li>What angle gives maximum height?</li>
+                        <li>Set gravity to 1.6 (Moon gravity)</li>
+                        <li>Launch at 90° - what happens?</li>
+                        <li>Find the optimal angle for max distance</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Initial Velocity</span>
+                            <span class="sim-control-value"><span id="val-velocity">30</span> m/s</span>
+                        </div>
+                        <input type="range" id="slider-velocity" min="5" max="60" value="30" oninput="updateParameter('velocity', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Launch Angle</span>
+                            <span class="sim-control-value"><span id="val-angle">45</span>°</span>
+                        </div>
+                        <input type="range" id="slider-angle" min="0" max="90" value="45" oninput="updateParameter('angle', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Gravity</span>
+                            <span class="sim-control-value"><span id="val-gravity">9.81</span> m/s²</span>
+                        </div>
+                        <input type="range" id="slider-gravity" min="1" max="20" value="9.81" step="0.01" oninput="updateParameter('gravity', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Trail</span>
+                        <div class="sim-toggle-switch active" id="toggle-trail" onclick="toggleTrail()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Velocity Vector</span>
+                        <div class="sim-toggle-switch active" id="toggle-vector" onclick="toggleVector()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Grid</span>
+                        <div class="sim-toggle-switch active" id="toggle-grid" onclick="toggleGrid()"></div>
+                    </div>
+                </div>
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-maxHeight">0.00</div>
+                        <div class="sim-stat-label">Max Height (m)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-range">0.00</div>
+                        <div class="sim-stat-label">Range (m)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-time">0.00</div>
+                        <div class="sim-stat-label">Time (s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-velocity">0.00</div>
+                        <div class="sim-stat-label">Velocity (m/s)</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            time: 0,
+            startTime: 0,
+            projectile: { x: 50, y: 0 },
+            trail: [],
+            velocity: 30,
+            angle: 45,
+            gravity: 9.81,
+            vx: 0,
+            vy: 0,
+            showTrail: true,
+            showVector: true,
+            showGrid: true,
+            scale: 5,
+            stats: { maxHeight: 0, range: 0, flightTime: 0 }
+        };
+
+        let animationId = null;
+
+        function init() {
+            drawCanvas();
+            calculateStats();
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            simState[param] = parseFloat(value);
+            
+            if (!simState.isRunning) {
+                drawCanvas();
+                calculateStats();
+            }
+        }
+
+        function toggleTrail() {
+            simState.showTrail = !simState.showTrail;
+            document.getElementById('toggle-trail').classList.toggle('active');
+        }
+
+        function toggleVector() {
+            simState.showVector = !simState.showVector;
+            document.getElementById('toggle-vector').classList.toggle('active');
+            if (!simState.isRunning) drawCanvas();
+        }
+
+        function toggleGrid() {
+            simState.showGrid = !simState.showGrid;
+            document.getElementById('toggle-grid').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function launchProjectile() {
+            resetSimulation();
+            const rad = (simState.angle * Math.PI) / 180;
+            simState.vx = simState.velocity * Math.cos(rad);
+            simState.vy = simState.velocity * Math.sin(rad);
+            simState.isRunning = true;
+            simState.isPaused = false;
+            simState.startTime = Date.now();
+            animate();
+
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                slider.disabled = true;
+            });
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                simState.startTime = Date.now() - (simState.time * 1000);
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.time = 0;
+            simState.projectile = { x: 50, y: 0 };
+            simState.trail = [];
+            cancelAnimationFrame(animationId);
+            
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            document.getElementById('stat-time').textContent = '0.00';
+            document.getElementById('stat-velocity').textContent = '0.00';
+
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                slider.disabled = false;
+            });
+            
+            drawCanvas();
+            calculateStats();
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            const elapsed = (Date.now() - simState.startTime) / 1000;
+            simState.time = elapsed;
+
+            const x = 50 + simState.vx * elapsed * simState.scale;
+            const y = simState.vy * elapsed - 0.5 * simState.gravity * elapsed * elapsed;
+            const yPos = y * simState.scale;
+
+            if (y < 0) {
+                simState.isRunning = false;
+                simState.projectile = { x, y: 0 };
+                drawCanvas();
+ 
+                document.querySelectorAll('input[type="range"]').forEach(slider => {
+                    slider.disabled = false;
+                });
+                return;
+            }
+            
+            simState.projectile = { x, y: yPos };
+
+            if (simState.showTrail) {
+                simState.trail.push({ x, y: yPos });
+                if (simState.trail.length > 500) simState.trail.shift();
+            }
+
+            const currentVelocity = Math.sqrt(
+                simState.vx ** 2 + 
+                (simState.vy - simState.gravity * elapsed) ** 2
+            );
+            document.getElementById('stat-time').textContent = elapsed.toFixed(2);
+            document.getElementById('stat-velocity').textContent = currentVelocity.toFixed(2);
+            
+            drawCanvas();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (simState.showGrid) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < canvas.width; i += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, canvas.height);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < canvas.height; i += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(canvas.width, i);
+                    ctx.stroke();
+                }
+            }
+
+            ctx.fillStyle = '#2a2a4a';
+            ctx.fillRect(0, canvas.height - 2, canvas.width, 2);
+
+            if (simState.showTrail && simState.trail.length > 1) {
+                ctx.strokeStyle = 'rgba(107, 158, 255, 0.6)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(simState.trail[0].x, canvas.height - simState.trail[0].y);
+                for (let i = 1; i < simState.trail.length; i++) {
+                    ctx.lineTo(simState.trail[i].x, canvas.height - simState.trail[i].y);
+                }
+                ctx.stroke();
+            }
+
+            if (simState.showVector && !simState.isRunning) {
+                const rad = (simState.angle * Math.PI) / 180;
+                const vectorLength = simState.velocity * 2;
+                
+                ctx.strokeStyle = '#6b9eff';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(50, canvas.height);
+                ctx.lineTo(
+                    50 + vectorLength * Math.cos(rad),
+                    canvas.height - vectorLength * Math.sin(rad)
+                );
+                ctx.stroke();
+
+                const endX = 50 + vectorLength * Math.cos(rad);
+                const endY = canvas.height - vectorLength * Math.sin(rad);
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(
+                    endX - 10 * Math.cos(rad - Math.PI/6),
+                    endY + 10 * Math.sin(rad - Math.PI/6)
+                );
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(
+                    endX - 10 * Math.cos(rad + Math.PI/6),
+                    endY + 10 * Math.sin(rad + Math.PI/6)
+                );
+                ctx.stroke();
+            }
+
+            const canvasY = canvas.height - simState.projectile.y;
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(simState.projectile.x, canvasY, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (simState.isRunning && simState.showVector) {
+                const currentVy = simState.vy - simState.gravity * simState.time;
+                const velMag = Math.sqrt(simState.vx ** 2 + currentVy ** 2);
+                const velAngle = Math.atan2(currentVy, simState.vx);
+                const vecLen = velMag * 1.5;
+                
+                ctx.strokeStyle = '#ffeb6b';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(simState.projectile.x, canvasY);
+                ctx.lineTo(
+                    simState.projectile.x + vecLen * Math.cos(velAngle),
+                    canvasY - vecLen * Math.sin(velAngle)
+                );
+                ctx.stroke();
+            }
+        }
+
+        function calculateStats() {
+            const rad = (simState.angle * Math.PI) / 180;
+            const vx = simState.velocity * Math.cos(rad);
+            const vy = simState.velocity * Math.sin(rad);
+            
+            const flightTime = (2 * vy) / simState.gravity;
+            const maxHeight = (vy * vy) / (2 * simState.gravity);
+            const range = vx * flightTime;
+            
+            simState.stats = { maxHeight, range, flightTime };
+            
+            document.getElementById('stat-maxHeight').textContent = maxHeight.toFixed(2);
+            document.getElementById('stat-range').textContent = range.toFixed(2);
+        }
+
+        init();
+    </script>
+</body>
+</html>
