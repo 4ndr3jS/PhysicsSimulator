@@ -175,5 +175,353 @@
             </div>
         </div>
     </div>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = 800, H = 500;
+        const CY = H / 2;
+        
+        let running = false, aid = null;
+        let showFocal = true, showNormals = false, showTrails = true;
+        
+        let params = {
+            n: 1.5,
+            curvature: 150,
+            thickness: 150,
+            rays: 9,
+            speed: 1.5
+        };
+
+        let rays = [];
+        let raySpawnTimer = 0;
+        let lensX = 500;
+
+        class Ray {
+            constructor(y) {
+                this.segments = [];
+                this.currentSegment = 0;
+                this.progress = 0;
+                this.startY = y;
+                this.color = '#ffeb6b';
+                this.active = true;
+                this.normal = null;
+                
+                this.calculatePath();
+            }
+
+            calculatePath() {
+                const intersectionPoint = this.findIntersection(this.startY);
+                
+                if (!intersectionPoint) {
+                    this.segments.push({
+                        x1: 0,
+                        y1: this.startY,
+                        x2: W,
+                        y2: this.startY,
+                        type: 'miss'
+                    });
+                    return;
+                }
+
+                this.segments.push({
+                    x1: 0,
+                    y1: this.startY,
+                    x2: intersectionPoint.x,
+                    y2: intersectionPoint.y,
+                    type: 'incident'
+                });
+
+                const dx = intersectionPoint.x - (lensX - params.curvature);
+                const dy = intersectionPoint.y - CY;
+                const normalAngle = Math.atan2(dy, dx);
+                this.normal = { x: intersectionPoint.x, y: intersectionPoint.y, angle: normalAngle };
+
+                const incidentAngle = 0;
+                const theta1 = normalAngle - incidentAngle;
+                const sinTheta2 = (1.0 / params.n) * Math.sin(theta1);
+                
+                if (Math.abs(sinTheta2) > 1) {
+                    this.active = false;
+                    return;
+                }
+                
+                const theta2 = Math.asin(sinTheta2);
+                const refractedAngle = normalAngle - theta2;
+
+                const travelDist = params.thickness;
+                const endX = intersectionPoint.x + travelDist * Math.cos(refractedAngle);
+                const endY = intersectionPoint.y + travelDist * Math.sin(refractedAngle);
+
+                this.segments.push({
+                    x1: intersectionPoint.x,
+                    y1: intersectionPoint.y,
+                    x2: endX,
+                    y2: endY,
+                    type: 'inside'
+                });
+
+                this.segments.push({
+                    x1: endX,
+                    y1: endY,
+                    x2: W,
+                    y2: endY + (W - endX) * Math.tan(refractedAngle),
+                    type: 'exit'
+                });
+            }
+
+            findIntersection(y) {
+                const centerX = lensX - params.curvature;
+                const centerY = CY;
+                const radius = params.curvature;
+
+                const dy = y - centerY;
+                if (Math.abs(dy) > radius) {
+                    return null;
+                }
+
+                const dx = Math.sqrt(radius * radius - dy * dy);
+                const intersectX = centerX + dx;
+
+                return { x: intersectX, y: y };
+            }
+
+            update(dt) {
+                if (!this.active || this.currentSegment >= this.segments.length) {
+                    this.active = false;
+                    return;
+                }
+
+                const segment = this.segments[this.currentSegment];
+                const length = Math.sqrt((segment.x2 - segment.x1) ** 2 + (segment.y2 - segment.y1) ** 2);
+                const speed = params.speed * (segment.type === 'inside' ? (1 / params.n) : 1);
+                
+                this.progress += (speed / length) * dt * 60;
+
+                if (this.progress >= 1) {
+                    this.progress = 0;
+                    this.currentSegment++;
+                }
+            }
+
+            draw() {
+                for (let i = 0; i < this.currentSegment; i++) {
+                    const seg = this.segments[i];
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2;
+                    ctx.globalAlpha = showTrails ? 0.6 : 0.3;
+                    ctx.beginPath();
+                    ctx.moveTo(seg.x1, seg.y1);
+                    ctx.lineTo(seg.x2, seg.y2);
+                    ctx.stroke();
+                }
+                if (this.currentSegment < this.segments.length) {
+                    const seg = this.segments[this.currentSegment];
+                    const currentX = seg.x1 + (seg.x2 - seg.x1) * this.progress;
+                    const currentY = seg.y1 + (seg.y2 - seg.y1) * this.progress;
+
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2;
+                    ctx.globalAlpha = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(seg.x1, seg.y1);
+                    ctx.lineTo(currentX, currentY);
+                    ctx.stroke();
+
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = 1;
+                    ctx.beginPath();
+                    ctx.arc(currentX, currentY, 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    const gradient = ctx.createRadialGradient(currentX, currentY, 0, currentX, currentY, 8);
+                    gradient.addColorStop(0, 'rgba(255, 235, 107, 0.8)');
+                    gradient.addColorStop(1, 'rgba(255, 235, 107, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(currentX, currentY, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                if (showNormals && this.normal && this.currentSegment >= 1) {
+                    ctx.strokeStyle = '#ff6b6b';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([3, 3]);
+                    ctx.beginPath();
+                    const len = 30;
+                    ctx.moveTo(this.normal.x - len * Math.cos(this.normal.angle), 
+                              this.normal.y - len * Math.sin(this.normal.angle));
+                    ctx.lineTo(this.normal.x + len * Math.cos(this.normal.angle), 
+                              this.normal.y + len * Math.sin(this.normal.angle));
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, W, H);
+
+
+            const centerX = lensX - params.curvature;
+            const centerY = CY;
+            const radius = params.curvature;
+
+            const angleSpan = Math.asin(Math.min(1, 250 / radius));
+
+            ctx.fillStyle = 'rgba(100, 150, 255, 0.2)';
+            ctx.beginPath();
+            
+            ctx.arc(centerX, centerY, radius, -angleSpan, angleSpan);
+
+            const topY = centerY - radius * Math.sin(angleSpan);
+            const bottomY = centerY + radius * Math.sin(angleSpan);
+            ctx.lineTo(lensX + params.thickness, bottomY);
+            ctx.lineTo(lensX + params.thickness, topY);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = '#6b9eff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, CY);
+            ctx.lineTo(W, CY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            if (showFocal) {
+                const f = params.curvature * params.n / (params.n - 1);
+                const focalX = lensX + f;
+
+                if (focalX < W && focalX > lensX) {
+                    ctx.strokeStyle = '#ff6b6b';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(focalX, CY - 30);
+                    ctx.lineTo(focalX, CY + 30);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.fillStyle = '#ff6b6b';
+                    ctx.font = '14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('F', focalX, CY + 50);
+                }
+            }
+
+            rays.forEach(ray => ray.draw());
+
+            const activeRays = rays.filter(r => r.active).length;
+            const f = params.curvature * params.n / (params.n - 1);
+            const speedRatio = (1 / params.n).toFixed(3);
+            
+            let maxAngle = 0;
+            rays.forEach(ray => {
+                if (ray.normal) {
+                    const angle = Math.abs(ray.normal.angle * 180 / Math.PI);
+                    maxAngle = Math.max(maxAngle, angle);
+                }
+            });
+            
+            document.getElementById('stat-focal').textContent = f.toFixed(1);
+            document.getElementById('stat-active').textContent = activeRays;
+            document.getElementById('stat-speed').textContent = speedRatio;
+            document.getElementById('stat-angle').textContent = maxAngle.toFixed(1) + '°';
+        }
+
+        function update(dt) {
+            rays.forEach(ray => ray.update(dt));
+
+            rays = rays.filter(r => r.active);
+
+            if (running) {
+                raySpawnTimer += dt;
+                if (raySpawnTimer > 0.4) {
+                    raySpawnTimer = 0;
+                    const spacing = 400 / (params.rays - 1);
+                    const startY = CY - 200;
+                    
+                    for (let i = 0; i < params.rays; i++) {
+                        const y = startY + i * spacing;
+                        rays.push(new Ray(y));
+                    }
+                }
+            }
+        }
+
+        function anim() {
+            if (!running) return;
+            update(0.016);
+            draw();
+            aid = requestAnimationFrame(anim);
+        }
+
+        function startSimulation() {
+            if (!running) {
+                running = true;
+                rays = [];
+                raySpawnTimer = 0;
+                anim();
+            }
+        }
+
+        function pauseSimulation() {
+            if (running) {
+                running = false;
+                cancelAnimationFrame(aid);
+                document.getElementById('pauseBtn').textContent = '▶️ Play';
+            } else {
+                running = true;
+                document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+                anim();
+            }
+        }
+
+        function resetSimulation() {
+            running = false;
+            cancelAnimationFrame(aid);
+            rays = [];
+            raySpawnTimer = 0;
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            draw();
+        }
+
+        function updateParameter(p, v) {
+            document.getElementById(`val-${p}`).textContent = v;
+            params[p] = parseFloat(v);
+            
+            rays = [];
+            raySpawnTimer = 0;
+            
+            draw();
+        }
+
+        function toggleFocal() {
+            showFocal = !showFocal;
+            document.getElementById('toggle-focal').classList.toggle('active');
+            draw();
+        }
+
+        function toggleNormals() {
+            showNormals = !showNormals;
+            document.getElementById('toggle-normals').classList.toggle('active');
+            draw();
+        }
+
+        function toggleTrails() {
+            showTrails = !showTrails;
+            document.getElementById('toggle-trails').classList.toggle('active');
+            draw();
+        }
+
+        draw();
+    </script>
 </body>
 </html>
