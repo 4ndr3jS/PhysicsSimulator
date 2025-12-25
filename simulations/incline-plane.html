@@ -81,7 +81,7 @@
                     <ul class="sim-info-list">
                         <li>Find the critical angle where motion starts</li>
                         <li>Compare motion with and without friction</li>
-                        <li>Try a 45° angle - is it half as fast as 90°?</li>
+                        <li>Try a 30° angle - is it half as fast as 60°?</li>
                         <li>Set friction to maximum and increase angle</li>
                         <li>Observe force vectors as you change angle</li>
                     </ul>
@@ -159,5 +159,319 @@
         </div>
     </div>
 
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasWidth = 800;
+        const canvasHeight = 500;
+        
+        let isRunning = false;
+        let animationId = null;
+        let lastTime = 0;
+        
+        let showVectors = true;
+        let showGrid = true;
+        
+        const g = 9.8;
+        const pixelsPerMeter = 40;
+        
+        let simState = {
+            angle: 30,
+            mass: 10,
+            friction: 0.2,
+            position: 0,
+            velocity: 0,
+            time: 0
+        };
+
+        function init() {
+            drawScene();
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            simState[param] = parseFloat(value);
+            
+            if (!isRunning) {
+                drawScene();
+            }
+        }
+
+        function calculateForces() {
+            const angleRad = simState.angle * Math.PI / 180;
+            
+            const weight = simState.mass * g;
+            const forceParallel = weight * Math.sin(angleRad);
+            const normalForce = weight * Math.cos(angleRad);
+            const frictionForce = simState.friction * normalForce;
+            
+            let netForce = forceParallel - frictionForce;
+            
+            const acceleration = netForce / simState.mass;
+            
+            return {
+                weight,
+                forceParallel,
+                normalForce,
+                frictionForce,
+                netForce,
+                acceleration,
+                angleRad
+            };
+        }
+
+        function drawScene() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            if (showGrid) {
+                drawGrid();
+            }
+            
+            const forces = calculateForces();
+            
+            const planeLength = 600;
+            const planeStartX = 100;
+            const planeStartY = 100;
+            const planeEndX = planeStartX + planeLength * Math.cos(forces.angleRad);
+            const planeEndY = planeStartY + planeLength * Math.sin(forces.angleRad);
+            
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(planeStartX, planeStartY);
+            ctx.lineTo(planeEndX, planeEndY);
+            ctx.stroke();
+            
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < planeLength; i += 40) {
+                const x = planeStartX + i * Math.cos(forces.angleRad);
+                const y = planeStartY + i * Math.sin(forces.angleRad);
+                const perpX = -10 * Math.sin(forces.angleRad);
+                const perpY = 10 * Math.cos(forces.angleRad);
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + perpX, y + perpY);
+                ctx.stroke();
+            }
+            
+            const boxSize = 30 + simState.mass * 0.5;
+            const boxX = planeStartX + simState.position * Math.cos(forces.angleRad);
+            const boxY = planeStartY + simState.position * Math.sin(forces.angleRad);
+            
+            ctx.save();
+            ctx.translate(boxX, boxY);
+            ctx.rotate(forces.angleRad);
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(-boxSize/2, -boxSize/2, boxSize, boxSize);
+            
+            ctx.restore();
+            
+            if (showVectors) {
+                drawForceVectors(boxX, boxY, forces);
+            }
+            
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.arc(planeStartX, planeStartY, 60, 0, forces.angleRad, false);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = '#6b9eff';
+            ctx.font = '16px sans-serif';
+            ctx.fillText(`${simState.angle}°`, planeStartX + 70, planeStartY + 30);
+            
+        }
+
+        function drawForceVectors(x, y, forces) {
+            const scale = 2;
+            
+            ctx.save();
+            ctx.translate(x, y);
+            
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 3;
+            drawArrow(0, 0, 0, forces.weight * scale, '#ff6b6b');
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Fg', 15, forces.weight * scale / 2);
+            
+            ctx.strokeStyle = '#6bffb4';
+            ctx.lineWidth = 3;
+            const normalX = forces.normalForce * scale * Math.sin(forces.angleRad);
+            const normalY = -forces.normalForce * scale * Math.cos(forces.angleRad);
+            drawArrow(0, 0, normalX, normalY, '#6bffb4');
+            ctx.fillStyle = '#6bffb4';
+            ctx.fillText('FN', normalX / 2 + 10, normalY / 2);
+
+            ctx.strokeStyle = '#ffeb6b';
+            ctx.lineWidth = 3;
+            const parallelX = forces.forceParallel * scale * Math.cos(forces.angleRad);
+            const parallelY = forces.forceParallel * scale * Math.sin(forces.angleRad);
+            drawArrow(0, 0, parallelX, parallelY, '#ffeb6b');
+            ctx.fillStyle = '#ffeb6b';
+            ctx.fillText('F‖', parallelX / 2, parallelY / 2 + 15);
+            
+            ctx.strokeStyle = '#b56bff';
+            ctx.lineWidth = 3;
+            const frictionX = -forces.frictionForce * scale * Math.cos(forces.angleRad);
+            const frictionY = -forces.frictionForce * scale * Math.sin(forces.angleRad);
+            drawArrow(0, 0, frictionX, frictionY, '#b56bff');
+            ctx.fillStyle = '#b56bff';
+            ctx.fillText('Ff', frictionX / 2, frictionY / 2 - 10);
+            
+            ctx.restore();
+        }
+
+        function drawArrow(x1, y1, x2, y2, color) {
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const headLength = 10;
+            
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(
+                x2 - headLength * Math.cos(angle - Math.PI / 6),
+                y2 - headLength * Math.sin(angle - Math.PI / 6)
+            );
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(
+                x2 - headLength * Math.cos(angle + Math.PI / 6),
+                y2 - headLength * Math.sin(angle + Math.PI / 6)
+            );
+            ctx.stroke();
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 1;
+            
+            for (let x = 0; x < canvasWidth; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvasHeight);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y < canvasHeight; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvasWidth, y);
+                ctx.stroke();
+            }
+        }
+        function updateSimulation(deltaTime) {
+            const forces = calculateForces();
+            
+            simState.velocity += forces.acceleration * deltaTime;
+            
+            if (simState.velocity < 0) {
+                simState.velocity = 0;
+            }
+            
+            simState.position += simState.velocity * deltaTime;
+            simState.time += deltaTime;
+            
+            const maxDistance = 580;
+            if (simState.position > maxDistance) {
+                simState.position = maxDistance;
+                simState.velocity = 0;
+                pauseSimulation();
+            }
+            
+            document.getElementById('stat-acceleration').textContent = forces.acceleration.toFixed(2);
+            document.getElementById('stat-velocity').textContent = simState.velocity.toFixed(2);
+            document.getElementById('stat-distance').textContent = (simState.position / pixelsPerMeter).toFixed(2);
+            document.getElementById('stat-time').textContent = simState.time.toFixed(2);
+        }
+
+        function animate(currentTime) {
+            if (!isRunning) return;
+            
+            if (lastTime === 0) lastTime = currentTime;
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            
+            if (deltaTime < 0.1) {
+                updateSimulation(deltaTime);
+                drawScene();
+            }
+            
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function startSimulation() {
+            if (!isRunning) {
+                isRunning = true;
+                lastTime = 0;
+                document.querySelectorAll('input[type="range"]').forEach(s => s.disabled = true);
+                animate(0);
+            }
+        }
+
+        function pauseSimulation() {
+            if (isRunning) {
+                isRunning = false;
+                cancelAnimationFrame(animationId);
+                document.getElementById('pauseBtn').textContent = '▶️ Play';
+                document.querySelectorAll('input[type="range"]').forEach(s => s.disabled = false);
+            } else if (simState.time > 0) {
+                isRunning = true;
+                lastTime = 0;
+                document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+                document.querySelectorAll('input[type="range"]').forEach(s => s.disabled = true);
+                animate(0);
+            }
+        }
+
+        function resetSimulation() {
+            isRunning = false;
+            cancelAnimationFrame(animationId);
+            
+            simState.position = 0;
+            simState.velocity = 0;
+            simState.time = 0;
+            lastTime = 0;
+            
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            document.querySelectorAll('input[type="range"]').forEach(s => s.disabled = false);
+            
+            document.getElementById('stat-acceleration').textContent = '0.0';
+            document.getElementById('stat-velocity').textContent = '0.0';
+            document.getElementById('stat-distance').textContent = '0.0';
+            document.getElementById('stat-time').textContent = '0.0';
+            
+            drawScene();
+        }
+
+        function toggleVectors() {
+            showVectors = !showVectors;
+            document.getElementById('toggle-vectors').classList.toggle('active');
+            drawScene();
+        }
+
+        function toggleGrid() {
+            showGrid = !showGrid;
+            document.getElementById('toggle-grid').classList.toggle('active');
+            drawScene();
+        }
+
+        function toggleCalc() {
+            showCalc = !showCalc;
+            document.getElementById('toggle-calc').classList.toggle('active');
+            drawScene();
+        }
+
+        init();
+    </script>
 </body>
 </html>
