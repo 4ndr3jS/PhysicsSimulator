@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projectile Motion - Physics Simulator</title>
+    <title>Elastic Collisions - Physics Simulator</title>
     <link rel="stylesheet" href="simulations.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
     <nav>
@@ -23,6 +24,536 @@
             <p>Explore conservation of momentum and kinetic energy in perfectly elastic collisions</p>
             <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
         </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="addBall()">➕ Add Ball</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">p = mv</div>
+                        <div class="sim-formula-description">Momentum</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">KE = ½mv²</div>
+                        <div class="sim-formula-description">Kinetic Energy</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Σp_before = Σp_after</div>
+                        <div class="sim-formula-description">Conservation of Momentum</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">ΣKE_before = ΣKE_after</div>
+                        <div class="sim-formula-description">Conservation of Energy (Elastic)</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Momentum is always conserved in collisions</li>
+                        <li>In elastic collisions, kinetic energy is conserved</li>
+                        <li>Heavier objects transfer more momentum</li>
+                        <li>Equal mass objects exchange velocities</li>
+                        <li>No energy is lost to heat or deformation</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Collide two equal mass balls</li>
+                        <li>Make one ball 3x heavier than the other</li>
+                        <li>Try a stationary target ball</li>
+                        <li>Add multiple balls and watch chaos!</li>
+                        <li>Observe momentum conservation in stats</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Ball 1 Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Mass</span>
+                            <span class="sim-control-value"><span id="val-mass1">10</span> kg</span>
+                        </div>
+                        <input type="range" id="slider-mass1" min="5" max="30" value="10" oninput="updateParameter('mass1', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Velocity</span>
+                            <span class="sim-control-value"><span id="val-velocity1">5</span> m/s</span>
+                        </div>
+                        <input type="range" id="slider-velocity1" min="0" max="15" value="5" oninput="updateParameter('velocity1', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-panel-header" style="margin-top: 1rem;">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Ball 2 Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Mass</span>
+                            <span class="sim-control-value"><span id="val-mass2">10</span> kg</span>
+                        </div>
+                        <input type="range" id="slider-mass2" min="5" max="30" value="10" oninput="updateParameter('mass2', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Velocity</span>
+                            <span class="sim-control-value"><span id="val-velocity2">0</span> m/s</span>
+                        </div>
+                        <input type="range" id="slider-velocity2" min="-15" max="15" value="0" oninput="updateParameter('velocity2', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Velocity Vectors</span>
+                        <div class="sim-toggle-switch active" id="toggle-vector" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Trails</span>
+                        <div class="sim-toggle-switch" id="toggle-trails" onclick="toggleTrails()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Real World Physics</span>
+                        <div class="sim-toggle-switch" id="toggle-realworld" onclick="toggleRealWorld()"></div>
+                    </div>
+                    <div id="realworld-info" style="display: none; font-size: 0.85rem; color: #888; margin-top: 0.5rem; padding: 0.5rem; background: #1a1a1a; border-radius: 4px;">
+                        Enables: Air resistance, friction, imperfect elasticity (~85%), and energy loss
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-momentum">0.0</div>
+                        <div class="sim-stat-label">Total Momentum (kg·m/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-energy">0.0</div>
+                        <div class="sim-stat-label">Total KINETIC ENERGY (J)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-collisions">0</div>
+                        <div class="sim-stat-label">Collisions</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-balls">2</div>
+                        <div class="sim-stat-label">Active Balls</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        const { Engine, Render, World, Bodies, Body, Events, Runner } = Matter;
+        
+        const canvas = document.getElementById('simCanvas');
+        const canvasWidth = 800;
+        const canvasHeight = 500;
+        
+        let engine, render, runner;
+        let balls = [];
+        let isRunning = false;
+        let collisionCount = 0;
+        let showVectors = true;
+        let showTrails = false;
+        let trails = [];
+        let realWorldMode = false;
+        
+        let simState = {
+            mass1: 10,
+            velocity1: 5,
+            mass2: 10,
+            velocity2: 0
+        };
+
+        const colors = ['#ff6b6b', '#6b9eff', '#6bffb4', '#ffeb6b', '#b56bff', '#ffb56b'];
+        let colorIndex = 0;
+
+        function init() {
+            engine = Engine.create({
+                enableSleeping: false,
+                positionIterations: 10,
+                velocityIterations: 10
+            });
+            engine.gravity.y = 0;
+            engine.gravity.x = 0;
+            engine.gravity.scale = 0;
+            
+            render = Render.create({
+                canvas: canvas,
+                engine: engine,
+                options: {
+                    width: canvasWidth,
+                    height: canvasHeight,
+                    wireframes: false,
+                    background: '#0a0a0a'
+                }
+            });
+            
+            createBalls();
+            
+            Render.run(render);
+            runner = Runner.create();
+            
+            Events.on(engine, 'collisionStart', handleCollision);
+            Events.on(engine, 'beforeUpdate', handleWallBounces);
+            Events.on(engine, 'afterUpdate', updateStats);
+        }
+
+        function createBalls() {
+            balls = [];
+            smoothedVelocities = [];
+            
+            const radius1 = Math.max(15, Math.min(30, simState.mass1 * 1.5));
+            const ball1 = Bodies.circle(150, canvasHeight / 2, radius1, {
+                mass: simState.mass1,
+                restitution: realWorldMode ? 0.85 : 1.0,
+                friction: realWorldMode ? 0.05 : 0,
+                frictionAir: realWorldMode ? 0.005 : 0,
+                frictionStatic: 0,
+                inertia: Infinity,
+                slop: 0.05,
+                render: { fillStyle: colors[0] }
+            });
+            Body.setVelocity(ball1, { x: simState.velocity1, y: 0 });
+            ball1.sleepThreshold = Infinity;
+            
+            const radius2 = Math.max(15, Math.min(30, simState.mass2 * 1.5));
+            const ball2 = Bodies.circle(650, canvasHeight / 2, radius2, {
+                mass: simState.mass2,
+                restitution: realWorldMode ? 0.85 : 1.0,
+                friction: realWorldMode ? 0.05 : 0,
+                frictionAir: realWorldMode ? 0.005 : 0,
+                frictionStatic: 0,
+                inertia: Infinity,
+                slop: 0.05,
+                render: { fillStyle: colors[1] }
+            });
+            Body.setVelocity(ball2, { x: -simState.velocity2, y: 0 });
+            ball2.sleepThreshold = Infinity;
+            
+            balls.push(ball1, ball2);
+            World.add(engine.world, balls);
+            
+            colorIndex = 2;
+        }
+
+        function addBall() {
+            if (balls.length >= 10) {
+                alert('Maximum 10 balls allowed!');
+                return;
+            }
+            
+            const randomMass = Math.floor(Math.random() * 20) + 10;
+            const radius = Math.max(15, Math.min(30, randomMass * 1.5));
+            const randomX = Math.random() * (canvasWidth - 200) + 100;
+            const randomY = Math.random() * (canvasHeight - 200) + 100;
+            const randomVelX = (Math.random() - 0.5) * 10;
+            const randomVelY = (Math.random() - 0.5) * 10;
+            
+            const newBall = Bodies.circle(randomX, randomY, radius, {
+                mass: randomMass,
+                restitution: realWorldMode ? 0.85 : 1.0,
+                friction: realWorldMode ? 0.05 : 0,
+                frictionAir: realWorldMode ? 0.005 : 0,
+                frictionStatic: 0,
+                inertia: Infinity,
+                slop: 0.05,
+                render: { fillStyle: colors[colorIndex % colors.length] }
+            });
+            
+            Body.setVelocity(newBall, { x: randomVelX, y: randomVelY });
+            newBall.sleepThreshold = Infinity;
+            
+            balls.push(newBall);
+            World.add(engine.world, newBall);
+            
+            colorIndex++;
+            document.getElementById('stat-balls').textContent = balls.length;
+        }
+
+        function handleWallBounces() {
+            balls.forEach(ball => {
+                const radius = ball.circleRadius;
+                let needsUpdate = false;
+                let newVelX = ball.velocity.x;
+                let newVelY = ball.velocity.y;
+                let newPosX = ball.position.x;
+                let newPosY = ball.position.y;
+                
+                const wallRestitution = realWorldMode ? 0.85 : 1.0;
+                
+                if (ball.position.x - radius <= 0) {
+                    newPosX = radius;
+                    newVelX = Math.abs(ball.velocity.x) * wallRestitution;
+                    needsUpdate = true;
+                }
+
+                if (ball.position.x + radius >= canvasWidth) {
+                    newPosX = canvasWidth - radius;
+                    newVelX = -Math.abs(ball.velocity.x) * wallRestitution;
+                    needsUpdate = true;
+                }
+
+                if (ball.position.y - radius <= 0) {
+                    newPosY = radius;
+                    newVelY = Math.abs(ball.velocity.y) * wallRestitution;
+                    needsUpdate = true;
+                }
+                
+                if (ball.position.y + radius >= canvasHeight) {
+                    newPosY = canvasHeight - radius;
+                    newVelY = -Math.abs(ball.velocity.y) * wallRestitution;
+                    needsUpdate = true;
+                }
+                
+                if (needsUpdate) {
+                    Body.setPosition(ball, { x: newPosX, y: newPosY });
+                    Body.setVelocity(ball, { x: newVelX, y: newVelY });
+                }
+            });
+        }
+
+        function handleCollision(event) {
+            const pairs = event.pairs;
+            
+            for (let pair of pairs) {
+                if (balls.includes(pair.bodyA) && balls.includes(pair.bodyB)) {
+                    collisionCount++;
+                    document.getElementById('stat-collisions').textContent = collisionCount;
+                }
+            }
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            simState[param] = parseFloat(value);
+            
+            if (!isRunning) {
+                World.remove(engine.world, balls);
+                createBalls();
+            }
+        }
+
+        function toggleVectors() {
+            showVectors = !showVectors;
+            document.getElementById('toggle-vector').classList.toggle('active');
+        }
+
+        function toggleTrails() {
+            showTrails = !showTrails;
+            document.getElementById('toggle-trails').classList.toggle('active');
+            if (!showTrails) {
+                trails = [];
+            }
+        }
+
+        function toggleRealWorld() {
+            realWorldMode = !realWorldMode;
+            document.getElementById('toggle-realworld').classList.toggle('active');
+            document.getElementById('realworld-info').style.display = realWorldMode ? 'block' : 'none';
+            
+            balls.forEach(ball => {
+                ball.restitution = realWorldMode ? 0.85 : 1.0;
+                ball.friction = realWorldMode ? 0.05 : 0;
+                ball.frictionAir = realWorldMode ? 0.005 : 0;
+                ball.frictionStatic = 0;
+                ball.sleepThreshold = Infinity;
+            });
+        }
+
+        function startSimulation() {
+            if (!isRunning) {
+                Runner.run(runner, engine);
+                isRunning = true;
+                
+                document.querySelectorAll('input[type="range"]').forEach(slider => {
+                    slider.disabled = true;
+                });
+            }
+        }
+
+        function pauseSimulation() {
+            if (isRunning) {
+                Runner.stop(runner);
+                isRunning = false;
+                document.getElementById('pauseBtn').textContent = '▶️ Play';
+                
+                document.querySelectorAll('input[type="range"]').forEach(slider => {
+                    slider.disabled = false;
+                });
+            } else if (engine.timing.timestamp > 0) {
+                Runner.run(runner, engine);
+                isRunning = true;
+                document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+                
+                document.querySelectorAll('input[type="range"]').forEach(slider => {
+                    slider.disabled = true;
+                });
+            }
+        }
+
+        function resetSimulation() {
+            if (isRunning) {
+                Runner.stop(runner);
+                isRunning = false;
+            }
+            
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            collisionCount = 0;
+            trails = [];
+            smoothedVelocities = [];
+            document.getElementById('stat-collisions').textContent = '0';
+            
+            World.remove(engine.world, balls);
+            balls = [];
+            
+            setTimeout(() => {
+                createBalls();
+                document.getElementById('stat-balls').textContent = balls.length;
+            }, 50);
+            
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                slider.disabled = false;
+            });
+        }
+
+        let smoothedVelocities = [];
+        const smoothingFactor = 0.15;
+
+        function updateStats() {
+            if (balls.length === 0) return;
+            
+            let totalMomentumX = 0;
+            let totalMomentumY = 0;
+            let totalKE = 0;
+            
+            balls.forEach((ball, i) => {
+                totalMomentumX += ball.mass * ball.velocity.x;
+                totalMomentumY += ball.mass * ball.velocity.y;
+                
+                const speed = Math.sqrt(ball.velocity.x ** 2 + ball.velocity.y ** 2);
+                totalKE += 0.5 * ball.mass * speed ** 2;
+                
+                if (!smoothedVelocities[i]) {
+                    smoothedVelocities[i] = { x: ball.velocity.x, y: ball.velocity.y };
+                }
+                
+                smoothedVelocities[i].x += (ball.velocity.x - smoothedVelocities[i].x) * smoothingFactor;
+                smoothedVelocities[i].y += (ball.velocity.y - smoothedVelocities[i].y) * smoothingFactor;
+            });
+            
+            const totalMomentum = Math.sqrt(totalMomentumX ** 2 + totalMomentumY ** 2);
+            
+            document.getElementById('stat-momentum').textContent = totalMomentum.toFixed(1);
+            document.getElementById('stat-energy').textContent = totalKE.toFixed(1);
+            
+            drawVectorsAndTrails();
+        }
+
+        function drawVectorsAndTrails() {
+            const ctx = render.context;
+            
+            if (showTrails && isRunning) {
+                balls.forEach((ball, i) => {
+                    if (!trails[i]) trails[i] = [];
+                    
+                    trails[i].push({ x: ball.position.x, y: ball.position.y });
+                    
+                    if (trails[i].length > 50) {
+                        trails[i].shift();
+                    }
+                    
+                    ctx.strokeStyle = ball.render.fillStyle;
+                    ctx.globalAlpha = 0.3;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    
+                    trails[i].forEach((point, j) => {
+                        if (j === 0) {
+                            ctx.moveTo(point.x, point.y);
+                        } else {
+                            ctx.lineTo(point.x, point.y);
+                        }
+                    });
+                    
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                });
+            }
+            
+            if (showVectors && isRunning) {
+                balls.forEach((ball, i) => {
+                    const scale = 10;
+                    
+                    ctx.strokeStyle = '#ffeb6b';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(ball.position.x, ball.position.y);
+                    ctx.lineTo(
+                        ball.position.x + smoothedVelocities[i].x * scale,
+                        ball.position.y + smoothedVelocities[i].y * scale
+                    );
+                    ctx.stroke();
+                    
+                    const angle = Math.atan2(smoothedVelocities[i].y, smoothedVelocities[i].x);
+                    const headLength = 8;
+                    const endX = ball.position.x + smoothedVelocities[i].x * scale;
+                    const endY = ball.position.y + smoothedVelocities[i].y * scale;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(endX, endY);
+                    ctx.lineTo(
+                        endX - headLength * Math.cos(angle - Math.PI / 6),
+                        endY - headLength * Math.sin(angle - Math.PI / 6)
+                    );
+                    ctx.moveTo(endX, endY);
+                    ctx.lineTo(
+                        endX - headLength * Math.cos(angle + Math.PI / 6),
+                        endY - headLength * Math.sin(angle + Math.PI / 6)
+                    );
+                    ctx.stroke();
+                });
+            }
+        }
+
+        init();
+    </script>
 </body>
 </html>
