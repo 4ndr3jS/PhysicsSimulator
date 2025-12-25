@@ -23,6 +23,157 @@
             <p>Watch light rays refract through a curved lens surface</p>
             <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
         </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start Rays</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">n₁ sin(θ₁) = n₂ sin(θ₂)</div>
+                        <div class="sim-formula-description">Snell's Law</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">n = c / v</div>
+                        <div class="sim-formula-description">Refractive index</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">θc = arcsin(n₂/n₁)</div>
+                        <div class="sim-formula-description">Critical angle</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">v₂ = v₁(n₁/n₂)</div>
+                        <div class="sim-formula-description">Speed in medium</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Light bends when entering different medium</li>
+                        <li>Curved surface causes rays to converge or diverge</li>
+                        <li>Light slows down in denser medium</li>
+                        <li>Angle of refraction depends on refractive indices</li>
+                        <li>Each ray bends individually based on its angle</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Watch parallel rays converge as they enter the lens</li>
+                        <li>Adjust refractive index to change bending amount</li>
+                        <li>Change curvature to see different focal points</li>
+                        <li>Increase ray count for denser light beam</li>
+                        <li>Observe how rays slow down inside the medium</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Lens Properties</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Refractive Index (n)</span>
+                            <span class="sim-control-value"><span id="val-n">1.5</span></span>
+                        </div>
+                        <input type="range" id="slider-n" min="1.3" max="2.0" step="0.05" value="1.5" oninput="updateParameter('n', this.value)">
+                        <div style="font-size: 0.85rem; color: #888; margin-top: 0.25rem;">Glass (1.5), Water (1.33), Diamond (2.42)</div>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Surface Curvature</span>
+                            <span class="sim-control-value"><span id="val-curvature">150</span> px</span>
+                        </div>
+                        <input type="range" id="slider-curvature" min="100" max="300" step="10" value="150" oninput="updateParameter('curvature', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Lens Thickness</span>
+                            <span class="sim-control-value"><span id="val-thickness">150</span> px</span>
+                        </div>
+                        <input type="range" id="slider-thickness" min="100" max="250" step="10" value="150" oninput="updateParameter('thickness', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Number of Rays</span>
+                            <span class="sim-control-value"><span id="val-rays">9</span></span>
+                        </div>
+                        <input type="range" id="slider-rays" min="5" max="15" step="2" value="9" oninput="updateParameter('rays', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Ray Speed</span>
+                            <span class="sim-control-value"><span id="val-speed">1.5</span></span>
+                        </div>
+                        <input type="range" id="slider-speed" min="0.5" max="3.0" step="0.5" value="1.5" oninput="updateParameter('speed', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Focal Point</span>
+                        <div class="sim-toggle-switch active" id="toggle-focal" onclick="toggleFocal()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Normals</span>
+                        <div class="sim-toggle-switch" id="toggle-normals" onclick="toggleNormals()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Ray Trails</span>
+                        <div class="sim-toggle-switch active" id="toggle-trails" onclick="toggleTrails()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-focal">0</div>
+                        <div class="sim-stat-label">Approx Focal Length (px)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-active">0</div>
+                        <div class="sim-stat-label">Active Rays</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-speed">0</div>
+                        <div class="sim-stat-label">Speed in Medium (c/n)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-angle">0</div>
+                        <div class="sim-stat-label">Max Refraction Angle</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
