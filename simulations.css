@@ -9,7 +9,7 @@ body{
     background: black;
     background-image: 
         radial-gradient(ellipse at 20% 30%, rgba(38, 38, 80, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 70% rgba(58, 28, 58, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(58, 28, 58, 0.3) 0%, transparent 50%),
         linear-gradient(135deg, black 0%, rgb(22, 22, 22) 50%, rgb(18, 18, 18) 100%);
     background-attachment: fixed;
     color: #fff;
@@ -17,7 +17,7 @@ body{
     padding: 2rem;
 }
 
-nav {
+nav{
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -31,41 +31,38 @@ nav {
     z-index: 1000;
 }
 
-nav > a {
+nav > a{
     text-decoration: none;
     font-size: 20px;
     font-weight: bold;
     color: #fff;
 }
 
-ul {
+nav ul{
     display: flex;
     list-style: none;
     gap: 3rem;
-    margin: 0;
-    padding: 0;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
 }
 
-ul a {
+nav ul a{
     text-decoration: none;
     font-size: 18px;
     color: #fff;
     transition: color 0.3s;
 }
 
-ul a:hover {
+nav ul a:hover{
     color: #888;
 }
 
 .sim-container{
     max-width: 1400px;
     margin: 80px auto 0;
-    padding-inline-start: 2rem;
+    padding: 2rem;
 }
-
 .sim-header{
     margin-bottom: 2rem;
     text-align: center;
@@ -95,6 +92,7 @@ ul a:hover {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 1.5rem;
+    align-items: start;
 }
 
 @media (max-width: 1024px){
@@ -122,10 +120,10 @@ ul a:hover {
 }
 
 .sim-canvas{
-    display: block;
     width: 100%;
     border-radius: 0.5rem;
     background: #0a0a0a;
+    display: block;
 }
 
 .sim-controls {
@@ -166,7 +164,7 @@ ul a:hover {
 }
 
 .sim-btn-primary{
-    background: linear-gradient(135deg, rgba(100, 100, 200, 0.7), rgba(150, 80, 150, 0.7));
+    background: linear-gradient(135deg, rgba(100,100,200,0.7), rgba(150,80,150,0.7));
 }
 
 .sim-btn-secondary{
@@ -178,7 +176,24 @@ ul a:hover {
 }
 
 .sim-btn-danger{
-    background: linear-gradient(135deg, rgba(200, 80, 80, 0.6), rgba(150, 60, 100, 0.6));
+    background: linear-gradient(135deg, rgba(200,80,80,0.6), rgba(150,60,100,0.6));
+}
+
+/* === STATS GRID === */
+.sim-stats{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.sim-stat-card{
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    text-align: center;
+    transition: all 0.3s;
 }
 
 .sim-stat-card:hover{
@@ -192,24 +207,12 @@ ul a:hover {
     margin-bottom: 0.5rem;
 }
 
-.sim-stat-value.blue {
-    color: #6b9eff;
-}
-.sim-stat-value.green {
-    color: #6bffb4;
-}
-.sim-stat-value.purple {
-    color: #b56bff;
-}
-.sim-stat-value.orange {
-    color: #ffb56b;
-}
-.sim-stat-value.red {
-    color: #ff6b6b;
-}
-.sim-stat-value.yellow {
-    color: #ffeb6b;
-}
+.sim-stat-value.blue{ color: #6b9eff; }
+.sim-stat-value.green{ color: #6bffb4; }
+.sim-stat-value.purple{ color: #b56bff; }
+.sim-stat-value.orange{ color: #ffb56b; }
+.sim-stat-value.red{ color: #ff6b6b; }
+.sim-stat-value.yellow{ color: #ffeb6b; }
 
 .sim-stat-label{
     font-size: 0.85rem;
@@ -222,6 +225,7 @@ ul a:hover {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    min-width: 0;
 }
 
 .sim-panel{
@@ -230,18 +234,20 @@ ul a:hover {
     border-radius: 1rem;
     padding: 1.5rem;
     transition: border-color 0.3s;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 
-.sim-panel{
+.sim-panel:hover{
     border-color: rgba(255, 255, 255, 0.2);
 }
 
 .sim-panel-header{
-    display: flex;
-    align-items: center;
     font-size: 1.3rem;
     margin-bottom: 1.25rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
 }
 
@@ -278,10 +284,12 @@ input[type="range"]{
     border-radius: 3px;
     background: rgba(255, 255, 255, 0.1);
     outline: none;
+    -webkit-appearance: none;
     cursor: pointer;
 }
 
 input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
     appearance: none;
     width: 18px;
     height: 18px;
@@ -360,12 +368,16 @@ input[type="range"]:disabled {
     font-size: 0.9rem;
     line-height: 1.8;
     color: #ccc;
+    padding: 0;
+    margin: 0;
 }
 
 .sim-info-list li{
     position: relative;
     padding-left: 1.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .sim-info-list li::before{
@@ -395,14 +407,20 @@ input[type="range"]:disabled {
 
 .sim-badge-medium{
     background: rgba(255, 235, 107, 0.2);
-    color: #6bffb4;
+    color: #ffeb6b;
     border: 1px solid rgba(255, 235, 107, 0.3);
 }
 
 .sim-badge-hard{
     background: rgba(255, 107, 107, 0.2);
-    color: #6bffb4;
-    border: 1px solid rgba(1255, 107, 107, 0.3);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.sim-divider{
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 1.5rem 0;
 }
 
 .sim-formula{
@@ -419,14 +437,14 @@ input[type="range"]:disabled {
     font-size: 1.5rem;
     font-weight: 500;
     letter-spacing: 1px;
-    color: #fff;
+    color: #ffffff;
     margin-bottom: 0.5rem;
     font-style: italic;
 }
 
 .sim-formula-description{
     text-align: center;
-    font-size: 0.85rem,;
+    font-size: 0.85rem;
     color: #b8c0ff;
     font-family: system-ui, -apple-system, sans-serif;
     font-style: normal;
@@ -454,12 +472,12 @@ input[type="range"]:disabled {
 .sim-alert-success{
     background: rgba(107, 255, 180, 0.15);
     border-color: #6bffb4;
-    color: #6bffdb;
+    color: #b8ffdb;
 }
 
 .sim-graph-container{
     background: rgba(10, 10, 10, 0.8);
-    border: 1px solid rgb(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.75rem;
     padding: 1.25rem;
     margin-top: 1.5rem;
@@ -492,7 +510,7 @@ input[type="range"]:disabled {
 
 .sim-input:focus{
     outline: none;
-    border-color: #6bfeff;
+    border-color: #6b9eff;
     background: rgba(255, 255, 255, 0.08);
 }
 
@@ -514,10 +532,10 @@ input[type="range"]:disabled {
     animation: loading 1.5s infinite;
 }
 
-@keyframes loading {
-    0%, 20% { content: '.';}
-    40% {content: '..';}
-    60% 100% {content: '...';}
+@keyframes loading{
+    0%, 20%{ content: '.'; }
+    40%{ content: '..'; }
+    60%, 100%{ content: '...'; }
 }
 
 .sim-vector-display{
@@ -551,18 +569,24 @@ input[type="range"]:disabled {
     body{
         padding: 1rem;
     }
+    
     .sim-container{
         padding: 1rem;
+        margin-top: 70px;
     }
+    
     .sim-header h1{
         font-size: 1.8rem;
     }
+    
     .sim-stats{
         grid-template-columns: repeat(2, 1fr);
     }
+    
     .sim-controls{
         flex-direction: column;
     }
+    
     .sim-btn{
         width: 100%;
     }
