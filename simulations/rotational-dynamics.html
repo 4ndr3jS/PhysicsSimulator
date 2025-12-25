@@ -200,5 +200,244 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = 800, H = 500, CX = W/2, CY = H/2;
+        
+        let running = false, aid = null, lt = 0;
+        let showVec = true, showMom = true, showTr = false;
+        let trail = [];
+        
+        let s = {
+            radius: 100, omega: 1, friction: 0.05,
+            mass1: 5, dist1: 0.7, mass2: 5, dist2: 0.7,
+            angle: 0, w: 1
+        };
+
+        const m2p = 0.01;
+
+        function calcI() {
+            const r1 = s.radius * s.dist1 * m2p;
+            const r2 = s.radius * s.dist2 * m2p;
+            const I1 = s.mass1 * r1 * r1;
+            const I2 = s.mass2 * r2 * r2;
+            const Id = 0.5 * 10 * (s.radius * m2p) ** 2;
+            return Id + I1 + I2;
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, W, H);
+            
+            const I = calcI();
+            const L = I * s.w;
+            const KE = 0.5 * I * s.w * s.w;
+            
+            document.getElementById('stat-omega').textContent = s.w.toFixed(3);
+            document.getElementById('stat-inertia').textContent = I.toFixed(4);
+            document.getElementById('stat-momentum').textContent = L.toFixed(4);
+            document.getElementById('stat-energy').textContent = KE.toFixed(4);
+            
+            if (showTr && trail.length) {
+                ctx.strokeStyle = '#ff6b6b';
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.3;
+                ctx.beginPath();
+                trail.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+            
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(CX, CY, s.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            for (let i = 0; i < 8; i++) {
+                const a = (Math.PI * 2 / 8) * i + s.angle;
+                const x1 = CX + s.radius * 0.9 * Math.cos(a);
+                const y1 = CY + s.radius * 0.9 * Math.sin(a);
+                const x2 = CX + s.radius * Math.cos(a);
+                const y2 = CY + s.radius * Math.sin(a);
+                ctx.strokeStyle = '#444';
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+            
+            ctx.fillStyle = '#222';
+            ctx.beginPath();
+            ctx.arc(CX, CY, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            if (s.mass1 > 0) {
+                const r1 = s.radius * s.dist1;
+                const x1 = CX + r1 * Math.cos(s.angle);
+                const y1 = CY + r1 * Math.sin(s.angle);
+                const sz1 = 10 + s.mass1 * 2;
+                
+                ctx.fillStyle = '#ff6b6b';
+                ctx.beginPath();
+                ctx.arc(x1, y1, sz1, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (showTr && running) {
+                    trail.push({x: x1, y: y1});
+                    if (trail.length > 100) trail.shift();
+                }
+                
+                if (showVec) {
+                    const vx = -r1 * s.w * Math.sin(s.angle);
+                    const vy = r1 * s.w * Math.cos(s.angle);
+                    drawVec(x1, y1, vx, vy, '#ffeb6b');
+                }
+            }
+            
+            if (s.mass2 > 0) {
+                const r2 = s.radius * s.dist2;
+                const a2 = s.angle + Math.PI;
+                const x2 = CX + r2 * Math.cos(a2);
+                const y2 = CY + r2 * Math.sin(a2);
+                const sz2 = 10 + s.mass2 * 2;
+                
+                ctx.fillStyle = '#6b9eff';
+                ctx.beginPath();
+                ctx.arc(x2, y2, sz2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (showVec) {
+                    const vx = -r2 * s.w * Math.sin(a2);
+                    const vy = r2 * s.w * Math.cos(a2);
+                    drawVec(x2, y2, vx, vy, '#6bffb4');
+                }
+            }
+            
+            if (showMom && Math.abs(s.w) > 0.01) {
+                ctx.fillStyle = '#b56bff';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(s.w > 0 ? 'L ⊙' : 'L ⊗', CX, CY - s.radius - 30);
+            }
+        }
+
+        function drawVec(x, y, vx, vy, c) {
+            const sc = 5;
+            const ex = x + vx * sc, ey = y + vy * sc;
+            ctx.strokeStyle = c;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+            
+            const a = Math.atan2(vy, vx);
+            const hl = 8;
+            ctx.beginPath();
+            ctx.moveTo(ex, ey);
+            ctx.lineTo(ex - hl * Math.cos(a - Math.PI/6), ey - hl * Math.sin(a - Math.PI/6));
+            ctx.moveTo(ex, ey);
+            ctx.lineTo(ex - hl * Math.cos(a + Math.PI/6), ey - hl * Math.sin(a + Math.PI/6));
+            ctx.stroke();
+        }
+
+        function update(dt) {
+            const I = calcI();
+            const tau = -s.friction * s.w;
+            const alpha = tau / I;
+            s.w += alpha * dt;
+            if (Math.abs(s.w) < 0.001) s.w = 0;
+            s.angle += s.w * dt;
+            if (s.angle > Math.PI * 2) s.angle -= Math.PI * 2;
+            else if (s.angle < -Math.PI * 2) s.angle += Math.PI * 2;
+        }
+
+        function anim(t) {
+            if (!running) return;
+            if (lt === 0) lt = t;
+            const dt = (t - lt) / 1000;
+            lt = t;
+            if (dt < 0.1) {
+                update(dt);
+                draw();
+            }
+            aid = requestAnimationFrame(anim);
+        }
+
+        function startSimulation() {
+            if (!running) {
+                running = true;
+                lt = 0;
+                document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = true);
+                anim(0);
+            }
+        }
+
+        function pauseSimulation() {
+            if (running) {
+                running = false;
+                cancelAnimationFrame(aid);
+                document.getElementById('pauseBtn').textContent = '▶️ Play';
+                document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = false);
+            } else {
+                running = true;
+                lt = 0;
+                document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+                document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = true);
+                anim(0);
+            }
+        }
+
+        function resetSimulation() {
+            running = false;
+            cancelAnimationFrame(aid);
+            s.angle = 0;
+            s.w = s.omega;
+            trail = [];
+            lt = 0;
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            document.querySelectorAll('input[type="range"]').forEach(e => e.disabled = false);
+            draw();
+        }
+
+        function applyImpulse() {
+            s.w += 2;
+        }
+
+        function updateParameter(p, v) {
+            document.getElementById(`val-${p}`).textContent = v;
+            s[p] = parseFloat(v);
+            if (p === 'omega' && !running) s.w = s.omega;
+            if (!running) draw();
+        }
+
+        function toggleVectors() {
+            showVec = !showVec;
+            document.getElementById('toggle-vectors').classList.toggle('active');
+            draw();
+        }
+
+        function toggleMomentum() {
+            showMom = !showMom;
+            document.getElementById('toggle-momentum').classList.toggle('active');
+            draw();
+        }
+
+        function toggleTrail() {
+            showTr = !showTr;
+            document.getElementById('toggle-trail').classList.toggle('active');
+            if (!showTr) trail = [];
+            draw();
+        }
+
+        s.w = s.omega;
+        draw();
+    </script>
 </body>
 </html>
