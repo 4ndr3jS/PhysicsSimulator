@@ -42,7 +42,7 @@ The simulator currently includes the following topics:
 1. **Clone the repository**
 
    ```bash
-   git clone <repository_url>
+   git clone [https://github.com/4ndr3jS/PhysicsSimulator](https://github.com/4ndr3jS/PhysicsSimulator)
    ```
 
 2. **Open `index.html` in your browser**
