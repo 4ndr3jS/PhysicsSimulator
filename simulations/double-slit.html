@@ -24,6 +24,156 @@
             <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-hard">● Hard</span></p>
         </div>
 
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="toggleView()">👁️ Toggle View</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">d sin(θ) = mλ</div>
+                        <div class="sim-formula-description">Bright fringes (constructive)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">d sin(θ) = (m + ½)λ</div>
+                        <div class="sim-formula-description">Dark fringes (destructive)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Δφ = 2π(Δr / λ)</div>
+                        <div class="sim-formula-description">Phase difference</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">I = 4I₀ cos²(πd sin(θ)/λ)</div>
+                        <div class="sim-formula-description">Intensity pattern</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Light acts as both particle and wave</li>
+                        <li>Two slits create two coherent sources</li>
+                        <li>Path difference causes interference pattern</li>
+                        <li>Bright fringes: waves arrive in phase</li>
+                        <li>Dark fringes: waves arrive out of phase</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Increase wavelength to see wider spacing</li>
+                        <li>Decrease slit separation for fewer fringes</li>
+                        <li>Watch wavefronts interfere in real-time</li>
+                        <li>Observe the intensity pattern on screen</li>
+                        <li>Toggle between wave and screen view</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Experiment Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Wavelength (λ)</span>
+                            <span class="sim-control-value"><span id="val-wavelength">40</span> nm</span>
+                        </div>
+                        <input type="range" id="slider-wavelength" min="20" max="80" step="5" value="40" oninput="updateParameter('wavelength', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Slit Separation (d)</span>
+                            <span class="sim-control-value"><span id="val-slitSep">100</span> px</span>
+                        </div>
+                        <input type="range" id="slider-slitSep" min="50" max="200" step="10" value="100" oninput="updateParameter('slitSep', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Slit Width</span>
+                            <span class="sim-control-value"><span id="val-slitWidth">10</span> px</span>
+                        </div>
+                        <input type="range" id="slider-slitWidth" min="5" max="20" step="1" value="10" oninput="updateParameter('slitWidth', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Wave Amplitude</span>
+                            <span class="sim-control-value"><span id="val-amplitude">30</span></span>
+                        </div>
+                        <input type="range" id="slider-amplitude" min="10" max="50" step="5" value="30" oninput="updateParameter('amplitude', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Frequency</span>
+                            <span class="sim-control-value"><span id="val-frequency">2.0</span> Hz</span>
+                        </div>
+                        <input type="range" id="slider-frequency" min="0.5" max="4.0" step="0.5" value="2.0" oninput="updateParameter('frequency', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Wavefronts</span>
+                        <div class="sim-toggle-switch active" id="toggle-wavefronts" onclick="toggleWavefronts()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Barrier</span>
+                        <div class="sim-toggle-switch active" id="toggle-barrier" onclick="toggleBarrier()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Screen Pattern</span>
+                        <div class="sim-toggle-switch active" id="toggle-screen" onclick="toggleScreen()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-fringes">0</div>
+                        <div class="sim-stat-label">Visible Fringes</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-spacing">0</div>
+                        <div class="sim-stat-label">Fringe Spacing (px)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-ratio">0</div>
+                        <div class="sim-stat-label">λ/d Ratio</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-maxint">0</div>
+                        <div class="sim-stat-label">Max Intensity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
