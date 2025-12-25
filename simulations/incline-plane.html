@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elastic Collisions - Physics Simulator</title>
+    <title>Inclined Plane - Physics Simulator</title>
     <link rel="stylesheet" href="simulations.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
     <nav>
@@ -21,18 +20,144 @@
     <div class="sim-container">
         <div class="sim-header">
             <h1>📐 Inclined Plane</h1>
-            <p>Explore forces, friction, and motion on inclined surfaces</p>
-            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Easy</span></p>
+            <p>Explore forces, acceleration, and motion on slopes</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
         </div>
 
         <div class="sim-layout">
             <div class="sim-canvas-section">
                 <div class="sim-canvas-wrapper">
-                    <canvas id="sumCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F‖ = mg sin(θ)</div>
+                        <div class="sim-formula-description">Force parallel to slope</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F⊥ = mg cos(θ)</div>
+                        <div class="sim-formula-description">Normal force</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Ff = μ × F⊥</div>
+                        <div class="sim-formula-description">Friction force</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">a = g(sin(θ) - μcos(θ))</div>
+                        <div class="sim-formula-description">Acceleration down slope</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Steeper angles produce greater acceleration</li>
+                        <li>Friction opposes motion down the slope</li>
+                        <li>Normal force equals weight × cos(θ)</li>
+                        <li>At steep angles, friction matters less</li>
+                        <li>Heavier objects don't slide faster (without air resistance)</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Find the critical angle where motion starts</li>
+                        <li>Compare motion with and without friction</li>
+                        <li>Try a 45° angle - is it half as fast as 90°?</li>
+                        <li>Set friction to maximum and increase angle</li>
+                        <li>Observe force vectors as you change angle</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Angle (θ)</span>
+                            <span class="sim-control-value"><span id="val-angle">30</span>°</span>
+                        </div>
+                        <input type="range" id="slider-angle" min="0" max="60" value="30" oninput="updateParameter('angle', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Mass</span>
+                            <span class="sim-control-value"><span id="val-mass">10</span> kg</span>
+                        </div>
+                        <input type="range" id="slider-mass" min="5" max="30" value="10" oninput="updateParameter('mass', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Friction (μ)</span>
+                            <span class="sim-control-value"><span id="val-friction">0.2</span></span>
+                        </div>
+                        <input type="range" id="slider-friction" min="0" max="0.8" step="0.05" value="0.2" oninput="updateParameter('friction', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Force Vectors</span>
+                        <div class="sim-toggle-switch active" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Grid</span>
+                        <div class="sim-toggle-switch" id="toggle-grid" onclick="toggleGrid()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Calculations</span>
+                        <div class="sim-toggle-switch" id="toggle-calc" onclick="toggleCalc()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-acceleration">0.0</div>
+                        <div class="sim-stat-label">Acceleration (m/s²)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-velocity">0.0</div>
+                        <div class="sim-stat-label">Velocity (m/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-distance">0.0</div>
+                        <div class="sim-stat-label">Distance (m)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-time">0.0</div>
+                        <div class="sim-stat-label">Time (s)</div>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
+
 </body>
 </html>
