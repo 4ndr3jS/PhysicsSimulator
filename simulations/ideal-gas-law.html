@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal Gas Law - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="guide.html">Guide</a>
+            <a href="theory.html">Theory</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>⚗️ Ideal Gas Law</h1>
+            <p>Explore the relationship between pressure, volume, temperature, and amount of gas</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">PV = nRT</div>
+                        <div class="sim-formula-description">Ideal Gas Law</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">P = nRT / V</div>
+                        <div class="sim-formula-description">Pressure calculation</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">KE_avg = (3/2)kT</div>
+                        <div class="sim-formula-description">Average kinetic energy per particle</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Higher temperature = faster particle motion</li>
+                        <li>Smaller volume = more collisions = higher pressure</li>
+                        <li>More moles = more particles = higher pressure</li>
+                        <li>R = 8.314 J/(mol·K) is the gas constant</li>
+                        <li>Temperature must be in Kelvin (K = °C + 273.15)</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Double the temperature - what happens to pressure?</li>
+                        <li>Halve the volume - how does pressure change?</li>
+                        <li>Add more moles and observe particle density</li>
+                        <li>Try extreme values to see the limits</li>
+                        <li>Keep volume constant and vary temperature</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Temperature</span>
+                            <span class="sim-control-value"><span id="val-temperature">300</span> K</span>
+                        </div>
+                        <input type="range" id="slider-temperature" min="0" max="600" value="300" oninput="updateParameter('temperature', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Volume</span>
+                            <span class="sim-control-value"><span id="val-volume">10</span> L</span>
+                        </div>
+                        <input type="range" id="slider-volume" min="2" max="20" value="10" step="0.5" oninput="updateParameter('volume', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Number of Moles</span>
+                            <span class="sim-control-value"><span id="val-moles">1.0</span> mol</span>
+                        </div>
+                        <input type="range" id="slider-moles" min="0.5" max="3" value="1" step="0.1" oninput="updateParameter('moles', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Particles</span>
+                        <div class="sim-toggle-switch active" id="toggle-particles" onclick="toggleParticles()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Vectors</span>
+                        <div class="sim-toggle-switch" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Stats</span>
+                        <div class="sim-toggle-switch active" id="toggle-stats" onclick="toggleStats()"></div>
+                    </div>
+                </div>
+                
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-pressure">0.00</div>
+                        <div class="sim-stat-label">Pressure (atm)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-particles">0</div>
+                        <div class="sim-stat-label">Particles</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-avgSpeed">0.00</div>
+                        <div class="sim-stat-label">Avg Speed (m/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-density">0.00</div>
+                        <div class="sim-stat-label">Density (mol/L)</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</body>
+</html>
