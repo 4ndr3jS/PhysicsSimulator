@@ -167,5 +167,295 @@
         </div>
     </div>
 
+
+
+    <script>
+        const state = {
+            mode: 'magnet-coil',
+            isPlaying: false,
+            time: 0,
+            speed: 2.0,
+            field: 1.5,
+            turns: 10,
+            showLines: true,
+            showCurrent: true,
+            showFlux: true,
+            magnetPos: 0,
+            angle: 0,
+            voltage: 0,
+            flux: 0,
+            prevFlux: 0
+        };
+
+        const canvas = document.getElementById('inductionCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
+
+        function setMode(mode) {
+            state.mode = mode;
+            state.time = 0;
+            state.magnetPos = 0;
+            state.angle = 0;
+            document.querySelectorAll('.mode-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', ['magnet-coil', 'rotating-coil', 'transformer'][i] === mode);
+            });
+        }
+
+        function toggleAnimation() {
+            state.isPlaying = !state.isPlaying;
+            document.getElementById('playText').textContent = state.isPlaying ? 'Pause' : 'Play';
+        }
+
+        function resetSim() {
+            state.time = 0;
+            state.magnetPos = 0;
+            state.angle = 0;
+            state.voltage = 0;
+            state.flux = 0;
+            state.prevFlux = 0;
+        }
+
+        function updateParam(param, val) {
+            document.getElementById(`val-${param}`).textContent = val;
+            state[param] = parseFloat(val);
+        }
+
+        function toggleLines() {
+            state.showLines = !state.showLines;
+            document.getElementById('toggle-lines').classList.toggle('active');
+        }
+
+        function toggleCurrent() {
+            state.showCurrent = !state.showCurrent;
+            document.getElementById('toggle-current').classList.toggle('active');
+        }
+
+        function toggleFlux() {
+            state.showFlux = !state.showFlux;
+            document.getElementById('toggle-flux').classList.toggle('active');
+        }
+
+        function drawCoil(x, y, width, height, turns) {
+            ctx.strokeStyle = '#ff922b';
+            ctx.lineWidth = 3;
+            
+            const coilWidth = width / turns;
+            for (let i = 0; i < turns; i++) {
+                const cx = x - width/2 + i * coilWidth + coilWidth/2;
+                
+                ctx.beginPath();
+                ctx.arc(cx, y - height/2, coilWidth/2, Math.PI, 0, false);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.arc(cx, y + height/2, coilWidth/2, 0, Math.PI, false);
+                ctx.stroke();
+            }
+            
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x - width/2 - 5, y - height/2 - 5, width + 10, height + 10);
+        }
+
+        function drawMagnet(x, y, width, height, angle = 0) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(-width/2, -height/2, width/2, height);
+            
+            ctx.fillStyle = '#6b9eff';
+            ctx.fillRect(0, -height/2, width/2, height);
+            
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-width/2, -height/2, width, height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('N', -width/4, 0);
+            ctx.fillText('S', width/4, 0);
+            
+            ctx.restore();
+        }
+
+        function drawFieldLines(x, y, strength) {
+            if (!state.showLines) return;
+            
+            const numLines = 8;
+            for (let i = 0; i < numLines; i++) {
+                const offset = (i - numLines/2) * 15;
+                
+                ctx.strokeStyle = `rgba(107, 158, 255, ${0.3 + strength * 0.2})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                for (let t = 0; t < 1; t += 0.05) {
+                    const curveX = x - 150 + t * 300;
+                    const curveY = y + offset + Math.sin(t * Math.PI) * 30;
+                    if (t === 0) ctx.moveTo(curveX, curveY);
+                    else ctx.lineTo(curveX, curveY);
+                }
+                ctx.stroke();
+                
+                const arrowX = x + 100;
+                const arrowY = y + offset;
+                ctx.fillStyle = `rgba(107, 158, 255, ${0.6 + strength * 0.3})`;
+                ctx.beginPath();
+                ctx.moveTo(arrowX, arrowY);
+                ctx.lineTo(arrowX - 10, arrowY - 5);
+                ctx.lineTo(arrowX - 10, arrowY + 5);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function drawCurrentFlow(voltage) {
+            if (!state.showCurrent || Math.abs(voltage) < 0.1) return;
+            
+            const direction = voltage > 0 ? 1 : -1;
+            const intensity = Math.min(Math.abs(voltage) / 5, 1);
+            
+            for (let i = 0; i < 5; i++) {
+                const t = (state.time * 5 + i * 0.2) % 1;
+                const alpha = Math.sin(t * Math.PI) * intensity;
+                
+                ctx.fillStyle = `rgba(81, 207, 102, ${alpha})`;
+                ctx.beginPath();
+                
+                if (state.mode === 'magnet-coil') {
+                    const x = 400 + (t - 0.5) * 300 * direction;
+                    const y = 150 - 60;
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                } else if (state.mode === 'rotating-coil') {
+                    const angle = t * Math.PI * 2 * direction;
+                    const x = 400 + Math.cos(angle) * 100;
+                    const y = 250 + Math.sin(angle) * 100;
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                }
+                
+                ctx.fill();
+            }
+        }
+
+        function updatePhysics() {
+            if (!state.isPlaying) return;
+            
+            state.time += 0.016 * state.speed;
+            
+            if (state.mode === 'magnet-coil') {
+                state.magnetPos = Math.sin(state.time) * 150;
+                
+                const distance = Math.abs(state.magnetPos);
+                const maxDist = 150;
+                const fluxFactor = Math.max(0, 1 - distance / maxDist);
+                state.flux = state.field * fluxFactor * state.turns;
+                
+                const dFlux = state.flux - state.prevFlux;
+                state.voltage = -dFlux * 60 * state.speed;
+                state.prevFlux = state.flux;
+                
+            } else if (state.mode === 'rotating-coil') {
+                state.angle += 0.016 * state.speed;
+                
+                state.flux = state.field * Math.cos(state.angle) * state.turns;
+                state.voltage = state.field * state.turns * Math.sin(state.angle) * state.speed;
+                
+            } else if (state.mode === 'transformer') {
+                const primaryCurrent = Math.sin(state.time * 2);
+                state.flux = primaryCurrent * state.field * state.turns;
+                
+                const dFlux = state.flux - state.prevFlux;
+                state.voltage = -dFlux * 60 * state.speed;
+                state.prevFlux = state.flux;
+            }
+            
+            const resistance = 10;
+            const current = state.voltage / resistance;
+            const power = Math.abs(state.voltage * current);
+            
+            document.getElementById('stat-voltage').textContent = state.voltage.toFixed(2);
+            document.getElementById('stat-flux').textContent = state.flux.toFixed(2);
+            document.getElementById('stat-current').textContent = current.toFixed(2);
+            document.getElementById('stat-power').textContent = power.toFixed(2);
+        }
+
+        function render() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            updatePhysics();
+            
+            if (state.mode === 'magnet-coil') {
+                const coilX = 400;
+                const coilY = 250;
+                drawCoil(coilX, coilY, 200, 120, Math.floor(state.turns / 2));
+                
+                const magnetX = coilX + state.magnetPos;
+                const magnetY = coilY;
+                drawFieldLines(magnetX, magnetY, state.field / 3);
+                drawMagnet(magnetX, magnetY, 80, 40);
+                
+                drawCurrentFlow(state.voltage);
+                
+            } else if (state.mode === 'rotating-coil') {
+                const centerX = 400;
+                const centerY = 250;
+                
+                drawFieldLines(centerX, centerY, state.field / 3);
+                
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(state.angle);
+                
+                ctx.strokeStyle = '#ff922b';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(-100, -80, 200, 160);
+                
+                for (let i = 0; i < state.turns / 3; i++) {
+                    ctx.strokeStyle = `rgba(255, 146, 43, ${0.3 + i * 0.1})`;
+                    ctx.strokeRect(-95 + i * 3, -75 + i * 3, 190 - i * 6, 150 - i * 6);
+                }
+                
+                ctx.restore();
+                
+                drawMagnet(centerX - 200, centerY, 60, 200, Math.PI / 2);
+                drawMagnet(centerX + 200, centerY, 60, 200, Math.PI / 2);
+                
+                drawCurrentFlow(state.voltage);
+                
+            } else if (state.mode === 'transformer') {
+                const primaryX = 300;
+                const secondaryX = 500;
+                const y = 250;
+                
+                drawCoil(primaryX, y, 120, 150, Math.floor(state.turns / 2));
+                drawCoil(secondaryX, y, 120, 150, Math.floor(state.turns / 2));
+                
+                ctx.fillStyle = '#666';
+                ctx.fillRect(primaryX + 60, y - 100, 80, 200);
+                
+                const fluxIntensity = Math.abs(state.flux) / (state.field * state.turns);
+                for (let i = 0; i < 6; i++) {
+                    const lineY = y - 75 + i * 30;
+                    ctx.strokeStyle = `rgba(107, 158, 255, ${fluxIntensity * 0.8})`;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(primaryX + 65, lineY);
+                    ctx.lineTo(secondaryX - 65, lineY);
+                    ctx.stroke();
+                }
+                
+                drawCurrentFlow(state.voltage);
+            }
+            
+            animationId = requestAnimationFrame(render);
+        }
+
+        render();
+    </script>
 </body>
 </html>
