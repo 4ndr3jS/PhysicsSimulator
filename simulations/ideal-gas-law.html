@@ -126,11 +126,6 @@
                         <span>Show Vectors</span>
                         <div class="sim-toggle-switch" id="toggle-vectors" onclick="toggleVectors()"></div>
                     </div>
-
-                    <div class="sim-toggle">
-                        <span>Show Stats</span>
-                        <div class="sim-toggle-switch active" id="toggle-stats" onclick="toggleStats()"></div>
-                    </div>
                 </div>
                 
                 <div class="sim-stats">
@@ -154,5 +149,338 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const R = 0.0821;
+        const k = 1.380649e-23;
+        const NA = 6.022e23;
+        
+        const BASE_CONTAINER_WIDTH = 600;
+        const BASE_CONTAINER_HEIGHT = 350;
+        const BASE_VOLUME = 10;
+        
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            temperature: 300,
+            volume: 10,
+            moles: 1.0,
+            particles: [],
+            showParticles: true,
+            showVectors: false,
+            containerWidth: BASE_CONTAINER_WIDTH,
+            containerHeight: BASE_CONTAINER_HEIGHT,
+            containerX: 0,
+            containerY: 0
+        };
+
+        let animationId = null;
+
+        function init() {
+            updateContainerSize();
+            createParticles();
+            calculateStats();
+            drawCanvas();
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            const oldTemp = simState.temperature;
+            simState[param] = parseFloat(value);
+            
+            if (param === 'volume') {
+                updateContainerSize();
+                constrainParticlesToContainer();
+            }
+            
+            if (param === 'temperature') {
+                updateParticleVelocities(oldTemp, simState.temperature);
+            }
+            
+            if (param === 'moles') {
+                createParticles();
+            }
+            
+            calculateStats();
+            drawCanvas();
+        }
+
+        function updateContainerSize() {
+            const volumeRatio = simState.volume / BASE_VOLUME;
+            const scale = Math.sqrt(volumeRatio);
+            
+            simState.containerWidth = BASE_CONTAINER_WIDTH * scale;
+            simState.containerHeight = BASE_CONTAINER_HEIGHT * scale;
+            
+            simState.containerWidth = Math.min(simState.containerWidth, 700);
+            simState.containerHeight = Math.min(simState.containerHeight, 450);
+            
+            simState.containerX = (canvas.width - simState.containerWidth) / 2;
+            simState.containerY = (canvas.height - simState.containerHeight) / 2;
+        }
+
+        function constrainParticlesToContainer() {
+            for (let p of simState.particles) {
+                if (p.x < simState.containerX + p.radius) {
+                    p.x = simState.containerX + p.radius;
+                }
+                if (p.x > simState.containerX + simState.containerWidth - p.radius) {
+                    p.x = simState.containerX + simState.containerWidth - p.radius;
+                }
+                if (p.y < simState.containerY + p.radius) {
+                    p.y = simState.containerY + p.radius;
+                }
+                if (p.y > simState.containerY + simState.containerHeight - p.radius) {
+                    p.y = simState.containerY + simState.containerHeight - p.radius;
+                }
+            }
+        }
+
+        function updateParticleVelocities(oldTemp, newTemp) {
+            if (oldTemp === 0 && newTemp > 0) {
+                const avgSpeed = Math.sqrt((3 * k * newTemp * NA) / 0.028) / 100;
+                for (let particle of simState.particles) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speedVariation = 0.5 + Math.random();
+                    particle.vx = Math.cos(angle) * avgSpeed * speedVariation;
+                    particle.vy = Math.sin(angle) * avgSpeed * speedVariation;
+                }
+                return;
+            }
+            
+            if (newTemp === 0) {
+                for (let particle of simState.particles) {
+                    particle.vx = 0;
+                    particle.vy = 0;
+                }
+                return;
+            }
+            
+            if (oldTemp === 0) {
+                createParticles();
+                return;
+            }
+            
+            const velocityRatio = Math.sqrt(newTemp / oldTemp);
+            
+            for (let particle of simState.particles) {
+                particle.vx *= velocityRatio;
+                particle.vy *= velocityRatio;
+            }
+        }
+
+        function toggleParticles() {
+            simState.showParticles = !simState.showParticles;
+            document.getElementById('toggle-particles').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function toggleVectors() {
+            simState.showVectors = !simState.showVectors;
+            document.getElementById('toggle-vectors').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function createParticles() {
+            const numParticles = Math.round(simState.moles * 100);
+            
+            let avgSpeed = 0;
+            if (simState.temperature > 0) {
+                avgSpeed = Math.sqrt((3 * k * simState.temperature * NA) / 0.028) / 100;
+            }
+            
+            simState.particles = [];
+            const radius = 4;
+            for (let i = 0; i < numParticles; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speedVariation = 0.5 + Math.random();
+                simState.particles.push({
+                    x: simState.containerX + radius + Math.random() * (simState.containerWidth - 2 * radius),
+                    y: simState.containerY + radius + Math.random() * (simState.containerHeight - 2 * radius),
+                    vx: Math.cos(angle) * avgSpeed * speedVariation,
+                    vy: Math.sin(angle) * avgSpeed * speedVariation,
+                    radius: radius
+                });
+            }
+        }
+
+        function startSimulation() {
+            simState.isRunning = true;
+            simState.isPaused = false;
+            animate();
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            cancelAnimationFrame(animationId);
+            
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            
+            updateContainerSize();
+            createParticles();
+            calculateStats();
+            drawCanvas();
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            updateParticles();
+            drawCanvas();
+            
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function updateParticles() {
+            for (let particle of simState.particles) {
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                
+                if (particle.x - particle.radius <= simState.containerX || 
+                    particle.x + particle.radius >= simState.containerX + simState.containerWidth) {
+                    particle.vx *= -1;
+                    particle.x = Math.max(simState.containerX + particle.radius, 
+                                         Math.min(particle.x, simState.containerX + simState.containerWidth - particle.radius));
+                }
+                
+                if (particle.y - particle.radius <= simState.containerY || 
+                    particle.y + particle.radius >= simState.containerY + simState.containerHeight) {
+                    particle.vy *= -1;
+                    particle.y = Math.max(simState.containerY + particle.radius, 
+                                         Math.min(particle.y, simState.containerY + simState.containerHeight - particle.radius));
+                }
+            }
+            
+            for (let i = 0; i < simState.particles.length; i++) {
+                for (let j = i + 1; j < simState.particles.length; j++) {
+                    const p1 = simState.particles[i];
+                    const p2 = simState.particles[j];
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < p1.radius + p2.radius) {
+                        const angle = Math.atan2(dy, dx);
+                        const sin = Math.sin(angle);
+                        const cos = Math.cos(angle);
+                        
+                        const vx1 = p1.vx * cos + p1.vy * sin;
+                        const vy1 = p1.vy * cos - p1.vx * sin;
+                        const vx2 = p2.vx * cos + p2.vy * sin;
+                        const vy2 = p2.vy * cos - p2.vx * sin;
+                        
+                        p1.vx = vx2 * cos - vy1 * sin;
+                        p1.vy = vy1 * cos + vx2 * sin;
+                        p2.vx = vx1 * cos - vy2 * sin;
+                        p2.vy = vy2 * cos + vx1 * sin;
+                        
+                        const overlap = p1.radius + p2.radius - dist;
+                        const moveX = overlap * cos / 2;
+                        const moveY = overlap * sin / 2;
+                        p1.x -= moveX;
+                        p1.y -= moveY;
+                        p2.x += moveX;
+                        p2.y += moveY;
+                    }
+                }
+            }
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#6b9eff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(simState.containerX, simState.containerY, 
+                          simState.containerWidth, simState.containerHeight);
+            
+            ctx.fillStyle = 'rgba(107, 158, 255, 0.05)';
+            ctx.fillRect(simState.containerX, simState.containerY, 
+                        simState.containerWidth, simState.containerHeight);
+            
+            if (simState.showParticles) {
+                for (let particle of simState.particles) {
+                    const speed = Math.sqrt(particle.vx ** 2 + particle.vy ** 2);
+
+                    const tempNormalized = Math.min(simState.temperature / 600, 1);
+                    
+                    let r, g, b;
+                    if (tempNormalized < 0.5) {
+                        const t = tempNormalized * 2;
+                        r = Math.floor(100 + (180 - 100) * t);
+                        g = Math.floor(150 + (140 - 150) * t);
+                        b = Math.floor(255 + (200 - 255) * t);
+                    } else {
+                        const t = (tempNormalized - 0.5) * 2;
+                        r = Math.floor(180 + (255 - 180) * t);
+                        g = Math.floor(140 + (160 - 140) * t);
+                        b = Math.floor(200 + (100 - 200) * t);
+                    }
+                    
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    if (simState.showVectors && (particle.vx !== 0 || particle.vy !== 0)) {
+                        ctx.strokeStyle = `rgba(255, 235, 107, 0.8)`;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(particle.x, particle.y);
+                        ctx.lineTo(particle.x + particle.vx * 8, particle.y + particle.vy * 8);
+                        ctx.stroke();
+                        
+                        const arrowX = particle.x + particle.vx * 8;
+                        const arrowY = particle.y + particle.vy * 8;
+                        const angle = Math.atan2(particle.vy, particle.vx);
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(arrowX, arrowY);
+                        ctx.lineTo(
+                            arrowX - 6 * Math.cos(angle - Math.PI / 6),
+                            arrowY - 6 * Math.sin(angle - Math.PI / 6)
+                        );
+                        ctx.moveTo(arrowX, arrowY);
+                        ctx.lineTo(
+                            arrowX - 6 * Math.cos(angle + Math.PI / 6),
+                            arrowY - 6 * Math.sin(angle + Math.PI / 6)
+                        );
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function calculateStats() {
+            const pressure = simState.temperature > 0 ? (simState.moles * R * simState.temperature) / simState.volume : 0;
+            const numParticles = Math.round(simState.moles * 100);
+            const avgSpeed = simState.temperature > 0 ? Math.sqrt((3 * k * simState.temperature * NA) / 0.028) : 0;
+            const density = simState.moles / simState.volume;
+            
+            document.getElementById('stat-pressure').textContent = pressure.toFixed(2);
+            document.getElementById('stat-particles').textContent = numParticles;
+            document.getElementById('stat-avgSpeed').textContent = avgSpeed.toFixed(0);
+            document.getElementById('stat-density').textContent = density.toFixed(3);
+        }
+
+        init();
+    </script>
 </body>
 </html>
