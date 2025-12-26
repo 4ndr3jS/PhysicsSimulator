@@ -158,6 +158,264 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            time: 0,
+            source: { x: 100, y: 250 },
+            waves: [],
+            velocity: 50,
+            frequency: 4,
+            soundSpeed: 60,
+            showWaves: true,
+            showObservers: true,
+            showLabels: true,
+            waveEmitTimer: 0,
+            pixelsPerMeter: 2
+        };
 
+        let animationId = null;
+        const observerAhead = { x: 700, y: 250 };
+        const observerBehind = { x: 100, y: 250 };
+
+        function init() {
+            drawCanvas();
+            calculateStats();
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            simState[param] = parseFloat(value);
+            calculateStats();
+            
+            const machNumber = simState.velocity / simState.soundSpeed;
+            const alert = document.getElementById('sonicBoomAlert');
+            if (machNumber >= 1.0) {
+                alert.style.display = 'block';
+            } else {
+                alert.style.display = 'none';
+            }
+        }
+
+        function toggleWaves() {
+            simState.showWaves = !simState.showWaves;
+            document.getElementById('toggle-waves').classList.toggle('active');
+        }
+
+        function toggleObservers() {
+            simState.showObservers = !simState.showObservers;
+            document.getElementById('toggle-observers').classList.toggle('active');
+        }
+
+        function toggleLabels() {
+            simState.showLabels = !simState.showLabels;
+            document.getElementById('toggle-labels').classList.toggle('active');
+        }
+
+        function startSimulation() {
+            if (!simState.isRunning) {
+                simState.isRunning = true;
+                simState.isPaused = false;
+                animate();
+            }
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.time = 0;
+            simState.source = { x: 100, y: 250 };
+            simState.waves = [];
+            simState.waveEmitTimer = 0;
+            cancelAnimationFrame(animationId);
+            
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            drawCanvas();
+            calculateStats();
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            const dt = 0.03;
+            simState.time += dt;
+            simState.waveEmitTimer += dt;
+
+            simState.source.x += simState.velocity * simState.pixelsPerMeter * dt;
+            
+            if (simState.source.x > canvas.width + 50) {
+                simState.source.x = -50;
+                simState.waves = [];
+            }
+
+            const emissionPeriod = 1 / simState.frequency;
+            if (simState.waveEmitTimer >= emissionPeriod) {
+                simState.waves.push({
+                    x: simState.source.x,
+                    y: simState.source.y,
+                    radius: 0,
+                    born: simState.time
+                });
+                simState.waveEmitTimer = 0;
+            }
+
+            simState.waves.forEach(wave => {
+                const age = simState.time - wave.born;
+                wave.radius = age * simState.soundSpeed * simState.pixelsPerMeter;
+            });
+
+            simState.waves = simState.waves.filter(wave => {
+                return wave.radius < Math.max(canvas.width, canvas.height) * 1.2;
+            });
+            
+            document.getElementById('stat-waveCount').textContent = simState.waves.length;
+            
+            drawCanvas();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'rgba(26, 26, 46, 1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const machNumber = simState.velocity / simState.soundSpeed;
+
+            if (simState.showWaves) {
+                if (machNumber >= 1.0) {
+                    ctx.strokeStyle = 'rgba(255, 107, 107, 0.7)';
+                    ctx.lineWidth = 3;
+                    
+                    const angle = Math.asin(1 / machNumber);
+                    const shockLength = 400;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(simState.source.x, simState.source.y);
+                    ctx.lineTo(
+                        simState.source.x - shockLength * Math.cos(angle),
+                        simState.source.y - shockLength * Math.sin(angle)
+                    );
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(simState.source.x, simState.source.y);
+                    ctx.lineTo(
+                        simState.source.x - shockLength * Math.cos(angle),
+                        simState.source.y + shockLength * Math.sin(angle)
+                    );
+                    ctx.stroke();
+                }
+
+                simState.waves.forEach((wave, i) => {
+                    const maxDist = 500;
+                    const opacity = Math.max(0.2, 1 - wave.radius / maxDist);
+                    
+                    if (machNumber >= 1.0) {
+                        ctx.strokeStyle = `rgba(255, 107, 107, ${opacity})`;
+                    } else {
+                        ctx.strokeStyle = `rgba(107, 158, 255, ${opacity})`;
+                    }
+                    
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+            }
+
+            if (simState.showObservers) {
+                ctx.fillStyle = '#6bff9e';
+                ctx.beginPath();
+                ctx.arc(observerAhead.x, observerAhead.y, 12, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ff9e6b';
+                ctx.beginPath();
+                ctx.arc(observerBehind.x, observerBehind.y, 12, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (simState.showLabels) {
+                    ctx.font = '14px sans-serif';
+                    ctx.fillStyle = '#6bff9e';
+                    ctx.fillText('Ahead', observerAhead.x - 20, observerAhead.y - 20);
+                    ctx.fillStyle = '#ff9e6b';
+                    ctx.fillText('Behind', observerBehind.x - 25, observerBehind.y - 20);
+                }
+            }
+
+            const gradient = ctx.createRadialGradient(
+                simState.source.x, simState.source.y, 0,
+                simState.source.x, simState.source.y, 15
+            );
+            
+            if (machNumber >= 1.0) {
+                gradient.addColorStop(0, '#ff6b6b');
+                gradient.addColorStop(1, '#cc0000');
+            } else {
+                gradient.addColorStop(0, '#6b9eff');
+                gradient.addColorStop(1, '#4477dd');
+            }
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(simState.source.x, simState.source.y, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (simState.showLabels && simState.isRunning) {
+                ctx.font = 'bold 14px sans-serif';
+                
+                if (machNumber >= 1.0) {
+                    ctx.fillStyle = '#ff6b6b';
+                    ctx.fillText(`SUPERSONIC →`, simState.source.x + 20, simState.source.y - 10);
+                } else {
+                    ctx.fillStyle = '#6b9eff';
+                    ctx.fillText(`→ ${simState.velocity} m/s`, simState.source.x + 20, simState.source.y - 10);
+                }
+            }
+        }
+
+        function calculateStats() {
+            const v = simState.soundSpeed;
+            const vs = simState.velocity;
+            const f = simState.frequency;
+            const machNumber = vs / v;
+
+            document.getElementById('stat-machNumber').textContent = machNumber.toFixed(2);
+
+            if (machNumber >= 1.0) {
+                document.getElementById('stat-freqAhead').textContent = '∞';
+                document.getElementById('stat-freqAhead').style.color = '#ff6b6b';
+                document.getElementById('stat-freqBehind').textContent = (f * v / (v + vs)).toFixed(1);
+            } else {
+                const freqAhead = f * v / (v - vs);
+                const freqBehind = f * v / (v + vs);
+                
+                document.getElementById('stat-freqAhead').textContent = freqAhead.toFixed(1);
+                document.getElementById('stat-freqAhead').style.color = '#6bff9e';
+                document.getElementById('stat-freqBehind').textContent = freqBehind.toFixed(1);
+            }
+        }
+
+        init();
+    </script>
 </body>
 </html>
