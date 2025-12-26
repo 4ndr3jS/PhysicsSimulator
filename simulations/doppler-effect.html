@@ -23,6 +23,140 @@
             <p>Observe how sound wave frequency changes when the source is moving relative to an observer</p>
             <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-easy">● Easy</span></p>
         </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">f' = f · (v ± v₀) / (v ± vₛ)</div>
+                        <div class="sim-formula-description">Observed frequency formula</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">λ = v / f</div>
+                        <div class="sim-formula-description">Wavelength relationship</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Mach Number = vₛ / v</div>
+                        <div class="sim-formula-description">When Mach ≥ 1: Sonic boom!</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Waves bunch up in front of moving source</li>
+                        <li>Waves spread out behind moving source</li>
+                        <li>Observer hears higher pitch when source approaches</li>
+                        <li>Observer hears lower pitch when source recedes</li>
+                        <li>At supersonic speeds, shock waves form</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Start slow and gradually increase speed</li>
+                        <li>Watch wave compression as speed increases</li>
+                        <li>Push velocity to supersonic (>343 m/s)</li>
+                        <li>Observe the V-shaped shock wave pattern</li>
+                        <li>Compare subsonic vs supersonic behavior</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div id="sonicBoomAlert" class="sonic-boom-alert" style="display: none;">
+                        💥 SONIC BOOM! 💥<br>Speed > Sound Speed
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Source Velocity</span>
+                            <span class="sim-control-value"><span id="val-velocity">50</span> m/s</span>
+                        </div>
+                        <input type="range" id="slider-velocity" min="0" max="250" value="50" oninput="updateParameter('velocity', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Emission Rate</span>
+                            <span class="sim-control-value"><span id="val-frequency">4</span> waves/s</span>
+                        </div>
+                        <input type="range" id="slider-frequency" min="1" max="10" value="4" oninput="updateParameter('frequency', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Sound Speed</span>
+                            <span class="sim-control-value"><span id="val-soundSpeed">60</span> m/s</span>
+                        </div>
+                        <input type="range" id="slider-soundSpeed" min="50" max="300" value="60" oninput="updateParameter('soundSpeed', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Wavefronts</span>
+                        <div class="sim-toggle-switch active" id="toggle-waves" onclick="toggleWaves()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Observers</span>
+                        <div class="sim-toggle-switch active" id="toggle-observers" onclick="toggleObservers()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Labels</span>
+                        <div class="sim-toggle-switch active" id="toggle-labels" onclick="toggleLabels()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-machNumber">0.15</div>
+                        <div class="sim-stat-label">Mach Number</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-freqAhead">N/A</div>
+                        <div class="sim-stat-label">Freq Ahead (Hz)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-freqBehind">N/A</div>
+                        <div class="sim-stat-label">Freq Behind (Hz)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-waveCount">0</div>
+                        <div class="sim-stat-label">Active Waves</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </body>
