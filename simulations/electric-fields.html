@@ -23,6 +23,144 @@
             <p>Explore electric fields, field lines, and forces between charged particles</p>
             <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-easy">● Easy</span></p>
         </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary active" onclick="setTool('positive')" id="btn-positive">➕ Positive</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="setTool('negative')" id="btn-negative">➖ Negative</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="setTool('test')" id="btn-test">🎯 Test Charge</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="clearAll()">🗑️ Clear</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F = k·q₁·q₂/r²</div>
+                        <div class="sim-formula-description">Coulomb's Law (force between charges)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">E = k·q/r²</div>
+                        <div class="sim-formula-description">Electric field strength</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F = q·E</div>
+                        <div class="sim-formula-description">Force on charge in field</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Like charges repel, opposite charges attract</li>
+                        <li>Field strength decreases with distance (1/r²)</li>
+                        <li>Field lines point away from positive charges</li>
+                        <li>Field lines point toward negative charges</li>
+                        <li>Denser field lines = stronger field</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Place two opposite charges to see attraction</li>
+                        <li>Place two same charges to see repulsion</li>
+                        <li>Add a test charge to see force vectors</li>
+                        <li>Create an electric dipole configuration</li>
+                        <li>Build a line of alternating charges</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Charge Settings</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Charge Magnitude</span>
+                            <span class="sim-control-value"><span id="val-charge">5.0</span> μC</span>
+                        </div>
+                        <input type="range" id="slider-charge" min="1" max="10" step="0.5" value="5" oninput="updateParameter('charge', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔧</span>
+                        <span>Visualization</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Field Line Density</span>
+                            <span class="sim-control-value"><span id="val-fieldDensity">20</span></span>
+                        </div>
+                        <input type="range" id="slider-fieldDensity" min="8" max="40" value="20" oninput="updateParameter('fieldDensity', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Vector Scale</span>
+                            <span class="sim-control-value"><span id="val-vectorScale">1.0</span>x</span>
+                        </div>
+                        <input type="range" id="slider-vectorScale" min="0.5" max="3.0" step="0.1" value="1.0" oninput="updateParameter('vectorScale', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Field Lines</span>
+                        <div class="sim-toggle-switch active" id="toggle-fieldLines" onclick="toggleFieldLines()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Vectors</span>
+                        <div class="sim-toggle-switch active" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Potential</span>
+                        <div class="sim-toggle-switch" id="toggle-potential" onclick="togglePotential()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value red" id="stat-positive">0</div>
+                        <div class="sim-stat-label">Positive Charges</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-negative">0</div>
+                        <div class="sim-stat-label">Negative Charges</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-test">0</div>
+                        <div class="sim-stat-label">Test Charges</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-total">0</div>
+                        <div class="sim-stat-label">Total Objects</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
 </body>
