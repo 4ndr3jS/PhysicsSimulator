@@ -634,3 +634,81 @@ input[type="range"]:disabled {
 .visible{
     display: block;
 }
+
+.simulation-area {
+    position: relative;
+    background: #1a1a2e;
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+#magneticCanvas {
+    display: block;
+    background: #1a1a2e;
+    border-radius: 8px;
+    cursor: crosshair;
+}
+
+.mode-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.mode-btn {
+    padding: 12px;
+    background: var(--sim-panel-bg);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    color: var(--sim-text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.mode-btn.active {
+    background: var(--sim-primary);
+    color: white;
+    border-color: var(--sim-primary);
+    box-shadow: 0 4px 12px rgba(107, 158, 255, 0.3);
+}
+
+.compass {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    color: #ff6b6b;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+}

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magnetic Field Simulation - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="guide.html">Guide</a>
+            <a href="theory.html">Theory</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🧲 Magnetic Field Simulation</h1>
+            <p>Visualize magnetic fields around magnets and current-carrying wires</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🎯</span>
+                        <span>Simulation Mode</span>
+                    </div>
+                    
+                    <div class="mode-selector">
+                        <button class="mode-btn active" onclick="setMode('magnet')">🧲 Bar Magnets</button>
+                        <button class="mode-btn" onclick="setMode('wire')">⚡ Current Wire</button>
+                        <button class="mode-btn" onclick="setMode('electromagnet')">🔌 Electromagnet</button>
+                    </div>
+                </div>
+
+                <div class="simulation-area">
+                    <canvas id="magneticCanvas" width="800" height="500"></canvas>
+                    <div class="grid-overlay" id="gridOverlay"></div>
+                    <div class="compass" id="compass">N</div>
+                </div>
+
+                <div class="sim-controls">
+                    <button class="sim-btn sim-btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">B = μ₀I / (2πr)</div>
+                        <div class="sim-formula-description">Magnetic field around a wire</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F = q(v × B)</div>
+                        <div class="sim-formula-description">Lorentz force on moving charge</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Φ = B⋅A</div>
+                        <div class="sim-formula-description">Magnetic flux through area</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Field lines go from North to South poles</li>
+                        <li>Right-hand rule: thumb=current, fingers=field</li>
+                        <li>Field strength decreases with distance</li>
+                        <li>Like poles repel, opposite poles attract</li>
+                        <li>Moving charges create magnetic fields</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Field Line Density</span>
+                            <span class="sim-control-value"><span id="val-density">16</span></span>
+                        </div>
+                        <input type="range" id="slider-density" min="8" max="32" value="16" step="4" oninput="updateParam('density', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Field Strength</span>
+                            <span class="sim-control-value"><span id="val-strength">1.0</span> T</span>
+                        </div>
+                        <input type="range" id="slider-strength" min="0.5" max="3" value="1.0" step="0.1" oninput="updateParam('strength', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Field Lines</span>
+                        <div class="sim-toggle-switch active" id="toggle-lines" onclick="toggleLines()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Grid</span>
+                        <div class="sim-toggle-switch active" id="toggle-grid" onclick="toggleGrid()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Compass</span>
+                        <div class="sim-toggle-switch active" id="toggle-compass" onclick="toggleCompass()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-strength">0.00</div>
+                        <div class="sim-stat-label">Field Strength (T)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-direction">0°</div>
+                        <div class="sim-stat-label">Field Direction</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-north">0</div>
+                        <div class="sim-stat-label">North Poles</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-objects">0</div>
+                        <div class="sim-stat-label">Total Objects</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            mode: 'magnet',
+            objects: [],
+            showLines: true,
+            showGrid: true,
+            showCompass: true,
+            density: 16,
+            strength: 1.0,
+            dragging: null
+        };
+
+        const canvas = document.getElementById('magneticCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
+
+        function setMode(mode) {
+            state.mode = mode;
+            console.log('Mode set to:', mode);
+            document.querySelectorAll('.mode-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', ['magnet', 'wire', 'electromagnet'][i] === mode);
+            });
+        }
+
+        function clearAll() {
+            if (confirm('Clear all objects?')) {
+                state.objects = [];
+                updateStats();
+            }
+        }
+
+        function updateParam(param, val) {
+            document.getElementById(`val-${param}`).textContent = val;
+            state[param] = parseFloat(val);
+        }
+
+        function toggleLines() {
+            state.showLines = !state.showLines;
+            document.getElementById('toggle-lines').classList.toggle('active');
+        }
+
+        function toggleGrid() {
+            state.showGrid = !state.showGrid;
+            document.getElementById('toggle-grid').classList.toggle('active');
+            document.getElementById('gridOverlay').style.display = state.showGrid ? 'block' : 'none';
+        }
+
+        function toggleCompass() {
+            state.showCompass = !state.showCompass;
+            document.getElementById('toggle-compass').classList.toggle('active');
+            document.getElementById('compass').style.display = state.showCompass ? 'flex' : 'none';
+        }
+
+        canvas.addEventListener('mousedown', e => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            for (let obj of state.objects) {
+                let hitBox = 50;
+                let hitHeight = 30;
+                if (obj.type === 'wire') {
+                    hitBox = 100;
+                    hitHeight = 15;
+                }
+                if (obj.type === 'electromagnet') {
+                    hitBox = 80;
+                    hitHeight = 40;
+                }
+                
+                if (Math.abs(x - obj.x) < hitBox && Math.abs(y - obj.y) < hitHeight) {
+                    state.dragging = {obj, dx: x - obj.x, dy: y - obj.y};
+                    return;
+                }
+            }
+
+            console.log('Adding object at click position, mode:', state.mode);
+            if (state.mode === 'magnet') {
+                state.objects.push({type: 'magnet', x, y, w: 100, h: 30, angle: 0, flip: false});
+                console.log('Added magnet at', x, y);
+            } else if (state.mode === 'wire') {
+                state.objects.push({type: 'wire', x, y, dir: 1});
+                console.log('Added wire at', x, y);
+            } else if (state.mode === 'electromagnet') {
+                state.objects.push({type: 'electromagnet', x, y, w: 120, h: 50, on: true});
+                console.log('Added electromagnet at', x, y);
+            }
+            updateStats();
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (!state.dragging) return;
+            const rect = canvas.getBoundingClientRect();
+            state.dragging.obj.x = e.clientX - rect.left - state.dragging.dx;
+            state.dragging.obj.y = e.clientY - rect.top - state.dragging.dy;
+        });
+
+        canvas.addEventListener('mouseup', () => state.dragging = null);
+
+        canvas.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            state.objects = state.objects.filter(obj => {
+                let hitBox = 50;
+                let hitHeight = 30;
+                if (obj.type === 'wire') {
+                    hitBox = 100;
+                    hitHeight = 15;
+                }
+                if (obj.type === 'electromagnet') {
+                    hitBox = 80;
+                    hitHeight = 40;
+                }
+                return Math.abs(x - obj.x) > hitBox || Math.abs(y - obj.y) > hitHeight;
+            });
+            updateStats();
+        });
+
+        function getField(x, y) {
+            let fx = 0, fy = 0;
+            
+            state.objects.forEach(obj => {
+                const dx = x - obj.x;
+                const dy = y - obj.y;
+                const d = Math.sqrt(dx*dx + dy*dy) || 1;
+                
+                if (obj.type === 'magnet') {
+                    const str = state.strength / (d * d);
+                    const dir = obj.flip ? -1 : 1;
+                    fx += (dx / d) * str * dir;
+                    fy += (dy / d) * str * dir;
+                } else if (obj.type === 'wire') {
+                    const str = state.strength * 5 / d;
+                    fx += (-dy / d) * str * obj.dir;
+                    fy += (dx / d) * str * obj.dir;
+                } else if (obj.type === 'electromagnet' && obj.on) {
+                    const str = state.strength * 1.5 / (d * d);
+                    fx += (dx / d) * str;
+                    fy += (dy / d) * str;
+                }
+            });
+            
+            return {x: fx, y: fy, mag: Math.sqrt(fx*fx + fy*fy)};
+        }
+
+        function drawFieldLine(sx, sy) {
+            const points = [{x: sx, y: sy}];
+            let x = sx, y = sy;
+            
+            for (let i = 0; i < 80; i++) {
+                const f = getField(x, y);
+                if (f.mag < 0.01) break;
+                
+                x += (f.x / f.mag) * 5;
+                y += (f.y / f.mag) * 5;
+                
+                if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) break;
+                points.push({x, y});
+            }
+            
+            if (points.length < 3) return;
+            
+            ctx.strokeStyle = 'rgba(107, 158, 255, 0.5)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            points.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.stroke();
+            
+            if (points.length > 10) {
+                const p1 = points[points.length - 1];
+                const p2 = points[points.length - 2];
+                const angle = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+                
+                ctx.save();
+                ctx.translate(p1.x, p1.y);
+                ctx.rotate(angle);
+                ctx.fillStyle = 'rgba(107, 158, 255, 0.8)';
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-8, -4);
+                ctx.lineTo(-8, 4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function drawObjects() {
+            state.objects.forEach(obj => {
+                ctx.save();
+                ctx.translate(obj.x, obj.y);
+                
+                if (obj.type === 'magnet') {
+                    ctx.rotate(obj.angle || 0);
+
+                    ctx.fillStyle = '#ff6b6b';
+                    ctx.fillRect(-obj.w/2, -obj.h/2, obj.w/2, obj.h);
+
+                    ctx.fillStyle = '#6b9eff';
+                    ctx.fillRect(0, -obj.h/2, obj.w/2, obj.h);
+
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(-obj.w/2, -obj.h/2, obj.w, obj.h);
+
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(obj.flip ? 'S' : 'N', -obj.w/4, 0);
+                    ctx.fillText(obj.flip ? 'N' : 'S', obj.w/4, 0);
+                    
+                } else if (obj.type === 'wire') {
+                    ctx.strokeStyle = '#ffeb6b';
+                    ctx.lineWidth = 6;
+                    ctx.lineCap = 'round';
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(-100, 0);
+                    ctx.lineTo(100, 0);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#000';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    if (obj.dir > 0) {
+                        ctx.moveTo(80, 0);
+                        ctx.lineTo(70, -6);
+                        ctx.lineTo(70, 6);
+                    } else {
+                        ctx.moveTo(-80, 0);
+                        ctx.lineTo(-70, -6);
+                        ctx.lineTo(-70, 6);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                } else if (obj.type === 'electromagnet') {
+                    ctx.fillStyle = '#888';
+                    ctx.fillRect(-obj.w/2, -8, obj.w, 16);
+
+                    ctx.strokeStyle = obj.on ? '#ffeb6b' : '#666';
+                    ctx.lineWidth = 3;
+                    
+                    const numCoils = 8;
+                    for (let i = 0; i < numCoils; i++) {
+                        const x = -obj.w/2 + (i / (numCoils - 1)) * obj.w;
+                        
+                        ctx.beginPath();
+                        ctx.arc(x, -8, 8, Math.PI, 0, false);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.arc(x, 8, 8, 0, Math.PI, false);
+                        ctx.stroke();
+                    }
+                    
+                    if (obj.on) {
+                        ctx.fillStyle = '#ff6b6b';
+                        ctx.beginPath();
+                        ctx.arc(-obj.w/2 - 15, 0, 12, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 12px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('N', -obj.w/2 - 15, 0);
+                        
+                        ctx.fillStyle = '#6b9eff';
+                        ctx.beginPath();
+                        ctx.arc(obj.w/2 + 15, 0, 12, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText('S', obj.w/2 + 15, 0);
+                    }
+                }
+                
+                ctx.restore();
+            });
+        }
+
+        function updateStats() {
+            const centerField = getField(canvas.width/2, canvas.height/2);
+            document.getElementById('stat-strength').textContent = centerField.mag.toFixed(2);
+            document.getElementById('stat-direction').textContent = 
+                (Math.atan2(centerField.y, centerField.x) * 180 / Math.PI).toFixed(0) + '°';
+            document.getElementById('stat-north').textContent = state.objects.length;
+            document.getElementById('stat-objects').textContent = state.objects.length;
+
+            const angle = Math.atan2(centerField.y, centerField.x);
+            document.getElementById('compass').style.transform = `rotate(${angle}rad)`;
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (state.showLines) {
+                state.objects.forEach(obj => {
+                    for (let i = 0; i < state.density; i++) {
+                        const angle = (i / state.density) * Math.PI * 2;
+                        const r = 30;
+                        drawFieldLine(
+                            obj.x + Math.cos(angle) * r,
+                            obj.y + Math.sin(angle) * r
+                        );
+                    }
+                });
+            }
+            
+            drawObjects();
+            updateStats();
+            animationId = requestAnimationFrame(render);
+        }
+
+        window.addEventListener('load', () => {
+            state.objects.push(
+                {type: 'magnet', x: 300, y: 250, w: 100, h: 30, angle: 0, flip: false},
+                {type: 'wire', x: 500, y: 250, dir: 1}
+            );
+            render();
+        });
+    </script>
+</body>
+</html>
