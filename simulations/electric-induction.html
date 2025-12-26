@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electromagnetic Induction - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="guide.html">Guide</a>
+            <a href="theory.html">Theory</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>⚡ Electromagnetic Induction</h1>
+            <p>Explore Faraday's Law and generate electricity through changing magnetic fields</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🎯</span>
+                        <span>Simulation Mode</span>
+                    </div>
+                    
+                    <div class="mode-selector">
+                        <button class="mode-btn active" onclick="setMode('magnet-coil')">🧲 Moving Magnet</button>
+                        <button class="mode-btn" onclick="setMode('rotating-coil')">🔄 Rotating Coil</button>
+                        <button class="mode-btn" onclick="setMode('transformer')">⚡ Transformer</button>
+                    </div>
+                </div>
+
+                <div class="sim-canvas-wrapper">
+                    <canvas id="inductionCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="toggleAnimation()">▶️ <span id="playText">Play</span></button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSim()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">ε = -N(dΦ/dt)</div>
+                        <div class="sim-formula-description">Faraday's Law: Induced EMF</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Φ = B·A·cos(θ)</div>
+                        <div class="sim-formula-description">Magnetic flux through area</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">ε = BLv</div>
+                        <div class="sim-formula-description">Motional EMF (straight conductor)</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Changing magnetic flux induces voltage</li>
+                        <li>Faster changes create larger voltages</li>
+                        <li>Lenz's Law: Induced current opposes change</li>
+                        <li>More coil turns = higher induced voltage</li>
+                        <li>Generators convert mechanical to electrical energy</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Increase speed - watch voltage spike!</li>
+                        <li>Try different modes to see various induction types</li>
+                        <li>Add more coil turns for higher voltage</li>
+                        <li>Observe how current direction follows Lenz's Law</li>
+                        <li>Compare generator (rotating) vs transformer modes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Motion Speed</span>
+                            <span class="sim-control-value"><span id="val-speed">2.0</span></span>
+                        </div>
+                        <input type="range" id="slider-speed" min="0.5" max="5" value="2.0" step="0.1" oninput="updateParam('speed', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Magnetic Field Strength</span>
+                            <span class="sim-control-value"><span id="val-field">1.5</span> T</span>
+                        </div>
+                        <input type="range" id="slider-field" min="0.5" max="3" value="1.5" step="0.1" oninput="updateParam('field', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Coil Turns</span>
+                            <span class="sim-control-value"><span id="val-turns">10</span></span>
+                        </div>
+                        <input type="range" id="slider-turns" min="1" max="30" value="10" step="1" oninput="updateParam('turns', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Field Lines</span>
+                        <div class="sim-toggle-switch active" id="toggle-lines" onclick="toggleLines()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Current Flow</span>
+                        <div class="sim-toggle-switch active" id="toggle-current" onclick="toggleCurrent()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Flux Direction</span>
+                        <div class="sim-toggle-switch active" id="toggle-flux" onclick="toggleFlux()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-voltage">0.00</div>
+                        <div class="sim-stat-label">Voltage (V)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-flux">0.00</div>
+                        <div class="sim-stat-label">Flux (Wb)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-current">0.00</div>
+                        <div class="sim-stat-label">Current (A)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-power">0.00</div>
+                        <div class="sim-stat-label">Power (W)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
