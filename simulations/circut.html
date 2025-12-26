@@ -128,7 +128,7 @@
                     </div>
 
                     <div class="sim-toggle">
-                        <span>Show Voltage Labels</span>
+                        <span>Show Labels</span>
                         <div class="sim-toggle-switch active" id="toggle-labels" onclick="toggleLabels()"></div>
                     </div>
 
@@ -159,6 +159,396 @@
             </div>
         </div>
     </div>
+    <script>
+        const state = {
+            switchOn: false,
+            voltage: 9,
+            resistance: 330,
+            current: 0,
+            power: 0,
+            showCurrent: true,
+            showLabels: true,
+            showElectrons: true,
+            time: 0,
+            electrons: [],
+            ledBrightness: 0,
+            ledBurned: false
+        };
 
+        const canvas = document.getElementById('circuitCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
+
+        const circuit = {
+            battery: { x: 150, y: 250, width: 60, height: 100 },
+            resistor: { x: 400, y: 150, width: 80, height: 30 },
+            switch: { x: 650, y: 150, width: 60, height: 30 },
+            led: { x: 650, y: 350, width: 40, height: 40 }
+        };
+
+        function initElectrons() {
+            state.electrons = [];
+            for (let i = 0; i < 15; i++) {
+                state.electrons.push({
+                    progress: i / 15,
+                    speed: 0.01
+                });
+            }
+        }
+
+        function toggleSwitch() {
+            if (state.ledBurned) {
+                return;
+            }
+            state.switchOn = !state.switchOn;
+            document.getElementById('switchText').textContent = state.switchOn ? '🔌 Turn OFF' : '🔌 Turn ON';
+            calculateCircuit();
+            if (!state.switchOn) {
+                state.electrons = [];
+            } else {
+                initElectrons();
+            }
+        }
+
+        function resetCircuit() {
+            state.switchOn = false;
+            state.voltage = 9;
+            state.resistance = 330;
+            state.electrons = [];
+            state.ledBurned = false;
+            state.ledBrightness = 0;
+            document.getElementById('switchText').textContent = '🔌 Turn ON';
+            document.getElementById('slider-voltage').value = 9;
+            document.getElementById('slider-resistance').value = 330;
+            document.getElementById('val-voltage').textContent = 9;
+            document.getElementById('val-resistance').textContent = 330;
+            calculateCircuit();
+        }
+
+        function updateParam(param, val) {
+            document.getElementById(`val-${param}`).textContent = val;
+            state[param] = parseFloat(val);
+            calculateCircuit();
+        }
+
+        function toggleCurrent() {
+            state.showCurrent = !state.showCurrent;
+            document.getElementById('toggle-current').classList.toggle('active');
+        }
+
+        function toggleLabels() {
+            state.showLabels = !state.showLabels;
+            document.getElementById('toggle-labels').classList.toggle('active');
+        }
+
+        function toggleElectrons() {
+            state.showElectrons = !state.showElectrons;
+            document.getElementById('toggle-electrons').classList.toggle('active');
+        }
+
+        function calculateCircuit() {
+            if (state.switchOn && !state.ledBurned) {
+                const ledVoltage = 2;
+                const effectiveVoltage = state.voltage - ledVoltage;
+                
+                if (effectiveVoltage <= 0) {
+                    state.current = 0;
+                    state.power = 0;
+                    state.ledBrightness = 0;
+                } else {
+                    state.current = (effectiveVoltage / state.resistance) * 1000;
+                    state.power = (effectiveVoltage * state.current);
+                    
+                    if (state.current > 35) {
+                        state.ledBurned = true;
+                        state.ledBrightness = 0;
+                        state.current = 0;
+                        state.power = 0;
+                    } else {
+                        state.ledBrightness = Math.min((state.current / 30) * 100, 100);
+                    }
+                }
+            } else {
+                state.current = 0;
+                state.power = 0;
+                state.ledBrightness = 0;
+            }
+
+            document.getElementById('stat-voltage').textContent = state.voltage.toFixed(1);
+            document.getElementById('stat-current').textContent = state.current.toFixed(2);
+            document.getElementById('stat-resistance').textContent = state.resistance;
+            document.getElementById('stat-power').textContent = state.power.toFixed(2);
+        }
+
+        function getCircuitPath(progress) {
+            const path = [
+                { x: 150, y: 200 },
+                { x: 150, y: 150 },
+                { x: 350, y: 150 },
+                { x: 480, y: 150 },
+                { x: 620, y: 150 },
+                { x: 710, y: 150 },
+                { x: 710, y: 350 },
+                { x: 650, y: 350 },
+                { x: 150, y: 350 },
+                { x: 150, y: 300 }
+            ];
+
+            const totalSegments = path.length - 1;
+            const segment = Math.floor(progress * totalSegments);
+            const segmentProgress = (progress * totalSegments) % 1;
+
+            const start = path[segment];
+            const end = path[segment + 1] || path[0];
+
+            return {
+                x: start.x + (end.x - start.x) * segmentProgress,
+                y: start.y + (end.y - start.y) * segmentProgress
+            };
+        }
+
+        function drawBattery(x, y, w, h) {
+            ctx.fillStyle = '#444';
+            ctx.fillRect(x - w/2, y - h/2, w, h);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x - w/2, y - h/2, w, h);
+
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(x - w/2 + 10, y - h/2 - 10, w - 20, 10);
+
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - 10, y - h/2 + 20);
+            ctx.lineTo(x + 10, y - h/2 + 20);
+            ctx.moveTo(x, y - h/2 + 10);
+            ctx.lineTo(x, y - h/2 + 30);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x - 10, y + h/2 - 20);
+            ctx.lineTo(x + 10, y + h/2 - 20);
+            ctx.stroke();
+
+            if (state.showLabels) {
+                ctx.fillStyle = '#6b9eff';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${state.voltage}V`, x, y);
+            }
+        }
+
+        function drawResistor(x, y, w, h) {
+            ctx.strokeStyle = '#ffeb6b';
+            ctx.lineWidth = 4;
+
+            ctx.beginPath();
+            ctx.moveTo(x - w/2, y);
+            const segments = 6;
+            const segWidth = w / segments;
+            for (let i = 0; i < segments; i++) {
+                const xPos = x - w/2 + i * segWidth + segWidth/2;
+                const yPos = y + (i % 2 === 0 ? -h/2 : h/2);
+                ctx.lineTo(xPos, yPos);
+            }
+            ctx.lineTo(x + w/2, y);
+            ctx.stroke();
+
+            if (state.showLabels) {
+                ctx.fillStyle = '#ffeb6b';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${state.resistance}Ω`, x, y + 30);
+            }
+        }
+
+        function drawSwitch(x, y, w, h, isOn) {
+            ctx.fillStyle = '#888';
+            ctx.beginPath();
+            ctx.arc(x - w/2, y, 6, 0, Math.PI * 2);
+            ctx.arc(x + w/2, y, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = isOn ? '#51cf66' : '#ff6b6b';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(x - w/2, y);
+            if (isOn) {
+                ctx.lineTo(x + w/2, y);
+            } else {
+                ctx.lineTo(x + w/2 - 10, y - 20);
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = isOn ? '#51cf66' : '#ff6b6b';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(isOn ? 'ON' : 'OFF', x, y + 30);
+        }
+
+        function drawLED(x, y, w, h) {
+            ctx.beginPath();
+            ctx.moveTo(x - w/2, y - h/2);
+            ctx.lineTo(x + w/2, y - h/2);
+            ctx.lineTo(x, y + h/2);
+            ctx.closePath();
+            
+            if (state.ledBurned) {
+                ctx.fillStyle = '#000';
+            } else {
+                const brightness = state.ledBrightness / 100;
+                const r = Math.floor(51 + (255 - 51) * brightness);
+                const g = Math.floor(51 + (235 - 51) * brightness);
+                const b = Math.floor(51 + (107 - 51) * brightness);
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+            }
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            if (state.ledBrightness > 5 && !state.ledBurned) {
+                const glowIntensity = state.ledBrightness / 100;
+                ctx.shadowBlur = 20 * glowIntensity;
+                ctx.shadowColor = '#ffeb6b';
+                ctx.fillStyle = `rgba(255, 235, 107, ${glowIntensity * 0.8})`;
+                ctx.beginPath();
+                ctx.arc(x, y - 5, 25 * glowIntensity, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            if (state.ledBurned) {
+                ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    const offset = Math.sin(state.time * 2 + i) * 5;
+                    ctx.arc(x + offset, y - 30 - i * 10, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - 10, y + h/2);
+            ctx.lineTo(x - 10, y + h/2 + 15);
+            ctx.moveTo(x + 10, y + h/2);
+            ctx.lineTo(x + 10, y + h/2 + 15);
+            ctx.stroke();
+
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            if (state.ledBurned) {
+                ctx.fillStyle = '#ff6b6b';
+                ctx.fillText('💥 LED BURNED OUT!', x, y + 65);
+            } else if (state.switchOn && state.ledBrightness > 0) {
+                ctx.fillStyle = '#51cf66';
+                ctx.fillText(`${state.ledBrightness.toFixed(0)}% Brightness`, x, y + 65);
+            }
+        }
+
+        function drawWires() {
+            ctx.strokeStyle = state.switchOn ? '#51cf66' : '#666';
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.moveTo(150, 200);
+            ctx.lineTo(150, 150);
+            ctx.lineTo(361, 150);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(440, 150);
+            ctx.lineTo(620, 150);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(680,150);
+            ctx.lineTo(711, 150)
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(710, 150);
+            ctx.lineTo(710, 350);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(711, 350);
+            ctx.lineTo(150, 350);
+            ctx.lineTo(150, 300);
+            ctx.stroke();
+
+            if (state.showCurrent && state.switchOn) {
+                ctx.fillStyle = '#51cf66';
+
+                ctx.beginPath();
+                ctx.moveTo(250, 150);
+                ctx.lineTo(240, 145);
+                ctx.lineTo(240, 155);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(710, 250);
+                ctx.lineTo(705, 240);
+                ctx.lineTo(715, 240);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(300, 350);
+                ctx.lineTo(310, 345);
+                ctx.lineTo(310, 355);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function drawElectrons() {
+            if (!state.showElectrons || !state.switchOn || state.ledBrightness < 5 || state.ledBurned) return;
+
+            ctx.fillStyle = '#51cf66';
+            state.electrons.forEach(electron => {
+                const pos = getCircuitPath(electron.progress);
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                electron.progress += electron.speed * (state.ledBrightness / 100);
+                if (electron.progress > 1) electron.progress = 0;
+            });
+        }
+
+        function render() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            state.time += 0.016;
+
+            drawWires();
+            drawBattery(circuit.battery.x, circuit.battery.y, circuit.battery.width, circuit.battery.height);
+            drawResistor(circuit.resistor.x, circuit.resistor.y, circuit.resistor.width, circuit.resistor.height);
+            drawSwitch(circuit.switch.x, circuit.switch.y, circuit.switch.width, circuit.switch.height, state.switchOn);
+            drawLED(circuit.led.x, circuit.led.y, circuit.led.width, circuit.led.height, state.switchOn);
+            drawElectrons();
+
+            animationId = requestAnimationFrame(render);
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (Math.abs(x - circuit.switch.x) < 40 && Math.abs(y - circuit.switch.y) < 40) {
+                toggleSwitch();
+            }
+        });
+
+        calculateCircuit();
+        render();
+    </script>
 </body>
 </html>
