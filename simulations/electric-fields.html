@@ -97,7 +97,7 @@
                             <span>Charge Magnitude</span>
                             <span class="sim-control-value"><span id="val-charge">5.0</span> μC</span>
                         </div>
-                        <input type="range" id="slider-charge" min="1" max="10" step="0.5" value="5" oninput="updateParameter('charge', this.value)">
+                        <input type="range" id="slider-charge" min="1" max="100" step="0.5" value="5" oninput="updateParameter('charge', this.value)">
                     </div>
 
                     <div class="sim-divider"></div>
@@ -162,6 +162,341 @@
             </div>
         </div>
     </div>
-    
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const k = 8.99e9;
+        
+        let simState = {
+            currentTool: 'positive',
+            charge: 5.0,
+            fieldDensity: 20,
+            vectorScale: 1.0,
+            showFieldLines: true,
+            showVectors: true,
+            showPotential: false,
+            objects: [],
+            gridSize: 25
+        };
+
+        window.setTool = function(tool) {
+            simState.currentTool = tool;
+            ['positive', 'negative', 'test'].forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
+                if (t === tool) {
+                    btn.classList.remove('sim-btn-secondary');
+                    btn.classList.add('sim-btn-primary', 'active');
+                } else {
+                    btn.classList.remove('sim-btn-primary', 'active');
+                    btn.classList.add('sim-btn-secondary');
+                }
+            });
+        }
+
+        function handleCanvasClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            let newObj = null;
+            switch(simState.currentTool) {
+                case 'positive':
+                    newObj = { type: 'positive', x, y, charge: simState.charge };
+                    break;
+                case 'negative':
+                    newObj = { type: 'negative', x, y, charge: -simState.charge };
+                    break;
+                case 'test':
+                    newObj = { type: 'test', x, y, charge: 0.1 };
+                    break;
+            }
+            
+            if (newObj) {
+                simState.objects.push(newObj);
+                drawCanvas();
+                updateStats();
+            }
+        }
+
+        function clearAll() {
+            simState.objects = [];
+            drawCanvas();
+            updateStats();
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            simState[param] = parseFloat(value);
+            drawCanvas();
+        }
+
+        function toggleFieldLines() {
+            simState.showFieldLines = !simState.showFieldLines;
+            document.getElementById('toggle-fieldLines').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function toggleVectors() {
+            simState.showVectors = !simState.showVectors;
+            document.getElementById('toggle-vectors').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function togglePotential() {
+            simState.showPotential = !simState.showPotential;
+            document.getElementById('toggle-potential').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function updateStats() {
+            const counts = { positive: 0, negative: 0, test: 0 };
+            simState.objects.forEach(obj => {
+                if (counts[obj.type] !== undefined) counts[obj.type]++;
+            });
+            
+            document.getElementById('stat-positive').textContent = counts.positive;
+            document.getElementById('stat-negative').textContent = counts.negative;
+            document.getElementById('stat-test').textContent = counts.test;
+            document.getElementById('stat-total').textContent = simState.objects.length;
+        }
+
+        function calculateField(x, y) {
+            let Ex = 0, Ey = 0;
+            
+            simState.objects.forEach(obj => {
+                if (obj.type === 'test') return;
+                
+                const dx = x - obj.x;
+                const dy = y - obj.y;
+                const r2 = dx * dx + dy * dy;
+                const r = Math.sqrt(r2);
+                
+                if (r < 15) return;
+                const softness = 1000;
+                const E = (obj.charge * 0.5) / (r2/softness);
+                Ex -= E * dx / r;
+                Ey -= E * dy / r;
+            });
+            
+            return { Ex, Ey, magnitude: Math.sqrt(Ex * Ex + Ey * Ey) };
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0a0a1e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (simState.showPotential && simState.objects.length > 0) {
+                const imageData = ctx.createImageData(canvas.width, canvas.height);
+                
+                for (let y = 0; y < canvas.height; y += 2) {
+                    for (let x = 0; x < canvas.width; x += 2) {
+                        let potential = 0;
+                        simState.objects.forEach(obj => {
+                            if (obj.type === 'test') return;
+                            const dx = x - obj.x;
+                            const dy = y - obj.y;
+                            const r = Math.sqrt(dx * dx + dy * dy);
+                            if (r > 1) potential += obj.charge / r;
+                        });
+                        
+                        const normalized = Math.max(-1, Math.min(1, potential / 20));
+                        const idx = (y * canvas.width + x) * 4;
+                        
+                        if (normalized > 0) {
+                            imageData.data[idx] = normalized * 100;
+                            imageData.data[idx + 1] = 0;
+                            imageData.data[idx + 2] = 0;
+                        } else {
+                            imageData.data[idx] = 0;
+                            imageData.data[idx + 1] = 0;
+                            imageData.data[idx + 2] = -normalized * 100;
+                        }
+                        imageData.data[idx + 3] = 60;
+                        
+                        if (x + 1 < canvas.width && y + 1 < canvas.height) {
+                            for (let dy = 0; dy < 2; dy++) {
+                                for (let dx = 0; dx < 2; dx++) {
+                                    const idx2 = ((y + dy) * canvas.width + (x + dx)) * 4;
+                                    imageData.data[idx2] = imageData.data[idx];
+                                    imageData.data[idx2 + 1] = imageData.data[idx + 1];
+                                    imageData.data[idx2 + 2] = imageData.data[idx + 2];
+                                    imageData.data[idx2 + 3] = imageData.data[idx + 3];
+                                }
+                            }
+                        }
+                    }
+                }
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            if (simState.showFieldLines && simState.objects.length > 0) {
+                const sources = simState.objects.filter(obj => obj.type !== 'test');
+                sources.forEach(obj => {
+                    const numLines = simState.fieldDensity;
+                    for (let i = 0; i < numLines; i++) {
+                        const angle = (i / numLines) * Math.PI * 2;
+                        const startX = obj.x + Math.cos(angle) * 20;
+                        const startY = obj.y + Math.sin(angle) * 20;
+                        
+                        drawFieldLine(startX, startY, obj.charge > 0);
+                    }
+                });
+            }
+
+            if (simState.showVectors && simState.objects.length > 0) {
+                for (let y = simState.gridSize; y < canvas.height; y += simState.gridSize) {
+                    for (let x = simState.gridSize; x < canvas.width; x += simState.gridSize) {
+                        const field = calculateField(x, y);
+                        
+                        if (field.magnitude > 0.01) {
+                            const scale = Math.min(20, field.magnitude * simState.vectorScale * 4);
+                            const angle = Math.atan2(field.Ey, field.Ex);
+                            
+                            const alpha = Math.min(0.6, field.magnitude / 5);
+                            ctx.strokeStyle = `rgba(107, 158, 255, ${alpha})`;
+                            ctx.fillStyle = `rgba(107, 158, 255, ${alpha})`;
+                            ctx.lineWidth = 1.5;
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(x, y);
+                            ctx.lineTo(x + Math.cos(angle) * scale, y + Math.sin(angle) * scale);
+                            ctx.stroke();
+
+                            const headSize = 4;
+                            const headAngle = 0.4;
+                            ctx.beginPath();
+                            ctx.moveTo(
+                                x + Math.cos(angle) * scale,
+                                y + Math.sin(angle) * scale
+                            );
+                            ctx.lineTo(
+                                x + Math.cos(angle) * scale - Math.cos(angle - headAngle) * headSize,
+                                y + Math.sin(angle) * scale - Math.sin(angle - headAngle) * headSize
+                            );
+                            ctx.lineTo(
+                                x + Math.cos(angle) * scale - Math.cos(angle + headAngle) * headSize,
+                                y + Math.sin(angle) * scale - Math.sin(angle + headAngle) * headSize
+                            );
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                }
+            }
+
+            simState.objects.forEach(obj => {
+                if (obj.type === 'positive') {
+                    const gradient = ctx.createRadialGradient(obj.x, obj.y, 0, obj.x, obj.y, 18);
+                    gradient.addColorStop(0, '#ff6b6b');
+                    gradient.addColorStop(1, '#cc0000');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(obj.x, obj.y, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(obj.x - 8, obj.y);
+                    ctx.lineTo(obj.x + 8, obj.y);
+                    ctx.moveTo(obj.x, obj.y - 8);
+                    ctx.lineTo(obj.x, obj.y + 8);
+                    ctx.stroke();
+                    
+                } else if (obj.type === 'negative') {
+                    const gradient = ctx.createRadialGradient(obj.x, obj.y, 0, obj.x, obj.y, 18);
+                    gradient.addColorStop(0, '#6b9eff');
+                    gradient.addColorStop(1, '#0044cc');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(obj.x, obj.y, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(obj.x - 8, obj.y);
+                    ctx.lineTo(obj.x + 8, obj.y);
+                    ctx.stroke();
+                    
+                } else if (obj.type === 'test') {
+                    ctx.fillStyle = '#6bff9e';
+                    ctx.beginPath();
+                    ctx.arc(obj.x, obj.y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#2d5a3d';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    const field = calculateField(obj.x, obj.y);
+                    const force = { x: field.Ex * obj.charge, y: field.Ey * obj.charge };
+                    const fMag = Math.sqrt(force.x * force.x + force.y * force.y);
+                    
+                    if (fMag > 0.01) {
+                        const scale = Math.min(40, fMag * 20);
+                        ctx.strokeStyle = '#ffeb6b';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.moveTo(obj.x, obj.y);
+                        ctx.lineTo(obj.x + force.x / fMag * scale, obj.y + force.y / fMag * scale);
+                        ctx.stroke();
+                    }
+                }
+            });
+        }
+
+        function drawFieldLine(x, y, outward) {
+            const points = [[x, y]];
+            const maxSteps = 200;
+            const stepSize = 3;
+            
+            for (let step = 0; step < maxSteps; step++) {
+                const field = calculateField(x, y);
+                
+                if (field.magnitude < 0.0002) break;
+                
+                const direction = outward ? 1 : -1;
+                x += direction * field.Ex / field.magnitude * stepSize;
+                y += direction * field.Ey / field.magnitude * stepSize;
+                
+                if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) break;
+                
+                let tooClose = false;
+                for (let obj of simState.objects) {
+                    if (obj.type === 'test') continue;
+                    const dx = x - obj.x;
+                    const dy = y - obj.y;
+                    if (dx * dx + dy * dy < 400) {
+                        tooClose = true;
+                        break;
+                    }
+                }
+                if (tooClose) break;
+                
+                points.push([x, y]);
+            }
+            
+            if (points.length > 1) {
+                ctx.strokeStyle = 'rgba(107, 255, 158, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(points[0][0], points[0][1]);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i][0], points[i][1]);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function init() {
+            canvas.addEventListener('click', handleCanvasClick);
+            drawCanvas();
+            updateStats();
+        }
+
+        init();
+    </script>
 </body>
 </html>
