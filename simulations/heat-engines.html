@@ -10,10 +10,10 @@
     <nav>
         <a href="index.html">Physics Simulator</a>
         <ul>
-            <a href="index.html">Home</a>
-            <a href="simulations.html">Simulations</a>
-            <a href="guide.html">Guide</a>
-            <a href="theory.html">Theory</a>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
         </ul>
     </nav>
 
@@ -443,32 +443,31 @@
 
         function getCyclePoint(t) {
             if (simState.cycleType === 'carnot') {
-                // Carnot cycle: 4 processes
-                const gamma = 1.4; // heat capacity ratio
+                const gamma = 1.4;
                 
                 if (t < 0.25) {
-                    // Process 1: Isothermal expansion at T_H (nearly horizontal top line)
+
                     const progress = t * 4;
-                    const v = 0.2 + progress * 0.4; // V1 to V2
-                    const p = 0.85 - progress * 0.05; // nearly constant, slight decrease
+                    const v = 0.2 + progress * 0.4;
+                    const p = 0.85 - progress * 0.05;
                     return {p, v};
                 } else if (t < 0.5) {
-                    // Process 2: Adiabatic expansion (curved down line to the right)
+                    
                     const progress = (t - 0.25) * 4;
-                    const v = 0.6 + progress * 0.2; // V2 to V3
-                    const p = 0.80 * Math.pow((1 - progress), 1.8); // steep curve down
+                    const v = 0.6 + progress * 0.2;
+                    const p = 0.80 * Math.pow((1 - progress), 1.8);
                     return {p: p * 0.5 + 0.25, v};
                 } else if (t < 0.75) {
-                    // Process 3: Isothermal compression at T_C (nearly horizontal bottom line going left)
+                    
                     const progress = (t - 0.5) * 4;
-                    const v = 0.8 - progress * 0.4; // V3 to V4
-                    const p = 0.25 + progress * 0.05; // nearly constant, slight increase
+                    const v = 0.8 - progress * 0.4;
+                    const p = 0.25 + progress * 0.05;
                     return {p, v};
                 } else {
-                    // Process 4: Adiabatic compression (curved up line to the left, back to start)
+                    
                     const progress = (t - 0.75) * 4;
-                    const v = 0.4 - progress * 0.2; // V4 to V1
-                    const p = 0.30 + Math.pow(progress, 0.7) * 0.55; // steep curve up
+                    const v = 0.4 - progress * 0.2;
+                    const p = 0.30 + Math.pow(progress, 0.7) * 0.55;
                     return {p, v};
                 }
             } else {
