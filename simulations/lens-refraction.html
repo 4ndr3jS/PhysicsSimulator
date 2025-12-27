@@ -140,18 +140,8 @@
                     <div class="sim-divider"></div>
 
                     <div class="sim-toggle">
-                        <span>Show Focal Point</span>
-                        <div class="sim-toggle-switch active" id="toggle-focal" onclick="toggleFocal()"></div>
-                    </div>
-
-                    <div class="sim-toggle">
                         <span>Show Normals</span>
                         <div class="sim-toggle-switch" id="toggle-normals" onclick="toggleNormals()"></div>
-                    </div>
-
-                    <div class="sim-toggle">
-                        <span>Show Ray Trails</span>
-                        <div class="sim-toggle-switch active" id="toggle-trails" onclick="toggleTrails()"></div>
                     </div>
                 </div>
 
@@ -504,21 +494,10 @@
             draw();
         }
 
-        function toggleFocal() {
-            showFocal = !showFocal;
-            document.getElementById('toggle-focal').classList.toggle('active');
-            draw();
-        }
 
         function toggleNormals() {
             showNormals = !showNormals;
             document.getElementById('toggle-normals').classList.toggle('active');
-            draw();
-        }
-
-        function toggleTrails() {
-            showTrails = !showTrails;
-            document.getElementById('toggle-trails').classList.toggle('active');
             draw();
         }
 
