@@ -14,7 +14,7 @@
             <a href="simulations.html">Simulations</a>
             <a href="guide.html" class="active1">Guide</a>
             <a href="theory.html">Theory</a>
-            <a href="links.html">Learn Physics</a>
+            <a href="learn.html">Learn Physics</a>
         </ul>
     </nav>
 
@@ -30,7 +30,6 @@
         <div class="control"><b>Sliders:</b> Adjust physical parametars like mass, velocity, force, or angle in real-time</div>
         <div class="control"><b>Play / Pause:</b> Start or stop the simulation to observe different properties</div>
         <div class="control"><b>Reset:</b> Return to its inital state</div>
-        <div class="control"><b>Click & Drag:</b> Many simulations let you interact directly with objects</div>
     </div>
     <div class="container1">
         <h1>🔬</h1>
@@ -42,7 +41,7 @@
         <h2>3. Text Extreme Values</h2>
         <h3>Text extreme values to see how the system behaves. Who know maybe you'll discover something new.</h3>
         <h2>3. Connect to Theory</h2>
-        <h3>Ofcourse, after experimenting, you need to connect the information you have just seen with theory. To do that visit the Theory page!</h3>
+        <h3>Of course, after experimenting, you need to connect the information you have just seen with theory. To do that visit the Theory page!</h3>
     </div>
     <div class="container1">
         <h1>🎯</h1>
@@ -63,5 +62,11 @@
         <button class="explore2">Explore Simulations</button>
     </div>
     <div class="invis2"></div>
+    <script>
+        const explore2 = document.querySelector('.explore2');
+        explore2.addEventListener('click', () => {
+            window.location.href = 'simulations.html';
+        });
+    </script>
 </body>
 </html>

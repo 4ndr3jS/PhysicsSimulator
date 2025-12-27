@@ -14,14 +14,14 @@
             <a href="simulations.html">Simulations</a>
             <a href="guide.html">Guide</a>
             <a href="theory.html">Theory</a>
-            <a href="links.html">Learn Physics</a>
+            <a href="learn.html">Learn Physics</a>
         </ul>
     </nav>
 
     <div class="heroSection">
         <h1 class="title">Interactive Physics Simulator</h1>
         <p class="intro">Explore the fundamental laws of physics through, real time simulations. Learn by doing, visualize the invisible, and understand our universe.</p>
-        <button class="explore">Explore Simulations </button>
+        <button class="explore">Explore Simulations</button>
     </div>
 
     <div class="container">
@@ -46,16 +46,23 @@
         </div>
         <div class="topics">
             <h1 class="name">🌊 Waves & Optics</h1>
-            <h3 class="explain">visualize wave interference, diffraction, refraction, and light behavior.</h3>
+            <h3 class="explain">Visualize wave interfernce, diffraction, refraction, and light behavior.</h3>
         </div>
         <div class="topics" style="padding-top: 20px; max-height: 132px;">
             <h1 class="name">🔋 Electromagnetism</h1>
-            <h3 class="explain">Experiment with electric fields, magnetic forces, and circut dynamics.</h3>
+            <h3 class="explain">Experiment with electric fields, magnetic fozrces, and circut dynamics.</h3>
         </div>
         <div class="topics" style="padding-top: 20px; max-height: 132px;">
             <h1 class="name">🌡️ Thermodynamics</h1>
             <h3 class="explain">Understand heat transfer, gas laws, and energy transformations.</h3>
         </div>
     </div>
+    <script>
+        const explore = document.querySelector('.explore');
+
+        explore.addEventListener('click', () =>{
+            window.location.href ='simulations.html';
+        });
+    </script>
 </body>
 </html>

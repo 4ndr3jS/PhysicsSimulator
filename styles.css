@@ -124,6 +124,12 @@ nav ul a.active1::after {
     font-size: 15px;
     font-weight: bold;
     background: linear-gradient(135deg, rgba(80,80,160,0.8), rgba(120,60,120,0.8));
+    transition: filter 0.3s;
+}
+
+.explore:hover, .explore2:hover{
+    cursor: pointer;
+    filter: brightness(1.15);
 }
 
 .container{
@@ -272,6 +278,7 @@ nav ul a.active1::after {
     font-size: 16px;
     font-weight: bold;
     background: linear-gradient(135deg, rgba(80,80,160,0.8), rgba(120,60,120,0.8));
+    transition: filter 0.3s;
 }
 
 .button{
@@ -289,6 +296,7 @@ nav ul a.active1::after {
     transform: translateY(-2px);
     border: 1px solid rgba(255, 255, 255, 0.247);
     background-color: #2b2b49;
+    cursor: pointer;
 }
 
 .button:active{
