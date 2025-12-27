@@ -131,11 +131,6 @@
                         <span>Show Grid</span>
                         <div class="sim-toggle-switch" id="toggle-grid" onclick="toggleGrid()"></div>
                     </div>
-
-                    <div class="sim-toggle">
-                        <span>Show Calculations</span>
-                        <div class="sim-toggle-switch" id="toggle-calc" onclick="toggleCalc()"></div>
-                    </div>
                 </div>
 
                 <div class="sim-stats">
@@ -463,12 +458,6 @@
         function toggleGrid() {
             showGrid = !showGrid;
             document.getElementById('toggle-grid').classList.toggle('active');
-            drawScene();
-        }
-
-        function toggleCalc() {
-            showCalc = !showCalc;
-            document.getElementById('toggle-calc').classList.toggle('active');
             drawScene();
         }
 
