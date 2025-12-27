@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase Changes - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="guide.html">Guide</a>
+            <a href="theory.html">Theory</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🌡️ Phase Changes</h1>
+            <p>Explore the transitions between solid, liquid, and gas states of matter</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+            <div class="phase-indicator" id="phaseIndicator">SOLID</div>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Phase Transitions</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Melting: Solid → Liquid</div>
+                        <div class="sim-formula-description">Energy increases, bonds weaken (0°C for water)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Vaporization: Liquid → Gas</div>
+                        <div class="sim-formula-description">Energy increases, particles escape (100°C for water)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Condensation: Gas → Liquid</div>
+                        <div class="sim-formula-description">Energy decreases, particles slow down</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Freezing: Liquid → Solid</div>
+                        <div class="sim-formula-description">Energy decreases, ordered structure forms</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Solid: Fixed shape, vibrating particles in lattice</li>
+                        <li>Liquid: Takes container shape, particles flow freely</li>
+                        <li>Gas: Fills entire volume, particles move rapidly</li>
+                        <li>Phase changes occur at specific temperatures</li>
+                        <li>Higher pressure can change phase transition points</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Slowly heat from -50°C to 150°C - watch transitions</li>
+                        <li>Observe particle spacing in each phase</li>
+                        <li>See how pressure affects the container volume</li>
+                        <li>Compare particle speeds in different phases</li>
+                        <li>Try rapid heating vs. slow heating</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Temperature</span>
+                            <span class="sim-control-value"><span id="val-temperature">-20</span> °C</span>
+                        </div>
+                        <input type="range" id="slider-temperature" min="-50" max="150" value="-20" oninput="updateParameter('temperature', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Pressure</span>
+                            <span class="sim-control-value"><span id="val-pressure">1.0</span> atm</span>
+                        </div>
+                        <input type="range" id="slider-pressure" min="0.5" max="3" value="1" step="0.1" oninput="updateParameter('pressure', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Bonds</span>
+                        <div class="sim-toggle-switch active" id="toggle-bonds" onclick="toggleBonds()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Vectors</span>
+                        <div class="sim-toggle-switch" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Grid</span>
+                        <div class="sim-toggle-switch" id="toggle-grid" onclick="toggleGrid()"></div>
+                    </div>
+                </div>
+                
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-phase">SOLID</div>
+                        <div class="sim-stat-label">Current Phase</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-particles">100</div>
+                        <div class="sim-stat-label">Particles</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-avgSpeed">0.00</div>
+                        <div class="sim-stat-label">Avg Speed</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-kineticEnergy">0.00</div>
+                        <div class="sim-stat-label">Kinetic Energy</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

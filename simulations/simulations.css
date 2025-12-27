@@ -712,3 +712,27 @@ input[type="range"]:disabled {
     pointer-events: none;
     z-index: 0;
 }
+
+.phase-indicator {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+.phase-solid {
+    background: rgba(107, 158, 255, 0.3);
+    color: #6b9eff;
+}
+
+.phase-liquid {
+    background: rgba(107, 255, 185, 0.3);
+    color: #6bffb9;
+}
+
+.phase-gas {
+    background: rgba(255, 107, 107, 0.3);
+    color: #ff6b6b;
+}
