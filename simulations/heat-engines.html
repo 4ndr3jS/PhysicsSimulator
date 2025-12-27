@@ -95,10 +95,20 @@
                         <div class="sim-control-label">
                             <span>Cycle Type</span>
                         </div>
-                        <select id="select-cycle" onchange="changeCycle(this.value)">
-                            <option value="carnot">Carnot Cycle</option>
-                            <option value="otto">Otto Cycle</option>
-                        </select>
+                        <div class="cycle-toggle">
+                            <button 
+                                class="cycle-btn active" 
+                                data-cycle="carnot"
+                                onclick="setCycle(this)">
+                                Carnot
+                            </button>
+                            <button 
+                                class="cycle-btn" 
+                                data-cycle="otto"
+                                onclick="setCycle(this)">
+                                Otto
+                            </button>
+                        </div>
                     </div>
 
                     <div class="sim-control-group">
@@ -171,6 +181,372 @@
             </div>
         </div>
     </div>
+        <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            cycleType: 'carnot',
+            hotTemp: 600,
+            coldTemp: 300,
+            compression: 8,
+            speed: 1.0,
+            phase: 0,
+            time: 0,
+            showPV: true,
+            showLabels: true,
+            pistonPos: 0,
+            particles: []
+        };
 
+        let animationId = null;
+
+        function init() {
+            generateParticles();
+            calculateStats();
+            drawCanvas();
+        }
+
+        function generateParticles() {
+            simState.particles = [];
+            for (let i = 0; i < 40; i++) {
+                simState.particles.push({
+                    x: Math.random() * 180 + 60,
+                    y: Math.random() * 200 + 150,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2
+                });
+            }
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            simState[param] = parseFloat(value);
+            calculateStats();
+            if (!simState.isRunning) drawCanvas();
+        }
+
+        function changeCycle(type) {
+            simState.cycleType = type;
+            const compressionGroup = document.getElementById('compressionGroup');
+            compressionGroup.style.display = type === 'otto' ? 'block' : 'none';
+            calculateStats();
+            if (!simState.isRunning) drawCanvas();
+        }
+
+        function togglePV() {
+            simState.showPV = !simState.showPV;
+            document.getElementById('toggle-pv').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function toggleLabels() {
+            simState.showLabels = !simState.showLabels;
+            document.getElementById('toggle-labels').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function startEngine() {
+            simState.isRunning = true;
+            simState.isPaused = false;
+            document.getElementById('startBtn').textContent = '⏹️ Stop Engine';
+            document.getElementById('startBtn').onclick = stopEngine;
+            animate();
+        }
+
+        function stopEngine() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.phase = 0;
+            simState.time = 0;
+            cancelAnimationFrame(animationId);
+            document.getElementById('startBtn').textContent = '▶️ Start Engine';
+            document.getElementById('startBtn').onclick = startEngine;
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            drawCanvas();
+        }
+
+        function pauseSimulation() {
+            if (!simState.isRunning) return;
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            stopEngine();
+            simState.phase = 0;
+            simState.time = 0;
+            simState.pistonPos = 0;
+            generateParticles();
+            drawCanvas();
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            simState.time += 0.02 * simState.speed;
+            simState.phase = (simState.time % 4);
+            
+            const cycleProgress = (simState.time % 4) / 4;
+            simState.pistonPos = Math.sin(cycleProgress * Math.PI * 2) * 60 + 60;
+            
+            updateParticles();
+            drawCanvas();
+            
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function updateParticles() {
+            const temp = getCurrentTemp();
+            const speedFactor = Math.sqrt(temp / 300);
+            const bounds = { left: 60, right: 240 - simState.pistonPos, top: 150, bottom: 350 };
+            
+            simState.particles.forEach(p => {
+                p.x += p.vx * speedFactor;
+                p.y += p.vy * speedFactor;
+                
+                if (p.x < bounds.left || p.x > bounds.right) {
+                    p.vx *= -1;
+                    p.x = Math.max(bounds.left, Math.min(bounds.right, p.x));
+                }
+                if (p.y < bounds.top || p.y > bounds.bottom) {
+                    p.vy *= -1;
+                    p.y = Math.max(bounds.top, Math.min(bounds.bottom, p.y));
+                }
+            });
+        }
+
+        function getCurrentTemp() {
+            const phase = simState.phase;
+            if (phase < 1) return simState.coldTemp + (simState.hotTemp - simState.coldTemp) * phase;
+            if (phase < 2) return simState.hotTemp;
+            if (phase < 3) return simState.hotTemp - (simState.hotTemp - simState.coldTemp) * (phase - 2);
+            return simState.coldTemp;
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawCylinder();
+            drawParticles();
+            drawPiston();
+            
+            if (simState.showPV) {
+                drawPVDiagram();
+            }
+            
+            if (simState.showLabels) {
+                drawLabels();
+            }
+        }
+
+        function drawCylinder() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.strokeStyle = '#6b9eff';
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            ctx.rect(60, 150, 180, 200);
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.fillStyle = '#2a2a4a';
+            ctx.fillRect(60, 140, 180, 10);
+        }
+
+        function drawPiston() {
+            const pistonX = 240 - simState.pistonPos;
+            
+            ctx.fillStyle = '#4a4a6a';
+            ctx.fillRect(pistonX - 10, 150, 10, 200);
+            
+            ctx.strokeStyle = '#8b8baa';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(pistonX - 10, 150, 10, 200);
+            
+            ctx.fillStyle = '#6a6a8a';
+            ctx.beginPath();
+            ctx.moveTo(pistonX, 200);
+            ctx.lineTo(pistonX + 60, 200);
+            ctx.lineTo(pistonX + 60, 300);
+            ctx.lineTo(pistonX, 300);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function drawParticles() {
+            const temp = getCurrentTemp();
+            const hue = ((temp - 200) / 800) * 60;
+            ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+            
+            simState.particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawPVDiagram() {
+            const pvX = 500;
+            const pvY = 100;
+            const pvWidth = 250;
+            const pvHeight = 250;
+            
+            ctx.strokeStyle = '#4a4a6a';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(pvX, pvY, pvWidth, pvHeight);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '14px Arial';
+            ctx.fillText('P-V Diagram', pvX + 10, pvY - 10);
+            ctx.fillText('P', pvX - 20, pvY + 10);
+            ctx.fillText('V', pvX + pvWidth - 10, pvY + pvHeight + 20);
+            
+            ctx.strokeStyle = '#6b9eff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            const points = 100;
+            for (let i = 0; i <= points; i++) {
+                const t = i / points;
+                const {p, v} = getCyclePoint(t);
+                const x = pvX + v * pvWidth;
+                const y = pvY + pvHeight - p * pvHeight;
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            if (simState.isRunning) {
+                const cycleProgress = (simState.time % 4) / 4;
+                const {p, v} = getCyclePoint(cycleProgress);
+                const x = pvX + v * pvWidth;
+                const y = pvY + pvHeight - p * pvHeight;
+                
+                ctx.fillStyle = '#ff6b6b';
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function getCyclePoint(t) {
+            if (simState.cycleType === 'carnot') {
+                // Carnot cycle: 4 processes
+                const gamma = 1.4; // heat capacity ratio
+                
+                if (t < 0.25) {
+                    // Process 1: Isothermal expansion at T_H (nearly horizontal top line)
+                    const progress = t * 4;
+                    const v = 0.2 + progress * 0.4; // V1 to V2
+                    const p = 0.85 - progress * 0.05; // nearly constant, slight decrease
+                    return {p, v};
+                } else if (t < 0.5) {
+                    // Process 2: Adiabatic expansion (curved down line to the right)
+                    const progress = (t - 0.25) * 4;
+                    const v = 0.6 + progress * 0.2; // V2 to V3
+                    const p = 0.80 * Math.pow((1 - progress), 1.8); // steep curve down
+                    return {p: p * 0.5 + 0.25, v};
+                } else if (t < 0.75) {
+                    // Process 3: Isothermal compression at T_C (nearly horizontal bottom line going left)
+                    const progress = (t - 0.5) * 4;
+                    const v = 0.8 - progress * 0.4; // V3 to V4
+                    const p = 0.25 + progress * 0.05; // nearly constant, slight increase
+                    return {p, v};
+                } else {
+                    // Process 4: Adiabatic compression (curved up line to the left, back to start)
+                    const progress = (t - 0.75) * 4;
+                    const v = 0.4 - progress * 0.2; // V4 to V1
+                    const p = 0.30 + Math.pow(progress, 0.7) * 0.55; // steep curve up
+                    return {p, v};
+                }
+            } else {
+                if (t < 0.25) {
+                    const v = 0.7 - t * 4 * 0.4;
+                    const p = 0.2 + t * 4 * 0.6;
+                    return {p, v};
+                } else if (t < 0.5) {
+                    const v = 0.3;
+                    const p = 0.8;
+                    return {p, v};
+                } else if (t < 0.75) {
+                    const v = 0.3 + (t - 0.5) * 4 * 0.4;
+                    const p = 0.8 - (t - 0.5) * 4 * 0.6;
+                    return {p, v};
+                } else {
+                    const v = 0.7;
+                    const p = 0.2;
+                    return {p, v};
+                }
+            }
+        }
+
+        function drawLabels() {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            
+            ctx.fillText('🔥 Hot Reservoir', 280, 30);
+            ctx.fillText(`${simState.hotTemp} K`, 280, 50);
+            
+            ctx.fillText('❄️ Cold Reservoir', 280, 470);
+            ctx.fillText(`${simState.coldTemp} K`, 280, 490);
+            
+            const temp = getCurrentTemp();
+            ctx.fillText(`Cylinder: ${temp.toFixed(0)} K`, 80, 130);
+            
+            const phaseNames = ['Compression', 'Heat Addition', 'Expansion', 'Heat Rejection'];
+            const phaseIndex = Math.floor(simState.phase);
+            if (simState.isRunning) {
+                ctx.fillText(`Phase: ${phaseNames[phaseIndex]}`, 280, 100);
+            }
+        }
+
+        function calculateStats() {
+            const carnotEff = (1 - simState.coldTemp / simState.hotTemp) * 100;
+            
+            let actualEff;
+            if (simState.cycleType === 'carnot') {
+                actualEff = carnotEff * 0.95;
+            } else {
+                const gamma = 1.4;
+                const r = simState.compression;
+                actualEff = (1 - 1 / Math.pow(r, gamma - 1)) * 100;
+            }
+            
+            const Qh = 1000;
+            const W = Qh * actualEff / 100;
+            const Qc = Qh - W;
+            
+            document.getElementById('stat-efficiency').textContent = actualEff.toFixed(1);
+            document.getElementById('stat-work').textContent = W.toFixed(1);
+            document.getElementById('stat-qh').textContent = Qh.toFixed(1);
+            document.getElementById('stat-qc').textContent = Qc.toFixed(1);
+            document.getElementById('stat-carnot').textContent = carnotEff.toFixed(1);
+        }
+
+        changeCycle('carnot');
+        init();
+
+        function setCycle(btn){
+            const cycle = btn.dataset.cycle;
+
+            document.querySelectorAll('.cycle-btn')
+                .forEach(b => b.classList.remove('active'));
+
+            btn.classList.add('active');
+            changeCycle(cycle);
+        }
+    </script>
 </body>
 </html>
