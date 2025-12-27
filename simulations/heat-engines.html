@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heat Engine - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="guide.html">Guide</a>
+            <a href="theory.html">Theory</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🔥 Heat Engine Simulator</h1>
+            <p>Explore thermodynamic cycles and energy conversion from heat to work</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startEngine()" id="startBtn">▶️ Start Engine</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Thermodynamic Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">η = W / Q<sub>H</sub> = 1 - Q<sub>C</sub>/Q<sub>H</sub></div>
+                        <div class="sim-formula-description">Engine efficiency</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">η<sub>Carnot</sub> = 1 - T<sub>C</sub>/T<sub>H</sub></div>
+                        <div class="sim-formula-description">Maximum theoretical efficiency</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">W = Q<sub>H</sub> - Q<sub>C</sub></div>
+                        <div class="sim-formula-description">Work output</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Heat engines convert thermal energy to mechanical work</li>
+                        <li>No engine can be 100% efficient (2nd Law)</li>
+                        <li>Carnot cycle represents maximum efficiency</li>
+                        <li>Higher temperature difference = higher efficiency</li>
+                        <li>Some heat must always be rejected to cold reservoir</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Maximize hot temperature - what happens to efficiency?</li>
+                        <li>Try equal hot and cold temps - any work output?</li>
+                        <li>Compare Carnot vs Otto cycle efficiency</li>
+                        <li>Increase compression ratio for Otto cycle</li>
+                        <li>Find optimal settings for maximum power output</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Cycle Type</span>
+                        </div>
+                        <select id="select-cycle" onchange="changeCycle(this.value)">
+                            <option value="carnot">Carnot Cycle</option>
+                            <option value="otto">Otto Cycle</option>
+                        </select>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Hot Temperature (T<sub>H</sub>)</span>
+                            <span class="sim-control-value"><span id="val-hotTemp">600</span> K</span>
+                        </div>
+                        <input type="range" id="slider-hotTemp" min="400" max="1000" value="600" oninput="updateParameter('hotTemp', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Cold Temperature (T<sub>C</sub>)</span>
+                            <span class="sim-control-value"><span id="val-coldTemp">300</span> K</span>
+                        </div>
+                        <input type="range" id="slider-coldTemp" min="200" max="500" value="300" oninput="updateParameter('coldTemp', this.value)">
+                    </div>
+
+                    <div class="sim-control-group" id="compressionGroup">
+                        <div class="sim-control-label">
+                            <span>Compression Ratio</span>
+                            <span class="sim-control-value"><span id="val-compression">8</span>:1</span>
+                        </div>
+                        <input type="range" id="slider-compression" min="4" max="12" value="8" oninput="updateParameter('compression', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Engine Speed</span>
+                            <span class="sim-control-value"><span id="val-speed">1.0</span>x</span>
+                        </div>
+                        <input type="range" id="slider-speed" min="0.5" max="3" value="1.0" step="0.1" oninput="updateParameter('speed', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show PV Diagram</span>
+                        <div class="sim-toggle-switch active" id="toggle-pv" onclick="togglePV()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Labels</span>
+                        <div class="sim-toggle-switch active" id="toggle-labels" onclick="toggleLabels()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-efficiency">0.0</div>
+                        <div class="sim-stat-label">Efficiency (%)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-work">0.0</div>
+                        <div class="sim-stat-label">Work Output (J)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-qh">0.0</div>
+                        <div class="sim-stat-label">Heat In (J)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-qc">0.0</div>
+                        <div class="sim-stat-label">Heat Out (J)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value red" id="stat-carnot">50.0</div>
+                        <div class="sim-stat-label">Carnot Max (%)</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
