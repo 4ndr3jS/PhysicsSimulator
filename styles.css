@@ -472,6 +472,7 @@ nav ul a.active1::after {
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    height: 490px;
 }
 
 .sim-card:hover {
@@ -841,4 +842,31 @@ nav ul a.active1::after {
     padding-left: 1.2rem;
     display: block;
     left: auto;
+}
+
+.sim-link {
+    display: block;
+    text-decoration: none !important;
+    color: inherit;
+}
+
+.sim-link:visited {
+    color: inherit;
+}
+
+.sim-link:hover {
+    text-decoration: none;
+}
+
+.sim-link * {
+    text-decoration: none !important;
+}
+
+.sim-link:focus-visible .sim-card {
+    outline: 2px solid #b8c0ff;
+    outline-offset: 4px;
+}
+
+.sim-link {
+    -webkit-tap-highlight-color: transparent;
 }
