@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring-Mass System - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🔧 Spring-Mass System</h1>
+            <p>Explore damped and driven oscillations with adjustable parameters</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-easy">● Easy</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F = -kx - bv</div>
+                        <div class="sim-formula-description">Force (spring + damping)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">ω₀ = √(k/m)</div>
+                        <div class="sim-formula-description">Natural frequency</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">T = 2π/ω</div>
+                        <div class="sim-formula-description">Period of oscillation</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Underdamped: oscillates with decreasing amplitude</li>
+                        <li>Critically damped: returns to equilibrium fastest</li>
+                        <li>Overdamped: slowly returns without oscillating</li>
+                        <li>Driving force can cause resonance</li>
+                        <li>Energy dissipates through damping</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Set damping to 0 for perpetual oscillation</li>
+                        <li>Increase damping until oscillations stop</li>
+                        <li>Match driving frequency to natural frequency</li>
+                        <li>Compare different mass values</li>
+                        <li>Observe energy transfer in the graph</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Mass</span>
+                            <span class="sim-control-value"><span id="val-mass">1.0</span> kg</span>
+                        </div>
+                        <input type="range" id="slider-mass" min="0.5" max="5" value="1" step="0.1" oninput="updateParameter('mass', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Spring Constant</span>
+                            <span class="sim-control-value"><span id="val-springK">50</span> N/m</span>
+                        </div>
+                        <input type="range" id="slider-springK" min="10" max="200" value="50" oninput="updateParameter('springK', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Damping Coefficient</span>
+                            <span class="sim-control-value"><span id="val-damping">0.5</span> kg/s</span>
+                        </div>
+                        <input type="range" id="slider-damping" min="0" max="10" value="0.5" step="0.1" oninput="updateParameter('damping', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Initial Displacement</span>
+                            <span class="sim-control-value"><span id="val-displacement">100</span> px</span>
+                        </div>
+                        <input type="range" id="slider-displacement" min="20" max="150" value="100" oninput="updateParameter('displacement', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Driving Force Amplitude</span>
+                            <span class="sim-control-value"><span id="val-driveAmp">0</span> N</span>
+                        </div>
+                        <input type="range" id="slider-driveAmp" min="0" max="50" value="0" oninput="updateParameter('driveAmp', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Driving Frequency</span>
+                            <span class="sim-control-value"><span id="val-driveFreq">1.0</span> Hz</span>
+                        </div>
+                        <input type="range" id="slider-driveFreq" min="0.1" max="5" value="1" step="0.1" oninput="updateParameter('driveFreq', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Graph</span>
+                        <div class="sim-toggle-switch active" id="toggle-graph" onclick="toggleGraph()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Vectors</span>
+                        <div class="sim-toggle-switch active" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-position">0.00</div>
+                        <div class="sim-stat-label">Position (m)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-velocity">0.00</div>
+                        <div class="sim-stat-label">Velocity (m/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-energy">0.00</div>
+                        <div class="sim-stat-label">Total Energy (J)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-frequency">0.00</div>
+                        <div class="sim-stat-label">Natural Freq (Hz)</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            time: 0,
+            mass: 1.0,
+            springK: 50,
+            damping: 0.5,
+            displacement: 100,
+            driveAmp: 0,
+            driveFreq: 1.0,
+            position: 0,
+            velocity: 0,
+            showGraph: true,
+            showVectors: true,
+            graphData: [],
+            maxGraphPoints: 300,
+            dt: 0.016
+        };
+
+        const centerX = 400;
+        const centerY = 150;
+        const equilibriumY = centerY;
+        let animationId = null;
+
+        function init() {
+            simState.position = simState.displacement;
+            calculateNaturalFrequency();
+            drawCanvas();
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = parseFloat(value).toFixed(param === 'mass' || param === 'damping' || param === 'driveFreq' ? 1 : 0);
+            simState[param] = parseFloat(value);
+            
+            if (!simState.isRunning) {
+                simState.position = simState.displacement;
+                simState.velocity = 0;
+                simState.graphData = [];
+                calculateNaturalFrequency();
+                drawCanvas();
+            }
+        }
+
+        function toggleGraph() {
+            simState.showGraph = !simState.showGraph;
+            document.getElementById('toggle-graph').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function toggleVectors() {
+            simState.showVectors = !simState.showVectors;
+            document.getElementById('toggle-vectors').classList.toggle('active');
+            drawCanvas();
+        }
+
+        function calculateNaturalFrequency() {
+            const omega = Math.sqrt(simState.springK / simState.mass);
+            const freq = omega / (2 * Math.PI);
+            document.getElementById('stat-frequency').textContent = freq.toFixed(2);
+        }
+
+        function startSimulation() {
+            if (!simState.isRunning) {
+                simState.position = simState.displacement;
+                simState.velocity = 0;
+                simState.time = 0;
+                simState.graphData = [];
+            }
+            simState.isRunning = true;
+            simState.isPaused = false;
+            
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                if (!slider.id.includes('drive')) {
+                    slider.disabled = true;
+                }
+            });
+            
+            animate();
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.time = 0;
+            simState.position = simState.displacement;
+            simState.velocity = 0;
+            simState.graphData = [];
+            cancelAnimationFrame(animationId);
+            
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                slider.disabled = false;
+            });
+            
+            drawCanvas();
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            const pixelToMeter = 0.01;
+            const posMeters = simState.position * pixelToMeter;
+            
+            const springForce = -simState.springK * posMeters;
+            const dampingForce = -simState.damping * simState.velocity;
+            const drivingForce = simState.driveAmp * Math.sin(2 * Math.PI * simState.driveFreq * simState.time);
+            
+            const totalForce = springForce + dampingForce + drivingForce;
+            const acceleration = totalForce / simState.mass;
+            
+            simState.velocity += acceleration * simState.dt;
+            simState.position += (simState.velocity / pixelToMeter) * simState.dt;
+            simState.time += simState.dt;
+            
+            simState.graphData.push({
+                time: simState.time,
+                position: simState.position
+            });
+            
+            if (simState.graphData.length > simState.maxGraphPoints) {
+                simState.graphData.shift();
+            }
+            
+            const kineticEnergy = 0.5 * simState.mass * simState.velocity * simState.velocity;
+            const potentialEnergy = 0.5 * simState.springK * posMeters * posMeters;
+            const totalEnergy = kineticEnergy + potentialEnergy;
+            
+            document.getElementById('stat-position').textContent = posMeters.toFixed(2);
+            document.getElementById('stat-velocity').textContent = simState.velocity.toFixed(2);
+            document.getElementById('stat-energy').textContent = totalEnergy.toFixed(2);
+            
+            drawCanvas();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, equilibriumY);
+            ctx.lineTo(canvas.width, equilibriumY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            const massY = equilibriumY + simState.position;
+            
+            const springCoils = 12;
+            const springWidth = 30;
+            const springTop = 20;
+            
+            ctx.strokeStyle = '#6b9eff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, springTop);
+            
+            for (let i = 0; i <= springCoils; i++) {
+                const y = springTop + (massY - 40 - springTop) * (i / springCoils);
+                const x = centerX + (i % 2 === 0 ? -springWidth : springWidth);
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(centerX, massY - 40);
+            ctx.stroke();
+            
+            const massSize = 40;
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(centerX - massSize/2, massY - massSize/2, massSize, massSize);
+            
+            ctx.strokeStyle = '#ff4444';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(centerX - massSize/2, massY - massSize/2, massSize, massSize);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('M', centerX, massY + 5);
+            
+            if (simState.showVectors && simState.isRunning) {
+                const velScale = 30;
+                const velLength = simState.velocity * velScale;
+                
+                if (Math.abs(velLength) > 2) {
+                    ctx.strokeStyle = '#ffeb6b';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + massSize/2 + 10, massY);
+                    ctx.lineTo(centerX + massSize/2 + 10, massY - velLength);
+                    ctx.stroke();
+                    
+                    const arrowSize = 8;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + massSize/2 + 10, massY - velLength);
+                    if (velLength > 0) {
+                        ctx.lineTo(centerX + massSize/2 + 10 - arrowSize/2, massY - velLength + arrowSize);
+                        ctx.lineTo(centerX + massSize/2 + 10 + arrowSize/2, massY - velLength + arrowSize);
+                    } else {
+                        ctx.lineTo(centerX + massSize/2 + 10 - arrowSize/2, massY - velLength - arrowSize);
+                        ctx.lineTo(centerX + massSize/2 + 10 + arrowSize/2, massY - velLength - arrowSize);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = '#ffeb6b';
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#ffeb6b';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('v', centerX + massSize/2 + 20, massY - velLength/2);
+                }
+            }
+            
+            if (simState.showGraph && simState.graphData.length > 1) {
+                const graphX = 50;
+                const graphY = 320;
+                const graphWidth = 700;
+                const graphHeight = 150;
+                
+                ctx.fillStyle = 'rgba(42, 42, 74, 0.5)';
+                ctx.fillRect(graphX, graphY, graphWidth, graphHeight);
+                
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(graphX, graphY, graphWidth, graphHeight);
+                
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.beginPath();
+                ctx.moveTo(graphX, graphY + graphHeight/2);
+                ctx.lineTo(graphX + graphWidth, graphY + graphHeight/2);
+                ctx.stroke();
+                
+                const maxDisp = Math.max(...simState.graphData.map(d => Math.abs(d.position)));
+                const minGraphScale = 10;
+                const effectiveMaxDisp = Math.max(maxDisp, minGraphScale);
+                const scale = (graphHeight / 2 - 10) / effectiveMaxDisp;
+                
+                ctx.strokeStyle = '#6b9eff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                for (let i = 0; i < simState.graphData.length; i++) {
+                    const x = graphX + (i / simState.maxGraphPoints) * graphWidth;
+                    const y = graphY + graphHeight/2 - simState.graphData[i].position * scale;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText('Position vs Time', graphX + 10, graphY + 20);
+            }
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, 20);
+        }
+
+        init();
+    </script>
+</body>
+</html>
