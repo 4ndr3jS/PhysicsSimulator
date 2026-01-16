@@ -692,7 +692,7 @@ input[type="range"]:disabled {
 
 .mode-btn {
     padding: 12px;
-    background: var(--sim-panel-bg);
+    background: #111;
     border: 2px solid transparent;
     border-radius: 8px;
     color: var(--sim-text);
@@ -700,13 +700,15 @@ input[type="range"]:disabled {
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mode-btn:hover:not(.active){
+    transform: translateY(-2px);
 }
 
 .mode-btn.active {
-    background: var(--sim-primary);
-    color: white;
-    border-color: var(--sim-primary);
-    box-shadow: 0 4px 12px rgba(107, 158, 255, 0.3);
+    border-color:rgba(255, 255, 255, 0.5);
 }
 
 .compass {

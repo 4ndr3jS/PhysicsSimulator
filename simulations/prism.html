@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispersion & Prism - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🌈 Dispersion & Prism</h1>
+            <p>See how white light splits into a rainbow through refraction</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-easy">● Easy</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">n₁sin(θ₁) = n₂sin(θ₂)</div>
+                        <div class="sim-formula-description">Snell's Law of Refraction</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">n(λ) = A + B/λ²</div>
+                        <div class="sim-formula-description">Cauchy's Equation (simplified)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">δ = (n-1)A</div>
+                        <div class="sim-formula-description">Deviation angle (thin prism)</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Different wavelengths refract at different angles</li>
+                        <li>Violet light bends more than red light</li>
+                        <li>Refractive index depends on wavelength</li>
+                        <li>Prism angle affects dispersion amount</li>
+                        <li>Material determines how much light disperses</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Change the prism angle and see the effect</li>
+                        <li>Try different light sources (white vs colored)</li>
+                        <li>Increase refractive index for more dispersion</li>
+                        <li>Rotate the prism to change incident angle</li>
+                        <li>Use rainbow mode to see full spectrum</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Prism Settings</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Prism Angle</span>
+                            <span class="sim-control-value"><span id="val-prismAngle">60</span>°</span>
+                        </div>
+                        <input type="range" id="slider-prismAngle" min="30" max="85" value="60" step="5" oninput="updateParameter('prismAngle', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Refractive Index</span>
+                            <span class="sim-control-value"><span id="val-refractiveIndex">1.5</span></span>
+                        </div>
+                        <input type="range" id="slider-refractiveIndex" min="1.3" max="2.0" value="1.5" step="0.05" oninput="updateParameter('refractiveIndex', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Incident Angle</span>
+                            <span class="sim-control-value"><span id="val-incidentAngle">45</span>°</span>
+                        </div>
+                        <input type="range" id="slider-incidentAngle" min="20" max="70" value="45" step="5" oninput="updateParameter('incidentAngle', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Dispersion Strength</span>
+                            <span class="sim-control-value"><span id="val-dispersion">1.0</span></span>
+                        </div>
+                        <input type="range" id="slider-dispersion" min="0.5" max="2.0" value="1.0" step="0.1" oninput="updateParameter('dispersion', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Normal Lines</span>
+                        <div class="sim-toggle-switch active" id="toggle-normals" onclick="toggleNormals()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Animate Rays</span>
+                        <div class="sim-toggle-switch active" id="toggle-animate" onclick="toggleAnimate()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">💡</span>
+                        <span>Light Source</span>
+                    </div>
+                    
+                    <div class="mode-selector">
+                        <button class="mode-btn active" onclick="setLightMode('white')">White Light</button>
+                        <button class="mode-btn" onclick="setLightMode('rainbow')">Rainbow</button>
+                        <button class="mode-btn" onclick="setLightMode('single')">Single Color</button>
+                    </div>
+
+                    <div id="colorPicker" style="display: none; margin-top: 15px;">
+                        <div class="sim-control-label" style="margin-bottom: 10px;">
+                            <span>Select Color</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                            <button class="color-swatch" style="background: #ff0000;" onclick="setSingleColor('#ff0000', 650)"></button>
+                            <button class="color-swatch" style="background: #ff8800;" onclick="setSingleColor('#ff8800', 600)"></button>
+                            <button class="color-swatch" style="background: #ffff00;" onclick="setSingleColor('#ffff00', 570)"></button>
+                            <button class="color-swatch" style="background: #00ff00;" onclick="setSingleColor('#00ff00', 530)"></button>
+                            <button class="color-swatch" style="background: #00ffff;" onclick="setSingleColor('#00ffff', 490)"></button>
+                            <button class="color-swatch" style="background: #0088ff;" onclick="setSingleColor('#0088ff', 470)"></button>
+                            <button class="color-swatch" style="background: #4400ff;" onclick="setSingleColor('#4400ff', 450)"></button>
+                            <button class="color-swatch" style="background: #8800ff;" onclick="setSingleColor('#8800ff', 420)"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-deviation">0.0</div>
+                        <div class="sim-stat-label">Deviation Angle (°)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-spread">0.0</div>
+                        <div class="sim-stat-label">Angular Spread (°)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-rays">7</div>
+                        <div class="sim-stat-label">Active Rays</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-wavelength">550</div>
+                        <div class="sim-stat-label">Avg Wavelength (nm)</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            prismAngle: 60,
+            refractiveIndex: 1.5,
+            incidentAngle: 45,
+            dispersion: 1.0,
+            showNormals: true,
+            showAngles: false,
+            animate: true,
+            lightMode: 'white',
+            singleColor: '#ff0000',
+            singleWavelength: 650,
+            animationProgress: 0,
+            animationSpeed: 0.004,
+            holdTime: 0,
+            maxHoldTime: 5000,
+            isHolding: false
+        };
+
+        const wavelengthColors = [
+            { wavelength: 420, color: '#8800ff', name: 'Violet' },
+            { wavelength: 450, color: '#4400ff', name: 'Blue' },
+            { wavelength: 490, color: '#0088ff', name: 'Cyan' },
+            { wavelength: 530, color: '#00ff00', name: 'Green' },
+            { wavelength: 570, color: '#ffff00', name: 'Yellow' },
+            { wavelength: 600, color: '#ff8800', name: 'Orange' },
+            { wavelength: 650, color: '#ff0000', name: 'Red' }
+        ];
+
+        let animationId = null;
+
+        function init() {
+            drawCanvas();
+        }
+
+        function updateParameter(param, value) {
+            const numValue = parseFloat(value);
+            document.getElementById(`val-${param}`).textContent = param === 'refractiveIndex' || param === 'dispersion' ? numValue.toFixed(2) : Math.round(numValue);
+            simState[param] = numValue;
+            if (simState.isRunning) {
+                drawCanvas();
+            }
+        }
+
+        function toggleNormals() {
+            simState.showNormals = !simState.showNormals;
+            document.getElementById('toggle-normals').classList.toggle('active');
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function toggleAnimate() {
+            simState.animate = !simState.animate;
+            document.getElementById('toggle-animate').classList.toggle('active');
+        }
+
+        function setLightMode(mode) {
+            simState.lightMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('colorPicker').style.display = mode === 'single' ? 'block' : 'none';
+            
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function setSingleColor(color, wavelength) {
+            simState.singleColor = color;
+            simState.singleWavelength = wavelength;
+            document.querySelectorAll('.color-swatch').forEach(btn => btn.style.border = '2px solid transparent');
+            event.target.style.border = '2px solid white';
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function startSimulation() {
+            simState.isRunning = true;
+            simState.isPaused = false;
+            simState.animationProgress = 0;
+            simState.holdTime = 0;
+            simState.isHolding = false;
+            animate();
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.animationProgress = 0;
+            simState.holdTime = 0;
+            simState.isHolding = false;
+            cancelAnimationFrame(animationId);
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            drawCanvas();
+        }
+
+        let lastTime = Date.now();
+        
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            const currentTime = Date.now();
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+            
+            if (simState.animate) {
+                if (!simState.isHolding) {
+                    simState.animationProgress += simState.animationSpeed;
+                    
+                    if (simState.animationProgress >= 1.5) {
+                        simState.animationProgress = 1.5;
+                        simState.isHolding = true;
+                        simState.holdTime = 0;
+                    }
+                } else {
+                    simState.holdTime += deltaTime;
+                    
+                    if (simState.holdTime >= simState.maxHoldTime) {
+                        simState.animationProgress = 0;
+                        simState.holdTime = 0;
+                        simState.isHolding = false;
+                    }
+                }
+            } else {
+                simState.animationProgress = 1;
+            }
+            
+            drawCanvas();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function getRefractiveIndex(wavelength) {
+            const baseIndex = simState.refractiveIndex;
+            const dispersionFactor = simState.dispersion * 0.05;
+            return baseIndex + dispersionFactor * (550 - wavelength) / 100;
+        }
+
+        function refract(incident, normal, n1, n2) {
+            const cosI = -normal.x * incident.x - normal.y * incident.y;
+            const sinT2 = (n1 / n2) * (n1 / n2) * (1.0 - cosI * cosI);
+            
+            if (sinT2 > 1.0) return null;
+            
+            const cosT = Math.sqrt(1.0 - sinT2);
+            return {
+                x: (n1 / n2) * incident.x + ((n1 / n2) * cosI - cosT) * normal.x,
+                y: (n1 / n2) * incident.y + ((n1 / n2) * cosI - cosT) * normal.y
+            };
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0a0a1a');
+            gradient.addColorStop(1, '#1a1a2a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const prismX = canvas.width / 2;
+            const prismY = canvas.height / 2;
+            const prismSize = 200;
+            const angleRad = (simState.prismAngle * Math.PI) / 180;
+
+            ctx.save();
+            ctx.translate(prismX, prismY);
+            
+            const apex = { x: 0, y: -prismSize * 0.8 };
+            const leftBase = { x: -prismSize * Math.sin(angleRad / 2), y: prismSize * 0.5 };
+            const rightBase = { x: prismSize * Math.sin(angleRad / 2), y: prismSize * 0.5 };
+            
+            const prismGradient = ctx.createLinearGradient(leftBase.x, 0, rightBase.x, 0);
+            prismGradient.addColorStop(0, 'rgba(100, 150, 255, 0.15)');
+            prismGradient.addColorStop(0.5, 'rgba(150, 200, 255, 0.25)');
+            prismGradient.addColorStop(1, 'rgba(100, 150, 255, 0.15)');
+            
+            ctx.fillStyle = prismGradient;
+            ctx.beginPath();
+            ctx.moveTo(apex.x, apex.y);
+            ctx.lineTo(leftBase.x, leftBase.y);
+            ctx.lineTo(rightBase.x, rightBase.y);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.strokeStyle = 'rgba(180, 220, 255, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.restore();
+
+            let rays = [];
+            if (simState.lightMode === 'white' || simState.lightMode === 'rainbow') {
+                rays = wavelengthColors;
+            } else {
+                rays = [{ wavelength: simState.singleWavelength, color: simState.singleColor, name: 'Single' }];
+            }
+
+            document.getElementById('stat-rays').textContent = rays.length;
+            
+            let totalDeviation = 0;
+            let minAngle = Infinity;
+            let maxAngle = -Infinity;
+
+            rays.forEach((ray, index) => {
+                const angleDifference = simState.prismAngle - 60;
+                const lengthAdjustment = angleDifference >= 0 ? (angleDifference / 5) * 5 : (angleDifference / 5) * 7;
+                const anotherChnageLenght = angleDifference >= 0 ? (angleDifference / 5) * 1 : (angleDifference / 5) * 3;
+
+                const n = getRefractiveIndex(ray.wavelength);
+                const incident = (simState.incidentAngle * Math.PI) / 180;
+                const rotation = (50 * Math.PI) / 180;
+                
+                const baseEntryX = prismX + leftBase.x * 0.5 - 80 + 109 - anotherChnageLenght;
+                const baseEntryY = prismY + leftBase.y * 0.5 + 34;
+                
+                const dx = baseEntryX - prismX;
+                const dy = baseEntryY - prismY;
+                const entryX = prismX + (dx * Math.cos(rotation) - dy * Math.sin(rotation));
+                const entryY = prismY + (dx * Math.sin(rotation) + dy * Math.cos(rotation));
+                
+                const baseIncidentX = Math.cos(incident);
+                const baseIncidentY = -Math.sin(incident);
+                const incidentDir = { 
+                    x: baseIncidentX * Math.cos(rotation) - baseIncidentY * Math.sin(rotation),
+                    y: baseIncidentX * Math.sin(rotation) + baseIncidentY * Math.cos(rotation)
+                };
+                
+                const baseLeftNormalX = Math.sin(angleRad / 2);
+                const baseLeftNormalY = Math.cos(angleRad / 2);
+                const leftNormal = {
+                    x: baseLeftNormalX * Math.cos(rotation) - baseLeftNormalY * Math.sin(rotation),
+                    y: baseLeftNormalX * Math.sin(rotation) + baseLeftNormalY * Math.cos(rotation)
+                };
+                
+                const refracted1 = refract(incidentDir, leftNormal, 1.0, n);
+                if (!refracted1) return;
+
+                let prismTravel;
+                if(simState.prismAngle<45){
+                    prismTravel = 145 + lengthAdjustment*1.2;
+                }else{
+                    prismTravel = 145 + lengthAdjustment;
+                }
+                
+                const exitX = entryX + refracted1.x * prismTravel;
+                const exitY = entryY + refracted1.y * prismTravel;
+                
+                const baseRightNormalX = -Math.sin(angleRad / 2);
+                const baseRightNormalY = Math.cos(angleRad / 2);
+                const rightNormal = {
+                    x: baseRightNormalX * Math.cos(rotation) - baseRightNormalY * Math.sin(rotation),
+                    y: baseRightNormalX * Math.sin(rotation) + baseRightNormalY * Math.cos(rotation)
+                };
+                
+                const refracted2 = refract(refracted1, rightNormal, n, 1.0);
+                if (!refracted2) return;
+                
+                const exitAngle = Math.atan2(-refracted2.y, refracted2.x) * (180 / Math.PI);
+                totalDeviation += Math.abs(exitAngle - simState.incidentAngle);
+                minAngle = Math.min(minAngle, exitAngle);
+                maxAngle = Math.max(maxAngle, exitAngle);
+                
+                const opacity = simState.lightMode === 'white' ? 0.5 : 0.8;
+                const progress = simState.animationProgress;
+                
+                if (progress > 0) {
+                    const incidentLength = 150 * Math.min(progress * 2, 1);
+                    ctx.strokeStyle = simState.lightMode === 'white' ? `rgba(255, 255, 255, ${opacity})` : ray.color + Math.floor(opacity * 255).toString(16);
+                    ctx.lineWidth = simState.lightMode === 'white' ? 2 : 3;
+                    ctx.beginPath();
+                    ctx.moveTo(entryX - incidentDir.x * 150, entryY - incidentDir.y * 150);
+                    ctx.lineTo(entryX - incidentDir.x * (150 - incidentLength), entryY - incidentDir.y * (150 - incidentLength));
+                    ctx.stroke();
+                }
+                
+                if (progress > 0.5) {
+                    const insideProgress = Math.min((progress - 0.5) * 2, 1);
+                    const insideLength = prismTravel * insideProgress;
+                    ctx.strokeStyle = ray.color + Math.floor(opacity * 255).toString(16);
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(entryX, entryY);
+                    ctx.lineTo(entryX + refracted1.x * insideLength, entryY + refracted1.y * insideLength);
+                    ctx.stroke();
+                }
+                
+                if (progress >= 1) {
+                    const emergentProgress = Math.min((progress - 1) * 2, 1);
+                    const emergentLength = 800 * emergentProgress;
+                    ctx.strokeStyle = ray.color + 'ff';
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = ray.color;
+                    ctx.beginPath();
+                    ctx.moveTo(exitX, exitY);
+                    ctx.lineTo(exitX + refracted2.x * emergentLength, exitY + refracted2.y * emergentLength);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+            });
+
+            if (rays.length > 0) {
+                const avgDeviation = totalDeviation / rays.length;
+                document.getElementById('stat-deviation').textContent = avgDeviation.toFixed(1);
+                document.getElementById('stat-spread').textContent = (maxAngle - minAngle).toFixed(1);
+                
+                const avgWavelength = rays.reduce((sum, r) => sum + r.wavelength, 0) / rays.length;
+                document.getElementById('stat-wavelength').textContent = Math.round(avgWavelength);
+            }
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .color-swatch {
+                width: 100%;
+                height: 40px;
+                border: 2px solid transparent;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .color-swatch:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+        `;
+        document.head.appendChild(style);
+
+        init();
+    </script>
+</body>
+</html>
