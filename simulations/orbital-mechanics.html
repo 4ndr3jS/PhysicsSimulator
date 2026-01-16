@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital Mechanics - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🪐 Orbital Mechanics</h1>
+            <p>Explore our solar system and Kepler's laws with real planetary orbits</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F = GMm/r²</div>
+                        <div class="sim-formula-description">Newton's law of gravitation</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">T² ∝ a³</div>
+                        <div class="sim-formula-description">Kepler's third law</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">v = √(GM/r)</div>
+                        <div class="sim-formula-description">Circular orbit velocity</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Planets sweep equal areas in equal times</li>
+                        <li>Orbital period increases with distance</li>
+                        <li>More massive bodies orbit more slowly</li>
+                        <li>Planets can gravitationally affect each other</li>
+                        <li>Angular momentum is conserved</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Make Jupiter 10x more massive</li>
+                        <li>Speed up Earth's orbit velocity</li>
+                        <li>Turn off outer planets, watch inner ones</li>
+                        <li>Add a massive custom planet near Earth</li>
+                        <li>Slow down time to see planet interactions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Global Settings</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Time Speed</span>
+                            <span class="sim-control-value"><span id="val-timeSpeed">1.0</span>x</span>
+                        </div>
+                        <input type="range" id="slider-timeSpeed" min="0.1" max="5" value="1" step="0.1" oninput="updateParameter('timeSpeed', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Sun Mass</span>
+                            <span class="sim-control-value"><span id="val-sunMass">1000</span></span>
+                        </div>
+                        <input type="range" id="slider-sunMass" min="500" max="2000" value="1000" oninput="updateParameter('sunMass', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Orbits</span>
+                        <div class="sim-toggle-switch active" id="toggle-trails" onclick="toggleTrails()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Velocities</span>
+                        <div class="sim-toggle-switch" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Planet Interactions</span>
+                        <div class="sim-toggle-switch" id="toggle-interactions" onclick="toggleInteractions()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🌍</span>
+                        <span>Planet Controls</span>
+                    </div>
+                    
+                    <div id="planetControls" style="max-height: 300px; overflow-y: auto;"></div>
+                    
+                    <button class="sim-btn sim-btn-primary" style="width: 100%; margin-top: 10px;" onclick="addCustomPlanet()">+ Add Custom Planet</button>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-time">0.0</div>
+                        <div class="sim-stat-label">Time (years)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-planets">8</div>
+                        <div class="sim-stat-label">Active Planets</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-energy">0.00</div>
+                        <div class="sim-stat-label">System Energy</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-momentum">0.00</div>
+                        <div class="sim-stat-label">Angular Momentum</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            time: 0,
+            timeSpeed: 1.0,
+            sunMass: 1000,
+            G: 0.5,
+            dt: 0.016,
+            showTrails: true,
+            showVectors: false,
+            planetInteractions: false,
+            planets: [],
+            maxTrailLength: 200,
+            scale: 1
+        };
+
+        const planetData = [
+            { name: 'Mercury', distance: 60, speed: 2.4, mass: 0.5, color: '#8c7853', size: 4, active: true },
+            { name: 'Venus', distance: 80, speed: 1.8, mass: 0.8, color: '#ffc649', size: 6, active: true },
+            { name: 'Earth', distance: 100, speed: 1.5, mass: 1, color: '#4a90e2', size: 6, active: true },
+            { name: 'Mars', distance: 120, speed: 1.2, mass: 0.6, color: '#e27b58', size: 5, active: true },
+            { name: 'Jupiter', distance: 160, speed: 0.8, mass: 10, color: '#d4a574', size: 12, active: true },
+            { name: 'Saturn', distance: 200, speed: 0.6, mass: 8, color: '#e6d7b0', size: 10, active: true },
+            { name: 'Uranus', distance: 235, speed: 0.4, mass: 4, color: '#4fd0e7', size: 8, active: true },
+            { name: 'Neptune', distance: 270, speed: 0.3, mass: 4, color: '#4b70dd', size: 8, active: true }
+        ];
+
+        let animationId = null;
+        let customPlanetCount = 0;
+
+        function init() {
+            initializePlanets();
+            createPlanetControls();
+            drawCanvas();
+        }
+
+        function initializePlanets() {
+            simState.planets = planetData.map(p => ({
+                ...p,
+                angle: Math.random() * Math.PI * 2,
+                x: centerX + p.distance * Math.cos(0),
+                y: centerY + p.distance * Math.sin(0),
+                vx: -p.speed * Math.sin(0) * simState.timeSpeed,
+                vy: p.speed * Math.cos(0) * simState.timeSpeed,
+                trail: [],
+                isCustom: false
+            }));
+        }
+
+        function createPlanetControls() {
+            const container = document.getElementById('planetControls');
+            container.innerHTML = '';
+            
+            simState.planets.forEach((planet, index) => {
+                const controlDiv = document.createElement('div');
+                controlDiv.className = 'planet-control-card';
+                
+                controlDiv.innerHTML = `
+                    <div class="planet-control-header">
+                        <div class="planet-name-wrapper">
+                            <div class="planet-color-dot" style="background: ${planet.color}; box-shadow: 0 0 8px ${planet.color};"></div>
+                            <span class="planet-name">${planet.name}</span>
+                        </div>
+                        <label class="planet-active-toggle">
+                            <input type="checkbox" ${planet.active ? 'checked' : ''} 
+                                   onchange="togglePlanet(${index})">
+                            <span class="planet-active-label">Active</span>
+                        </label>
+                    </div>
+                    <div class="planet-params">
+                        <div class="planet-param">
+                            <span class="planet-param-label">Mass:</span>
+                            <input type="number" value="${planet.mass}" step="0.1" min="0.1" 
+                                  onchange="updatePlanetMass(${index}, this.value)">
+                        </div>
+                        <div class="planet-param">
+                            <span class="planet-param-label">Speed:</span>
+                            <input type="number" value="${planet.speed}" step="0.1" min="0.1" 
+                                  onchange="updatePlanetSpeed(${index}, this.value)">
+                        </div>
+                    </div>
+                    ${planet.isCustom ? `<button onclick="removePlanet(${index})" class="planet-remove-btn">Remove Planet</button>` : ''}
+                `;
+                
+                container.appendChild(controlDiv);
+            });
+        }
+
+        function togglePlanet(index) {
+            simState.planets[index].active = !simState.planets[index].active;
+            updateActivePlanetCount();
+        }
+
+        function updatePlanetMass(index, value) {
+            simState.planets[index].mass = parseFloat(value);
+        }
+
+        function updatePlanetSpeed(index, value) {
+            const newSpeed = parseFloat(value);
+            simState.planets[index].speed = newSpeed;
+            const angle = simState.planets[index].angle;
+            simState.planets[index].vx = -newSpeed * Math.sin(angle) * simState.timeSpeed;
+            simState.planets[index].vy = newSpeed * Math.cos(angle) * simState.timeSpeed;
+        }
+
+        function removePlanet(index) {
+            simState.planets.splice(index, 1);
+            createPlanetControls();
+            updateActivePlanetCount();
+        }
+
+        function addCustomPlanet() {
+            customPlanetCount++;
+            const colors = ['#ff6b6b', '#51cf66', '#ffd43b', '#ff8787', '#a78bfa'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomAngle = Math.random() * Math.PI * 2;
+            const randomDistance = 80 + Math.random() * 150;
+            const speed = 15 / Math.sqrt(randomDistance);
+            
+            const newPlanet = {
+                name: `Custom ${customPlanetCount}`,
+                distance: randomDistance,
+                speed: speed,
+                mass: 1 + Math.random() * 5,
+                color: randomColor,
+                size: 6,
+                active: true,
+                angle: randomAngle,
+                x: centerX + randomDistance * Math.cos(randomAngle),
+                y: centerY + randomDistance * Math.sin(randomAngle),
+                vx: -speed * Math.sin(randomAngle) * simState.timeSpeed,
+                vy: speed * Math.cos(randomAngle) * simState.timeSpeed,
+                trail: [],
+                isCustom: true
+            };
+            
+            simState.planets.push(newPlanet);
+            createPlanetControls();
+            updateActivePlanetCount();
+        }
+
+        function updateActivePlanetCount() {
+            const count = simState.planets.filter(p => p.active).length;
+            document.getElementById('stat-planets').textContent = count;
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = parseFloat(value).toFixed(1);
+            simState[param] = parseFloat(value);
+            
+            if (param === 'timeSpeed' && simState.isRunning) {
+                simState.planets.forEach(planet => {
+                    const currentSpeed = Math.sqrt(planet.vx ** 2 + planet.vy ** 2);
+                    const angle = Math.atan2(planet.vy, planet.vx);
+                    planet.vx = currentSpeed * Math.cos(angle) * (value / simState.timeSpeed);
+                    planet.vy = currentSpeed * Math.sin(angle) * (value / simState.timeSpeed);
+                });
+            }
+        }
+
+        function toggleTrails() {
+            simState.showTrails = !simState.showTrails;
+            document.getElementById('toggle-trails').classList.toggle('active');
+        }
+
+        function toggleVectors() {
+            simState.showVectors = !simState.showVectors;
+            document.getElementById('toggle-vectors').classList.toggle('active');
+        }
+
+        function toggleInteractions() {
+            simState.planetInteractions = !simState.planetInteractions;
+            document.getElementById('toggle-interactions').classList.toggle('active');
+        }
+
+        function startSimulation() {
+            if (!simState.isRunning) {
+                simState.time = 0;
+                simState.planets.forEach(p => p.trail = []);
+            }
+            simState.isRunning = true;
+            simState.isPaused = false;
+            animate();
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.time = 0;
+            initializePlanets();
+            createPlanetControls();
+            cancelAnimationFrame(animationId);
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            document.getElementById('stat-time').textContent = '0.0';
+            drawCanvas();
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            const activePlanets = simState.planets.filter(p => p.active);
+            
+            activePlanets.forEach(planet => {
+                let ax = 0, ay = 0;
+                
+                const dx = centerX - planet.x;
+                const dy = centerY - planet.y;
+                const distSq = dx * dx + dy * dy;
+                const dist = Math.sqrt(distSq);
+                
+                const force = (simState.G * simState.sunMass * planet.mass) / distSq;
+                ax += (force * dx / dist) / planet.mass;
+                ay += (force * dy / dist) / planet.mass;
+                
+                if (simState.planetInteractions) {
+                    activePlanets.forEach(other => {
+                        if (other !== planet) {
+                            const dx2 = other.x - planet.x;
+                            const dy2 = other.y - planet.y;
+                            const distSq2 = dx2 * dx2 + dy2 * dy2;
+                            const dist2 = Math.sqrt(distSq2);
+                            
+                            if (dist2 > 10) {
+                                const force2 = (simState.G * other.mass * planet.mass) / distSq2;
+                                ax += (force2 * dx2 / dist2) / planet.mass;
+                                ay += (force2 * dy2 / dist2) / planet.mass;
+                            }
+                        }
+                    });
+                }
+                
+                planet.vx += ax * simState.dt * simState.timeSpeed;
+                planet.vy += ay * simState.dt * simState.timeSpeed;
+                planet.x += planet.vx * simState.dt;
+                planet.y += planet.vy * simState.dt;
+                
+                planet.angle = Math.atan2(planet.y - centerY, planet.x - centerX);
+                
+                if (simState.showTrails) {
+                    planet.trail.push({ x: planet.x, y: planet.y });
+                    if (planet.trail.length > simState.maxTrailLength) {
+                        planet.trail.shift();
+                    }
+                }
+            });
+            
+            simState.time += simState.dt * simState.timeSpeed;
+            document.getElementById('stat-time').textContent = (simState.time / 10).toFixed(1);
+            
+            let totalEnergy = 0;
+            let totalMomentum = 0;
+            activePlanets.forEach(planet => {
+                const speed = Math.sqrt(planet.vx ** 2 + planet.vy ** 2);
+                const dist = Math.sqrt((planet.x - centerX) ** 2 + (planet.y - centerY) ** 2);
+                const ke = 0.5 * planet.mass * speed * speed;
+                const pe = -(simState.G * simState.sunMass * planet.mass) / dist;
+                totalEnergy += ke + pe;
+                totalMomentum += planet.mass * speed * dist;
+            });
+            
+            document.getElementById('stat-energy').textContent = totalEnergy.toFixed(2);
+            document.getElementById('stat-momentum').textContent = totalMomentum.toFixed(2);
+            
+            drawCanvas();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+            for (let r = 50; r < 350; r += 50) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            simState.planets.forEach(planet => {
+                if (planet.active && simState.showTrails && planet.trail.length > 1) {
+                    ctx.strokeStyle = planet.color + '40';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(planet.trail[0].x, planet.trail[0].y);
+                    for (let i = 1; i < planet.trail.length; i++) {
+                        ctx.lineTo(planet.trail[i].x, planet.trail[i].y);
+                    }
+                    ctx.stroke();
+                }
+            });
+            
+            const sunGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 25);
+            sunGradient.addColorStop(0, '#fff9e6');
+            sunGradient.addColorStop(0.4, '#ffeb3b');
+            sunGradient.addColorStop(1, '#ff9800');
+            ctx.fillStyle = sunGradient;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = 'rgba(255, 235, 59, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            simState.planets.forEach(planet => {
+                if (planet.active) {
+                    ctx.fillStyle = planet.color;
+                    ctx.beginPath();
+                    ctx.arc(planet.x, planet.y, planet.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(planet.x, planet.y, planet.size, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    if (simState.showVectors) {
+                        const vecScale = 10;
+                        const vecX = planet.vx * vecScale;
+                        const vecY = planet.vy * vecScale;
+                        
+                        ctx.strokeStyle = '#ffeb6b';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(planet.x, planet.y);
+                        ctx.lineTo(planet.x + vecX, planet.y + vecY);
+                        ctx.stroke();
+                    }
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
