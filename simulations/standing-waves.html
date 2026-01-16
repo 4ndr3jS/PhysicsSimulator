@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standing Waves - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>〰️ Standing Waves</h1>
+            <p>Explore wave interference and resonance patterns in strings and pipes</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="startSimulation()">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">λ = 2L/n</div>
+                        <div class="sim-formula-description">Wavelength for nth harmonic</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">f = nv/2L</div>
+                        <div class="sim-formula-description">Frequency of nth harmonic</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">y = 2A sin(kx)cos(ωt)</div>
+                        <div class="sim-formula-description">Standing wave equation</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Nodes are points of zero displacement</li>
+                        <li>Antinodes are points of maximum displacement</li>
+                        <li>Higher harmonics have more nodes</li>
+                        <li>Frequency increases with harmonic number</li>
+                        <li>Standing waves form from interference</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Switch between different harmonics (1-10)</li>
+                        <li>Change amplitude to see energy effects</li>
+                        <li>Adjust frequency to change oscillation speed</li>
+                        <li>Show component waves to see interference</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Wave Settings</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Harmonic Number (n)</span>
+                            <span class="sim-control-value"><span id="val-harmonic">1</span></span>
+                        </div>
+                        <input type="range" id="slider-harmonic" min="1" max="10" value="1" step="1" oninput="updateParameter('harmonic', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Amplitude</span>
+                            <span class="sim-control-value"><span id="val-amplitude">50</span></span>
+                        </div>
+                        <input type="range" id="slider-amplitude" min="10" max="80" value="50" step="5" oninput="updateParameter('amplitude', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Frequency</span>
+                            <span class="sim-control-value"><span id="val-frequency">1.0</span> Hz</span>
+                        </div>
+                        <input type="range" id="slider-frequency" min="0.2" max="3.0" value="1.0" step="0.1" oninput="updateParameter('frequency', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Nodes</span>
+                        <div class="sim-toggle-switch active" id="toggle-nodes" onclick="toggleNodes()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Component Waves</span>
+                        <div class="sim-toggle-switch" id="toggle-components" onclick="toggleComponents()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Envelope</span>
+                        <div class="sim-toggle-switch" id="toggle-envelope" onclick="toggleEnvelope()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-wavelength">0.0</div>
+                        <div class="sim-stat-label">Wavelength (m)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-nodes">0</div>
+                        <div class="sim-stat-label">Number of Nodes</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-antinodes">0</div>
+                        <div class="sim-stat-label">Antinodes</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-energy">0.0</div>
+                        <div class="sim-stat-label">Relative Energy</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</body>
+</html>
