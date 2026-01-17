@@ -150,9 +150,316 @@
                         <div class="sim-stat-value orange" id="stat-energy">0.0</div>
                         <div class="sim-stat-label">Relative Energy</div>
                     </div>
-                </div>  
+                </div>
             </div>
         </div>
     </div>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            harmonic: 1,
+            amplitude: 50,
+            frequency: 1.0,
+            speed: 1.0,
+            showNodes: true,
+            showComponents: false,
+            showEnvelope: false,
+            time: 0,
+            stringLength: 600,
+            stringY: 250
+        };
+
+        let animationId = null;
+
+        function init() {
+            updateStats();
+            drawCanvas();
+        }
+
+        function updateParameter(param, value) {
+            const numValue = parseFloat(value);
+            document.getElementById(`val-${param}`).textContent = 
+                (param === 'frequency' || param === 'speed') ? numValue.toFixed(1) : Math.round(numValue);
+            simState[param] = numValue;
+            updateStats();
+            if (simState.isRunning) {
+                drawCanvas();
+            }
+        }
+
+        function toggleNodes() {
+            simState.showNodes = !simState.showNodes;
+            document.getElementById('toggle-nodes').classList.toggle('active');
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function toggleComponents() {
+            simState.showComponents = !simState.showComponents;
+            document.getElementById('toggle-components').classList.toggle('active');
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function toggleEnvelope() {
+            simState.showEnvelope = !simState.showEnvelope;
+            document.getElementById('toggle-envelope').classList.toggle('active');
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function startSimulation() {
+            simState.isRunning = true;
+            simState.isPaused = false;
+            simState.time = 0;
+            animate();
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.time = 0;
+            cancelAnimationFrame(animationId);
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            drawCanvas();
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            simState.time += 0.016 * simState.speed;
+            drawCanvas();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function updateStats() {
+            const L = simState.stringLength / 100;
+            let wavelength, nodes, antinodes;
+            
+            wavelength = (2 * L) / simState.harmonic;
+            nodes = simState.harmonic + 1;
+            antinodes = simState.harmonic;
+            
+            const energy = simState.amplitude * simState.amplitude * simState.frequency * simState.harmonic;
+            
+            document.getElementById('stat-wavelength').textContent = wavelength.toFixed(2);
+            document.getElementById('stat-nodes').textContent = nodes;
+            document.getElementById('stat-antinodes').textContent = antinodes;
+            document.getElementById('stat-energy').textContent = (energy / 100).toFixed(1);
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0a0a1a');
+            gradient.addColorStop(1, '#1a1a2a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const startX = 100;
+            const endX = startX + simState.stringLength;
+            const centerY = simState.stringY;
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(startX, centerY);
+            ctx.lineTo(endX, centerY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (simState.showComponents) {
+                drawComponentWaves(startX, endX, centerY);
+            }
+
+            if (simState.showEnvelope) {
+                drawEnvelope(startX, endX, centerY);
+            }
+
+            drawStandingWave(startX, endX, centerY);
+
+            drawBoundaries(startX, endX, centerY);
+
+
+            if (simState.showNodes) {
+                drawNodes(startX, endX, centerY);
+            }
+
+            drawInfoText();
+        }
+
+        function drawStandingWave(startX, endX, centerY) {
+            const n = simState.harmonic;
+            const A = simState.amplitude;
+            const omega = 2 * Math.PI * simState.frequency;
+            const t = simState.time;
+            const L = simState.stringLength;
+
+            ctx.strokeStyle = '#6bffb9';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#6bffb9';
+            ctx.beginPath();
+
+            for (let x = startX; x <= endX; x++) {
+                const pos = (x - startX) / L;
+                let y;
+
+                y = centerY + A * Math.sin(n * Math.PI * pos) * Math.cos(omega * t);
+                
+                if (x === startX) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        function drawComponentWaves(startX, endX, centerY) {
+            const n = simState.harmonic;
+            const A = simState.amplitude;
+            const omega = 2 * Math.PI * simState.frequency;
+            const t = simState.time;
+            const L = simState.stringLength;
+            const k = n * Math.PI / L;
+
+            ctx.strokeStyle = 'rgba(255, 107, 107, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            for (let x = startX; x <= endX; x++) {
+                const pos = x - startX;
+                const y = centerY + (A / 2) * Math.sin(k * pos - omega * t);
+                if (x === startX) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(107, 158, 255, 0.5)';
+            ctx.beginPath();
+
+            for (let x = startX; x <= endX; x++) {
+                const pos = x - startX;
+                const y = centerY + (A / 2) * Math.sin(k * pos + omega * t);
+                if (x === startX) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+        }
+
+        function drawEnvelope(startX, endX, centerY) {
+            const n = simState.harmonic;
+            const A = simState.amplitude;
+            const L = simState.stringLength;
+
+            ctx.strokeStyle = 'rgba(255, 235, 107, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([3, 3]);
+
+            ctx.beginPath();
+            for (let x = startX; x <= endX; x++) {
+                const pos = (x - startX) / L;
+                let y;
+
+                y = centerY - A * Math.abs(Math.sin(n * Math.PI * pos));
+                
+                if (x === startX) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+
+            ctx.beginPath();
+            for (let x = startX; x <= endX; x++) {
+                const pos = (x - startX) / L;
+                let y;
+
+                y = centerY + A * Math.abs(Math.sin(n * Math.PI * pos));
+
+                if (x === startX) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawNodes(startX, endX, centerY) {
+            const n = simState.harmonic;
+            const L = simState.stringLength;
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ff6b6b';
+
+            for (let m = 0; m <= n; m++) {
+                const x = startX + (m * L) / n;
+                ctx.beginPath();
+                ctx.arc(x, centerY, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.shadowBlur = 0;
+        }
+
+        function drawBoundaries(startX, endX, centerY) {
+            const boundaryHeight = 100;
+            
+            ctx.fillStyle = 'rgba(180, 180, 200, 0.5)';
+            ctx.fillRect(startX - 10, centerY - boundaryHeight / 2, 10, boundaryHeight);
+            ctx.strokeStyle = 'rgba(200, 200, 220, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX - 10, centerY - boundaryHeight / 2, 10, boundaryHeight);
+            
+            ctx.fillStyle = 'rgba(180, 180, 200, 0.5)';
+            ctx.fillRect(endX, centerY - boundaryHeight / 2, 10, boundaryHeight);
+            ctx.strokeStyle = 'rgba(200, 200, 220, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(endX, centerY - boundaryHeight / 2, 10, boundaryHeight);
+                
+        }
+
+        function drawInfoText() {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '14px system-ui';
+            if (simState.showComponents) {
+                ctx.fillStyle = 'rgba(255, 107, 107, 0.8)';
+                ctx.fillText('● Right-traveling wave', 100, 440);
+                ctx.fillStyle = 'rgba(107, 158, 255, 0.8)';
+                ctx.fillText('● Left-traveling wave', 100, 460);
+            }
+        }
+
+        init();
+    </script>
 </body>
 </html>
