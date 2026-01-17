@@ -84,7 +84,6 @@
                         <li>Vary thickness to see color changes</li>
                         <li>Change refractive index (soap vs oil)</li>
                         <li>Switch to monochromatic light mode</li>
-                        <li>Enable wedge mode for rainbow gradient</li>
                         <li>Watch colors change with viewing angle</li>
                     </ul>
                 </div>
@@ -116,9 +115,9 @@
                     <div class="sim-control-group">
                         <div class="sim-control-label">
                             <span>Viewing Angle</span>
-                            <span class="sim-control-value"><span id="val-angle">0</span>°</span>
+                            <span class="sim-control-value"><span id="val-angle">20</span>°</span>
                         </div>
-                        <input type="range" id="slider-angle" min="0" max="60" value="0" step="5" oninput="updateParameter('angle', this.value)">
+                        <input type="range" id="slider-angle" min="10" max="80" value="20" step="5" oninput="updateParameter('angle', this.value)">
                     </div>
 
                     <div class="sim-divider"></div>
@@ -131,11 +130,6 @@
                     <div class="sim-toggle">
                         <span>Show Phase Info</span>
                         <div class="sim-toggle-switch" id="toggle-phase" onclick="togglePhase()"></div>
-                    </div>
-
-                    <div class="sim-toggle">
-                        <span>Wedge Mode</span>
-                        <div class="sim-toggle-switch" id="toggle-wedge" onclick="toggleWedge()"></div>
                     </div>
                 </div>
 
@@ -187,5 +181,468 @@
             </div>
         </div>
     </div>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            thickness: 300,
+            refractiveIndex: 1.33,
+            angle: 0,
+            showRays: true,
+            showPhase: false,
+            viewMode: 'bubble',
+            lightMode: 'white',
+            wavelength: 550,
+            time: 0
+        };
+
+        let animationId = null;
+
+        function init() {
+            updateStats();
+            drawCanvas();
+        }
+
+        function updateParameter(param, value) {
+            const numValue = parseFloat(value);
+            if (param === 'refractiveIndex') {
+                document.getElementById(`val-${param}`).textContent = numValue.toFixed(2);
+            } else {
+                document.getElementById(`val-${param}`).textContent = Math.round(numValue);
+            }
+            simState[param] = numValue;
+            updateStats();
+            if (simState.isRunning) {
+                drawCanvas();
+            }
+        }
+
+        function updateWavelength(value) {
+            simState.wavelength = parseFloat(value);
+            document.getElementById('val-wavelength').textContent = Math.round(value);
+            updateStats();
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function setMaterial(n) {
+            simState.refractiveIndex = n;
+            document.getElementById('val-refractiveIndex').textContent = n.toFixed(2);
+            document.getElementById('slider-refractiveIndex').value = n;
+            updateStats();
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function toggleRays() {
+            simState.showRays = !simState.showRays;
+            document.getElementById('toggle-rays').classList.toggle('active');
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function togglePhase() {
+            simState.showPhase = !simState.showPhase;
+            document.getElementById('toggle-phase').classList.toggle('active');
+            if (simState.isRunning) drawCanvas();
+        }
+        function setViewMode(mode) {
+            simState.viewMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function setLightMode(mode) {
+            simState.lightMode = mode;
+            document.getElementById('wavelengthPicker').style.display = mode === 'mono' ? 'block' : 'none';
+            updateStats();
+            if (simState.isRunning) drawCanvas();
+        }
+
+        function toggleSimulation() {
+            if (!simState.isRunning) {
+                simState.isRunning = true;
+                simState.isPaused = false;
+                simState.time = 0;
+                document.getElementById('toggleBtn').textContent = '⏸️ Pause';
+                animate();
+            } else if (simState.isPaused) {
+                simState.isPaused = false;
+                document.getElementById('toggleBtn').textContent = '⏸️ Pause';
+                animate();
+            } else {
+                simState.isPaused = true;
+                document.getElementById('toggleBtn').textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            }
+        }
+
+        function startSimulation() {
+            simState.isRunning = true;
+            simState.isPaused = false;
+            simState.time = 0;
+            animate();
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Play';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.time = 0;
+            cancelAnimationFrame(animationId);
+            document.getElementById('toggleBtn').textContent = '▶️ Start';
+            drawCanvas();
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+            
+            simState.time += 0.016;
+            drawCanvas();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function calculateInterference(wavelength, thickness, n, angle) {
+            const angleRad = (angle * Math.PI) / 180;
+            const pathDiff = 2 * n * thickness * Math.cos(angleRad);
+            const phaseShift = 0.5;
+            const totalPhase = (pathDiff / wavelength) + phaseShift;
+            const order = Math.floor(totalPhase);
+            const fractionalPart = totalPhase - order;
+            
+            const intensity = Math.cos(Math.PI * fractionalPart) ** 2;
+            
+            const isConstructive = Math.abs(fractionalPart - 0) < 0.1 || Math.abs(fractionalPart - 1) < 0.1;
+            const isDestructive = Math.abs(fractionalPart - 0.5) < 0.1;
+            
+            return {
+                pathDiff,
+                order,
+                intensity,
+                type: isConstructive ? 'Constructive' : isDestructive ? 'Destructive' : 'Partial'
+            };
+        }
+
+        function updateStats() {
+            const wavelength = simState.lightMode === 'mono' ? simState.wavelength : 550;
+            const result = calculateInterference(wavelength, simState.thickness, simState.refractiveIndex, simState.angle);
+            
+            document.getElementById('stat-pathDiff').textContent = result.pathDiff.toFixed(1);
+            document.getElementById('stat-order').textContent = result.order;
+            document.getElementById('stat-type').textContent = result.type;
+            document.getElementById('stat-intensity').textContent = (result.intensity * 100).toFixed(1);
+        }
+
+        function wavelengthToRGB(wavelength) {
+            let r, g, b;
+            
+            if (wavelength >= 380 && wavelength < 440) {
+                r = -(wavelength - 440) / (440 - 380);
+                g = 0;
+                b = 1;
+            } else if (wavelength >= 440 && wavelength < 490) {
+                r = 0;
+                g = (wavelength - 440) / (490 - 440);
+                b = 1;
+            } else if (wavelength >= 490 && wavelength < 510) {
+                r = 0;
+                g = 1;
+                b = -(wavelength - 510) / (510 - 490);
+            } else if (wavelength >= 510 && wavelength < 580) {
+                r = (wavelength - 510) / (580 - 510);
+                g = 1;
+                b = 0;
+            } else if (wavelength >= 580 && wavelength < 645) {
+                r = 1;
+                g = -(wavelength - 645) / (645 - 580);
+                b = 0;
+            } else if (wavelength >= 645 && wavelength <= 700) {
+                r = 1;
+                g = 0;
+                b = 0;
+            } else {
+                r = 0;
+                g = 0;
+                b = 0;
+            }
+            
+            return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0a0a1a');
+            gradient.addColorStop(1, '#1a1a2a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (simState.viewMode === 'bubble') {
+                drawBubbleView();
+            } else if (simState.viewMode === 'puddle') {
+                drawPuddleView();
+            } else if (simState.viewMode === 'diagram') {
+                drawRayDiagram();
+            }
+        }
+
+        function drawBubbleView() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 150;
+
+            for (let angle = 0; angle < 360; angle += 2) {
+                for (let r = 0; r < radius; r += 2) {
+                    const angleRad = (angle * Math.PI) / 180;
+                    const x = centerX + r * Math.cos(angleRad);
+                    const y = centerY + r * Math.sin(angleRad);
+                    
+                    const heightFactor = (y - (centerY - radius)) / (2 * radius);
+                    const localThickness = simState.thickness * (0.3 + heightFactor * 1.7);
+                    
+                    let finalR = 0, finalG = 0, finalB = 0;
+                    
+                    for (let wl = 400; wl <= 700; wl += 20) {
+                        const result = calculateInterference(wl, localThickness, simState.refractiveIndex, simState.angle);
+                        const color = wavelengthToRGB(wl);
+                        const rgb = color.match(/\d+/g).map(Number);
+                        finalR += rgb[0] * result.intensity;
+                        finalG += rgb[1] * result.intensity;
+                        finalB += rgb[2] * result.intensity;
+                    }
+                    
+                    finalR = Math.min(255, finalR / 16);
+                    finalG = Math.min(255, finalG / 16);
+                    finalB = Math.min(255, finalB / 16);
+                    
+                    const distFromCenter = r / radius;
+                    const alpha = 0.7 * (1 - distFromCenter * 0.3);
+                    
+                    ctx.fillStyle = `rgba(${finalR}, ${finalG}, ${finalB}, ${alpha})`;
+                    ctx.fillRect(x, y, 2, 2);
+                }
+            }
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const highlightGradient = ctx.createRadialGradient(
+                centerX - 50, centerY - 50, 10,
+                centerX - 50, centerY - 50, 60
+            );
+            highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+            highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = highlightGradient;
+            ctx.fillRect(centerX - 110, centerY - 110, 120, 120);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = '14px system-ui';
+            ctx.fillText('Soap Bubble - Colors from thin film interference', 200, 450);
+            ctx.fillText(`Thickness range: ${Math.round(simState.thickness * 0.3)}-${Math.round(simState.thickness * 2)} nm`, 220, 470);
+        }
+
+        function drawPuddleView() {
+            const puddleX = 150;
+            const puddleY = 200;
+            const puddleWidth = 500;
+            const puddleHeight = 150;
+
+            for (let x = 0; x < puddleWidth; x += 3) {
+                for (let y = 0; y < puddleHeight; y += 3) {
+                    const dx = x - puddleWidth / 2;
+                    const dy = y - puddleHeight / 2;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const swirl = Math.sin(dist / 20 + simState.time * 0.5) * 0.5 + 0.5;
+                    const localThickness = simState.thickness * (0.5 + swirl);
+                    
+                    let finalR = 0, finalG = 0, finalB = 0;
+                    
+                    for (let wl = 400; wl <= 700; wl += 20) {
+                        const result = calculateInterference(wl, localThickness, simState.refractiveIndex, simState.angle);
+                        const color = wavelengthToRGB(wl);
+                        const rgb = color.match(/\d+/g).map(Number);
+                        finalR += rgb[0] * result.intensity;
+                        finalG += rgb[1] * result.intensity;
+                        finalB += rgb[2] * result.intensity;
+                    }
+                    
+                    finalR = Math.min(255, finalR / 16);
+                    finalG = Math.min(255, finalG / 16);
+                    finalB = Math.min(255, finalB / 16);
+                    
+                    ctx.fillStyle = `rgb(${finalR}, ${finalG}, ${finalB})`;
+                    ctx.fillRect(puddleX + x, puddleY + y, 3, 3);
+                }
+            }
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(puddleX, puddleY, puddleWidth, puddleHeight);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = '14px system-ui';
+            ctx.fillText('Oil Slick on Water - Swirling interference patterns', 200, 420);
+            ctx.fillText(`Base thickness: ${simState.thickness} nm`, 280, 440);
+
+            const filmX = 150;
+            const filmY = 200;
+            const filmWidth = 500;
+            const filmHeight = Math.max(20, simState.thickness / 15);
+
+            ctx.fillStyle = 'rgba(200, 220, 255, 0.1)';
+            ctx.fillRect(filmX, filmY - 80, filmWidth, 80);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = '14px system-ui';
+            ctx.fillText('Air (n = 1.0)', filmX + 10, filmY - 50);
+
+            if (simState.lightMode === 'white') {
+                const colors = [];
+                for (let wl = 400; wl <= 700; wl += 20) {
+                    const result = calculateInterference(wl, simState.thickness, simState.refractiveIndex, simState.angle);
+                    colors.push({ color: wavelengthToRGB(wl), intensity: result.intensity });
+                }
+                
+                let r = 0, g = 0, b = 0;
+                colors.forEach(c => {
+                    const rgb = c.color.match(/\d+/g).map(Number);
+                    r += rgb[0] * c.intensity;
+                    g += rgb[1] * c.intensity;
+                    b += rgb[2] * c.intensity;
+                });
+                r = Math.min(255, r / colors.length);
+                g = Math.min(255, g / colors.length);
+                b = Math.min(255, b / colors.length);
+                
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+            } else {
+                const result = calculateInterference(simState.wavelength, simState.thickness, simState.refractiveIndex, simState.angle);
+                const color = wavelengthToRGB(simState.wavelength);
+                const rgb = color.match(/\d+/g).map(Number);
+                ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${result.intensity})`;
+            }
+            
+            ctx.fillRect(filmX, filmY, filmWidth, filmHeight);
+            
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(filmX, filmY, filmWidth, filmHeight);
+
+            ctx.fillStyle = 'rgba(150, 150, 170, 0.3)';
+            ctx.fillRect(filmX, filmY + filmHeight, filmWidth, 80);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.fillText(`Substrate (n = ${(simState.refractiveIndex + 0.2).toFixed(2)})`, filmX + 10, filmY + filmHeight + 30);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillText(`Film: n = ${simState.refractiveIndex}, t = ${simState.thickness} nm`, filmX + 10, filmY + filmHeight / 2 + 5);
+
+            if (simState.showRays) {
+                drawRayPaths(filmX, filmY, filmWidth, filmHeight);
+            }
+
+            if (simState.showPhase) {
+                drawPhaseInfo(filmX + filmWidth + 30, filmY);
+            }
+        }
+
+        function drawRayPaths(filmX, filmY, filmWidth, filmHeight) {
+            const startX = filmX + 100;
+            const angleRad = (simState.angle * Math.PI) / 180;
+            const rayLength = 100;
+            
+            ctx.strokeStyle = 'rgba(255, 255, 100, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(startX - rayLength * Math.sin(angleRad), filmY - rayLength * Math.cos(angleRad));
+            ctx.lineTo(startX, filmY);
+            ctx.stroke();
+
+            drawArrow(startX - rayLength * Math.sin(angleRad) * 0.5, 
+                        filmY - rayLength * Math.cos(angleRad) * 0.5,
+                        startX, filmY, 'rgba(255, 255, 100, 0.8)');
+
+            ctx.strokeStyle = 'rgba(255, 100, 100, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(startX, filmY);
+            ctx.lineTo(startX + rayLength * Math.sin(angleRad), filmY - rayLength * Math.cos(angleRad));
+            ctx.stroke();
+
+            const refractAngle = Math.asin(Math.sin(angleRad) / simState.refractiveIndex);
+            ctx.strokeStyle = 'rgba(100, 255, 255, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(startX, filmY);
+            const bottomX = startX + filmHeight * Math.tan(refractAngle);
+            ctx.lineTo(bottomX, filmY + filmHeight);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255, 150, 255, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(bottomX, filmY + filmHeight);
+            const exitX = bottomX + filmHeight * Math.tan(refractAngle);
+            ctx.lineTo(exitX, filmY);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(100, 255, 100, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(exitX, filmY);
+            ctx.lineTo(exitX + rayLength * Math.sin(angleRad), filmY - rayLength * Math.cos(angleRad));
+            ctx.stroke();
+        }
+
+        function drawArrow(x1, y1, x2, y2, color) {
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            const arrowLength = 10;
+            
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - arrowLength * Math.cos(angle - Math.PI / 6), 
+                        y2 - arrowLength * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x2 - arrowLength * Math.cos(angle + Math.PI / 6), 
+                        y2 - arrowLength * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawPhaseInfo(x, y) {
+            ctx.fillStyle = 'rgba(30, 30, 50, 0.9)';
+            ctx.fillRect(x, y, 150, 120);
+            ctx.strokeStyle = 'rgba(107, 158, 255, 0.5)';
+            ctx.strokeRect(x, y, 150, 120);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = '12px system-ui';
+            ctx.fillText('Phase Analysis:', x + 10, y + 20);
+            
+            const wavelength = simState.lightMode === 'mono' ? simState.wavelength : 550;
+            const result = calculateInterference(wavelength, simState.thickness, simState.refractiveIndex, simState.angle);
+            
+            ctx.font = '11px system-ui';
+            ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
+            ctx.fillText(`Path diff: ${result.pathDiff.toFixed(1)} nm`, x + 10, y + 45);
+            ctx.fillText(`λ = ${wavelength} nm`, x + 10, y + 65);
+            ctx.fillText(`Order: m = ${result.order}`, x + 10, y + 85);
+            ctx.fillText(`Type: ${result.type}`, x + 10, y + 105);
+        }
+
+        init();
+    </script>
 </body>
 </html>
