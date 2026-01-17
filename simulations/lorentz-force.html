@@ -157,5 +157,270 @@
             </div>
         </div>
     </div>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let particle = null;
+        let isRunning = false;
+        let trail = [];
+
+        const params = {
+            Bz: 0.5,
+            Ey: 10,
+            q: 1,
+            m: 1,
+            v0: 5,
+            scale: 50
+        };
+
+        function updateFields() {
+            params.Bz = parseFloat(document.getElementById('range-b').value);
+            params.Ey = parseFloat(document.getElementById('range-e').value);
+
+            document.getElementById('val-b').innerText = params.Bz.toFixed(1);
+            document.getElementById('val-e').innerText = params.Ey.toFixed(1);
+        }
+
+        function toggleSimulation() {
+            if (!isRunning) {
+                resetSimulation();
+                isRunning = true;
+                document.getElementById('playBtn').innerText = '⏹️ Stop Simulation';
+            } else {
+                isRunning = false;
+                document.getElementById('playBtn').innerText = '🚀 Launch Particle';
+            }
+        }
+
+        function resetSimulation() {
+            const v0 = parseFloat(document.getElementById('range-v').value);
+            const q = parseFloat(document.getElementById('range-q').value);
+            const m = parseFloat(document.getElementById('range-m').value);
+
+            particle = {
+                x: 1,
+                y: 5,
+                vx: v0,
+                vy: 0,
+                q: q,
+                m: m
+            };
+
+            trail = [];
+            isRunning = false;
+            document.getElementById('playBtn').innerText = '🚀 Launch Particle';
+
+            updateStats();
+            draw();
+        }
+
+        function clearTrail() {
+            trail = [];
+        }
+
+        function getAcceleration(state, q, m, Bz, Ey) {
+            const ax = (q * (state.vy * Bz)) / m;
+            const ay = (q * (Ey - state.vx * Bz)) / m;
+            return { ax, ay };
+        }
+
+        function updatePhysics(dt) {
+            if (!particle) {
+                return;
+            }
+
+            const q = particle.q;
+            const m = particle.m;
+            const Bz = params.Bz;
+            const Ey = params.Ey;
+
+            const a1 = getAcceleration(particle, q, m, Bz, Ey);
+            const k1x = particle.vx;
+            const k1y = particle.vy;
+            const k1vx = a1.ax;
+            const k1vy = a1.ay;
+
+            const s2 = {
+                vx: particle.vx + k1vx * dt / 2,
+                vy: particle.vy + k1vy * dt / 2
+            };
+            const a2 = getAcceleration(s2, q, m, Bz, Ey);
+            const k2x = s2.vx;
+            const k2y = s2.vy;
+            const k2vx = a2.ax;
+            const k2vy = a2.ay;
+
+            const s3 = {
+                vx: particle.vx + k2vx * dt / 2,
+                vy: particle.vy + k2vy * dt / 2
+            };
+            const a3 = getAcceleration(s3, q, m, Bz, Ey);
+            const k3x = s3.vx;
+            const k3y = s3.vy;
+            const k3vx = a3.ax;
+            const k3vy = a3.ay;
+
+            const s4 = {
+                vx: particle.vx + k3vx * dt,
+                vy: particle.vy + k3vy * dt
+            };
+            const a4 = getAcceleration(s4, q, m, Bz, Ey);
+            const k4x = s4.vx;
+            const k4y = s4.vy;
+            const k4vx = a4.ax;
+            const k4vy = a4.ay;
+
+            particle.x += (k1x + 2 * k2x + 2 * k3x + k4x) * dt / 6;
+            particle.y += (k1y + 2 * k2y + 2 * k3y + k4y) * dt / 6;
+            particle.vx += (k1vx + 2 * k2vx + 2 * k3vx + k4vx) * dt / 6;
+            particle.vy += (k1vy + 2 * k2vy + 2 * k3vy + k4vy) * dt / 6;
+
+            trail.push({ x: particle.x, y: particle.y });
+            if (trail.length > 500) trail.shift();
+
+            const w = canvas.width / params.scale;
+            const h = canvas.height / params.scale;
+            if (particle.x < 0 || particle.x > w || particle.y < 0 || particle.y > h) {
+                isRunning = false;
+                document.getElementById('playBtn').innerText = '🚀 Launch Particle';
+            }
+        }
+
+        function drawFields() {
+            const spacing = 50;
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(107, 158, 255, 0.15)';
+
+            for (let x = spacing / 2; x < canvas.width; x += spacing) {
+                for (let y = spacing / 2; y < canvas.height; y += spacing) {
+                    if (params.Bz > 0) {
+                        ctx.fillStyle = 'rgba(107, 158, 255, 0.5)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(x, y, 8, 0, Math.PI * 2);
+                        ctx.stroke();
+                    } else if (params.Bz < 0) {
+                        ctx.strokeStyle = 'rgba(255, 107, 107, 0.5)';
+                        ctx.beginPath();
+                        ctx.moveTo(x - 5, y - 5);
+                        ctx.lineTo(x + 5, y + 5);
+                        ctx.moveTo(x + 5, y - 5);
+                        ctx.lineTo(x - 5, y + 5);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(x, y, 8, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            if (Math.abs(params.Ey) > 0.1) {
+                ctx.strokeStyle = 'rgba(255, 235, 107, 0.3)';
+                ctx.lineWidth = 2;
+                const eSpacing = 100;
+                for (let x = eSpacing / 2; x < canvas.width; x += eSpacing) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+
+                    const arrowY = canvas.height / 2;
+                    const dir = params.Ey > 0 ? 1 : -1;
+                    ctx.beginPath();
+                    ctx.moveTo(x, arrowY + 10 * dir);
+                    ctx.lineTo(x - 5, arrowY);
+                    ctx.moveTo(x, arrowY + 10 * dir);
+                    ctx.lineTo(x + 5, arrowY);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function updateStats() {
+            if (!particle) {
+                return;
+            }
+
+            const v = Math.sqrt(particle.vx ** 2 + particle.vy ** 2);
+            const b = Math.abs(params.Bz);
+            const r = (particle.m * v) / (Math.abs(particle.q) * b || 0.0001);
+
+            const Fx = particle.q * (particle.vy * params.Bz);
+            const Fy = particle.q * (params.Ey - particle.vx * params.Bz);
+            const Ftot = Math.sqrt(Fx ** 2 + Fy ** 2);
+
+            document.getElementById('stat-speed').innerText = v.toFixed(2);
+            document.getElementById('stat-radius').innerText = b < 0.01 ? '∞' : r.toFixed(2);
+            document.getElementById('stat-force').innerText = Ftot.toFixed(2);
+            document.getElementById('stat-energy').innerText = (0.5 * particle.m * v * v).toFixed(2);
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawFields();
+
+            if (trail.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = particle.q >= 0 ? '#ff6b6b' : '#6b9eff';
+                ctx.lineWidth = 2;
+                ctx.lineJoin = 'round';
+                ctx.moveTo(trail[0].x * params.scale, trail[0].y * params.scale);
+                for (let i = 1; i < trail.length; i++) {
+                    ctx.lineTo(trail[i].x * params.scale, trail[i].y * params.scale);
+                }
+                ctx.stroke();
+            }
+
+            if (particle) {
+                ctx.save();
+                ctx.translate(particle.x * params.scale, particle.y * params.scale);
+
+                const color = particle.q >= 0 ? '#ff6b6b' : '#6b9eff';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = color;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(0, 0, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(particle.q >= 0 ? '+' : '-', 0, 0);
+
+                ctx.restore();
+            }
+        }
+
+        function loop() {
+            if (isRunning) {
+                for (let i = 0; i < 5; i++) {
+                    updatePhysics(0.01);
+                }
+                updateStats();
+            }
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        document.querySelectorAll('input[type="range"]').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const id = e.target.id.split('-')[1];
+                document.getElementById(`val-${id}`).innerText = parseFloat(e.target.value).toFixed(1);
+                if (id === 'b' || id === 'e') updateFields();
+            });
+        });
+
+        updateFields();
+        resetSimulation();
+        loop();
+    </script>
 </body>
 </html>
