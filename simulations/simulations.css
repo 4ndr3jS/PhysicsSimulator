@@ -998,5 +998,5 @@ input[type="range"]:disabled {
 }
 
 li::before{
-    transform: translateY(-6zpx);
+    transform: translateY(-6px);
 }

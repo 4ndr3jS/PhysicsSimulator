@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacitor Lab - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🔋 Capacitor Lab</h1>
+            <p>Explore how plate area, separation, and dielectric materials store energy</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="toggleCharge()" id="toggleBtn">🔌
+                            Discharge</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">C = κε₀A / d</div>
+                        <div class="sim-formula-description">Capacitance of parallel plates</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">Q = CV</div>
+                        <div class="sim-formula-description">Charge stored on plates</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">E = V / d</div>
+                        <div class="sim-formula-description">Electric field strength</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Capacitance increases with larger plate area</li>
+                        <li>Smaller separation leads to higher capacitance</li>
+                        <li>Dielectric materials amplify stored charge</li>
+                        <li>Electric field lines point from positive to negative</li>
+                        <li>Energy is stored in the electric field</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Lab Settings</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Battery Voltage</span>
+                            <span class="sim-control-value"><span id="val-voltage">1.50</span> V</span>
+                        </div>
+                        <input type="range" id="slider-voltage" min="-1.5" max="1.5" value="1.5" step="0.1"
+                            oninput="updateParam('voltage', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Plate Area</span>
+                            <span class="sim-control-value"><span id="val-area">200</span> mm²</span>
+                        </div>
+                        <input type="range" id="slider-area" min="100" max="400" value="200" step="10"
+                            oninput="updateParam('area', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Separation</span>
+                            <span class="sim-control-value"><span id="val-distance">6.0</span> mm</span>
+                        </div>
+                        <input type="range" id="slider-distance" min="2" max="10" value="6" step="0.1"
+                            oninput="updateParam('distance', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Dielectric (κ)</span>
+                            <span class="sim-control-value"><span id="val-dielectric">1.0</span></span>
+                        </div>
+                        <input type="range" id="slider-dielectric" min="1.0" max="5.0" value="1.0" step="0.1"
+                            oninput="updateParam('dielectric', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Electric Field</span>
+                        <div class="sim-toggle-switch active" id="toggle-field" onclick="toggleUI('showField')"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Charge Carriers</span>
+                        <div class="sim-toggle-switch active" id="toggle-charge" onclick="toggleUI('showCharge')"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-capacitance">0.30</div>
+                        <div class="sim-stat-label">Capacitance (pF)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-storedCharge">0.45</div>
+                        <div class="sim-stat-label">Stored Charge (pC)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-energy">0.34</div>
+                        <div class="sim-stat-label">Stored Energy (pJ)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-field">250</div>
+                        <div class="sim-stat-label">Field (V/m)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
