@@ -83,7 +83,7 @@
                             <span>Battery Voltage</span>
                             <span class="sim-control-value"><span id="val-voltage">1.50</span> V</span>
                         </div>
-                        <input type="range" id="slider-voltage" min="-1.5" max="1.5" value="1.5" step="0.1"
+                        <input type="range" id="slider-voltage" min="-9" max="9" value="1.5" step="0.1"
                             oninput="updateParam('voltage', this.value)">
                     </div>
 
@@ -148,5 +148,216 @@
             </div>
         </div>
     </div>
+    <script>
+        const canvas = document.getElementById('simCanvas'), ctx = canvas.getContext('2d');
+        const EPSILON_0 = 8.854e-12;
+
+        let state = {
+            voltage: 1.5,
+            area: 200,
+            distance: 6.0,
+            dielectric: 1.0,
+            connected: true,
+            showField: true,
+            showCharge: true,
+            particles: [],
+            time: 0
+        };
+
+        const updateParam = (p, v) => {
+            state[p] = parseFloat(v);
+            document.getElementById(`val-${p}`).textContent = p === 'area' ? Math.round(state[p]) : state[p].toFixed(p === 'voltage' ? 2 : 1);
+            updateStats();
+        };
+
+        const toggleUI = p => {
+            state[p] = !state[p];
+            document.getElementById(`toggle-${p.replace('show', '').toLowerCase()}`).classList.toggle('active');
+        };
+
+        const toggleCharge = () => {
+            state.connected = !state.connected;
+            document.getElementById('toggleBtn').textContent = state.connected ? '🔌 Discharge' : '⚡ Connect';
+            if (!state.connected) {
+                state.voltage = 0;
+                document.getElementById('slider-voltage').value = 0;
+                updateParam('voltage', 0);
+            } else {
+                state.voltage = 1.5;
+                document.getElementById('slider-voltage').value = 1.5;
+                updateParam('voltage', 1.5);
+            }
+        };
+
+        const resetSimulation = () => {
+            state.connected = true;
+            document.getElementById('toggleBtn').textContent = '🔌 Discharge';
+            updateParam('voltage', 1.5);
+            updateParam('area', 200);
+            updateParam('distance', 6);
+            updateParam('dielectric', 1.0);
+            document.getElementById('slider-voltage').value = 1.5;
+            document.getElementById('slider-area').value = 200;
+            document.getElementById('slider-distance').value = 6;
+            document.getElementById('slider-dielectric').value = 1.0;
+        };
+
+        const updateStats = () => {
+            const A = state.area * 1e-6;
+            const d = state.distance * 1e-3;
+            const C = (state.dielectric * EPSILON_0 * A) / d;
+            const Q = C * Math.abs(state.voltage);
+            const U = 0.5 * C * state.voltage ** 2;
+            const E = Math.abs(state.voltage) / d;
+
+            document.getElementById('stat-capacitance').textContent = (C * 1e12).toFixed(2);
+            document.getElementById('stat-storedCharge').textContent = (Q * 1e12).toFixed(2);
+            document.getElementById('stat-energy').textContent = (U * 1e12).toFixed(2);
+            document.getElementById('stat-field').textContent = E.toFixed(0);
+        };
+
+        const drawLoop = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const someLength1 = document.getElementById('slider-distance').value - 6;
+            const someLength = someLength1 * 9;
+            
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, 50);
+            ctx.lineTo(centerX, centerY - 50 - someLength);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY + 50 + someLength);
+            ctx.lineTo(centerX, canvas.height - 50);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, 50);
+            ctx.lineTo(150, 50);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, canvas.height - 50);
+            ctx.lineTo(150, canvas.height - 50);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(150, 50);
+            ctx.lineTo(150, centerY - 8);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(150, canvas.height - 50);
+            ctx.lineTo(150, centerY + 12);
+            ctx.stroke();
+            
+            const batteryX = 150;
+            const batteryY = centerY;
+            
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(batteryX - 40, batteryY - 8);
+            ctx.lineTo(batteryX + 40, batteryY - 8);
+            ctx.stroke();
+            
+            ctx.strokeStyle = '#6b9eff';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(batteryX - 16, batteryY + 8);
+            ctx.lineTo(batteryX + 16, batteryY + 8);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('+', batteryX + 40, batteryY - 25);
+            
+            ctx.fillStyle = '#6b9eff';
+            ctx.fillText('−', batteryX + 20, batteryY + 30);
+
+            const plateW = Math.sqrt(state.area) * 10;
+            const gap = state.distance * 15;
+            const thickness = 10;
+
+            if (state.dielectric > 1.0) {
+                ctx.fillStyle = `rgba(100, 150, 255, ${0.1 * state.dielectric})`;
+                ctx.fillRect(centerX - plateW / 2, centerY - gap / 2, plateW, gap);
+                ctx.strokeStyle = 'rgba(100, 150, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(centerX - plateW / 2, centerY - gap / 2, plateW, gap);
+            }
+
+            if (state.showField && state.voltage !== 0) {
+                const numLines = Math.floor(state.area / 10);
+                const opacity = Math.min(0.8, Math.abs(state.voltage) / 1.5);
+                ctx.strokeStyle = `rgba(255, 235, 107, ${opacity})`;
+                ctx.lineWidth = 2;
+                for (let i = 0; i < numLines; i++) {
+                    const x = (centerX - plateW / 2) + (i / (numLines - 1)) * plateW;
+                    ctx.beginPath();
+                    if (state.voltage > 0) {
+                        ctx.moveTo(x, centerY - gap / 2);
+                        ctx.lineTo(x, centerY + gap / 2);
+                        if (i % 3 === 0) drawArrow(ctx, x+6, centerY, Math.PI / 2);
+                    } else {
+                        ctx.moveTo(x, centerY + gap / 2);
+                        ctx.lineTo(x, centerY - gap / 2);
+                        if (i % 3 === 0) drawArrow(ctx, x+12, centerY, -Math.PI / 2);
+                    }
+                    ctx.stroke();
+                }
+            }
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#fff';
+            ctx.fillStyle = state.voltage > 0 ? '#ff6b6b' : (state.voltage < 0 ? '#6b9eff' : '#444');
+            ctx.fillRect(centerX - plateW / 2, centerY - gap / 2 - thickness, plateW, thickness);
+            ctx.strokeRect(centerX - plateW / 2, centerY - gap / 2 - thickness, plateW, thickness);
+
+            ctx.fillStyle = state.voltage > 0 ? '#6b9eff' : (state.voltage < 0 ? '#ff6b6b' : '#444');
+            ctx.fillRect(centerX - plateW / 2, centerY + gap / 2, plateW, thickness);
+            ctx.strokeRect(centerX - plateW / 2, centerY + gap / 2, plateW, thickness);
+
+            if (state.showCharge && state.voltage !== 0) {
+                const density = Math.floor(plateW / 15);
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                for (let i = 0; i < density; i++) {
+                    const x = (centerX - plateW / 2 + 7) + (i / (density - 1)) * (plateW - 14);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(state.voltage > 0 ? '+' : '-', x, centerY - gap / 2 - thickness + 9);
+                    ctx.fillText(state.voltage > 0 ? '-' : '+', x, centerY + gap / 2 + 9);
+                }
+            }
+
+            state.time += 0.016;
+            requestAnimationFrame(drawLoop);
+        };
+
+        const drawArrow = (ctx, x, y, angle) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(-5, -5);
+            ctx.lineTo(0, 0);
+            ctx.lineTo(5, -5);
+            ctx.stroke();
+            ctx.restore();
+        };
+
+        updateStats();
+        drawLoop();
+    </script>
 </body>
 </html>
