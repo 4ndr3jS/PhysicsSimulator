@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC Resonance Lab - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🌀 LC Circuit</h1>
+            <p>Master the harmony between Electric and Magnetic energy</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-hard">● Advanced</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="450"></canvas>
+
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="togglePulse()" id="pulseBtn">⚡ Pulse
+                            (Charge)</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="oscilloscope-container">
+                    <div class="sim-panel-header" style="padding: 0 0 10px 0;">
+                        <span class="sim-panel-icon">📈</span>
+                        <span>Oscilloscope (V & I)</span>
+                    </div>
+
+                    <canvas id="oscCanvas" width="780" height="150" style="width: 100%; height: 150px;"></canvas>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Energy oscillates between the capacitor's electric field and the inductor's magnetic field.
+                        </li>
+                        <li>At resonance, the inductive reactance equals the capacitive reactance.</li>
+                        <li>Resistance causes damping, leading to a decay in the amplitude of oscillations over time.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🎯</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Increase the Resistance to see how quickly the energy dissipates (damped oscillation).</li>
+                        <li>Double the Capacitance and observe how the resonance frequency decreases.</li>
+                        <li>Set Resistance to 0 and observe a perfectly perpetual ideal LC oscillation.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Resonance Settings</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Capacitance (C)</span>
+                            <span class="sim-control-value"><span id="val-cap">10.0</span> μF</span>
+                        </div>
+                        <input type="range" id="slider-cap" min="1" max="100" value="10" step="1"
+                            oninput="updateParam('cap', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Inductance (L)</span>
+                            <span class="sim-control-value"><span id="val-ind">5.0</span> H</span>
+                        </div>
+                        <input type="range" id="slider-ind" min="0.1" max="20" value="5" step="0.1"
+                            oninput="updateParam('ind', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Resistance (Ω) - Damping</span>
+                            <span class="sim-control-value"><span id="val-res">0.50</span> Ω</span>
+                        </div>
+                        <input type="range" id="slider-res" min="0" max="5" value="0.5" step="0.05"
+                            oninput="updateParam('res', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Initial Voltage</span>
+                            <span class="sim-control-value"><span id="val-v0">200</span> V</span>
+                        </div>
+                        <input type="range" id="slider-v0" min="10" max="500" value="200" step="10"
+                            oninput="updateParam('v0', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-panel-header" style="font-size: 13px; margin-bottom: 5px;">Energy Distribution</div>
+                    <div class="energy-meter">
+                        <div id="energy-cap" style="width: 50%;"></div>
+                        <div id="energy-ind" style="width: 50%;"></div>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="dot" style="background: #ff6b6b;"></div> Capacitor (Ue)
+                        </div>
+                        <div class="legend-item">
+                            <div class="dot" style="background: #6b9eff;"></div> Inductor (Ub)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-freq">0.71</div>
+                        <div class="sim-stat-label">Frequency (Hz)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-current">0.00</div>
+                        <div class="sim-stat-label">Peak Current (A)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-totalE">0.20</div>
+                        <div class="sim-stat-label">Total Energy (J)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-omega">4.47</div>
+                        <div class="sim-stat-label">Angular Freq (rad/s)</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Advanced Theory</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">f = 1 / (2π√(LC))</div>
+                        <div class="sim-formula-description">Resonance Frequency</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">ω = 1 / √(LC)</div>
+                        <div class="sim-formula-description">Angular Frequency</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">U_E = Q² / (2C)</div>
+                        <div class="sim-formula-description">Capacitor Stored Energy</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">α = R / (2L)</div>
+                        <div class="sim-formula-description">Damping Coefficient</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

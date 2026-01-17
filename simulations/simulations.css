@@ -1000,3 +1000,53 @@ input[type="range"]:disabled {
 li::before{
     transform: translateY(-6px);
 }
+
+.oscilloscope-container {
+    background: #050510;
+    border: 1px solid #1a1a3a;
+    border-radius: 8px;
+    margin-top: 20px;
+    padding: 10px;
+    position: relative;
+}
+
+.energy-meter {
+    height: 12px;
+    background: #111;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    margin: 10px 0;
+    border: 1px solid #333;
+}
+
+#energy-cap {
+    background: #ff6b6b;
+    height: 100%;
+    transition: width 0.1s linear;
+}
+
+#energy-ind {
+    background: #6b9eff;
+    height: 100%;
+    transition: width 0.1s linear;
+}
+
+.legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
