@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorentz Force - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="theory.html">Theory</a>
+            <a href="learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>⚡ Lorentz Force Lab</h1>
+            <p>Master the interaction between charged particles and electromagnetic fields</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper" style="position: relative;">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="toggleSimulation()" id="playBtn">🚀 Launch
+                            Particle</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="clearTrail()">🧹 Clear Trail</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">F = q(E + v × B)</div>
+                        <div class="sim-formula-description">Lorentz Force Law (Vector Form)</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation" style="font-size: 1.2rem;">r = mv / qB</div>
+                        <div class="sim-formula-description">Gyroradius</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation" style="font-size: 1.2rem;">f = qB / 2πm</div>
+                        <div class="sim-formula-description">Cyclotron Frequency</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Magnetic force is perpendicular to both velocity and field</li>
+                        <li>Electric force is parallel to the electric field</li>
+                        <li>Positive charges curve opposite to negative charges</li>
+                        <li>Magnetic force does no work (speed stays constant)</li>
+                        <li>Particles spiral in combined fields</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Switch charge polarity - how does path change?</li>
+                        <li>Increase magnetic field - notice the radius?</li>
+                        <li>Add electric field perpendicular to motion</li>
+                        <li>Launch at different angles in both fields</li>
+                        <li>Compare electron vs proton motion (mass ratio)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>Particle Properties</span>
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Initial Velocity</span>
+                            <span class="sim-control-value"><span id="val-v">5.0</span> m/s</span>
+                        </div>
+                        <input type="range" id="range-v" min="1" max="15" step="0.5" value="5">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Charge (q)</span>
+                            <span class="sim-control-value"><span id="val-q">1.0</span> C</span>
+                        </div>
+                        <input type="range" id="range-q" min="-5" max="5" step="0.5" value="1">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Mass (m)</span>
+                            <span class="sim-control-value"><span id="val-m">1.0</span> kg</span>
+                        </div>
+                        <input type="range" id="range-m" min="0.1" max="10" step="0.1" value="1">
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>Field Parameters</span>
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Magnetic Field (Bz)</span>
+                            <span class="sim-control-value"><span id="val-b">0.5</span> T</span>
+                        </div>
+                        <input type="range" id="range-b" min="-2" max="2" step="0.1" value="0.5"
+                            oninput="updateFields()">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Electric Field (Ey)</span>
+                            <span class="sim-control-value"><span id="val-e">10.0</span> V/m</span>
+                        </div>
+                        <input type="range" id="range-e" min="-50" max="50" step="1" value="10"
+                            oninput="updateFields()">
+                    </div>
+                </div>
+
+                <div class="sim-stats" style="margin-top: 0;">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-speed">0.00</div>
+                        <div class="sim-stat-label">Velocity (m/s)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-radius">∞</div>
+                        <div class="sim-stat-label">Radius (m)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-force">0.00</div>
+                        <div class="sim-stat-label">Force (N)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-energy">0.00</div>
+                        <div class="sim-stat-label">Energy (J)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
