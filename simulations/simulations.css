@@ -160,6 +160,7 @@ nav ul a.active1::after {
     margin-top: 1rem;
     justify-content: center;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .sim-btn{
@@ -943,4 +944,59 @@ input[type="range"]:disabled {
     background: rgba(255, 107, 107, 0.3);
     border-color: rgba(255, 107, 107, 0.5);
     transform: translateY(-1px);
+}
+
+.help-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(122, 147, 194, 0.2);
+    border: 2px solid rgb(70, 74, 82);
+    border-radius: 50%;
+    color: #d4e2f3;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.help-tooltip {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 40, 0.95);
+    border: 1px solid rgba(107, 158, 255, 0.4);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #e0e0e0;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.help-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: rgba(107, 158, 255, 0.4);
+}
+
+.help-icon:hover .help-tooltip {
+    opacity: 1;
+}
+
+li::before{
+    transform: translateY(-6zpx);
 }

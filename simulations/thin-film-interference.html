@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thin Film Interference - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🌈 Thin Film Interference</h1>
+            <p>See how light creates colorful patterns in soap bubbles and oil slicks</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="toggleSimulation()" id="toggleBtn">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                        <div class="help-icon" id="helpIcon">
+                            <span>?</span>
+                            <div class="help-tooltip" id="helpTooltip">
+                                If you've hit the button for the simulation to start, and you think nothing is happening, its because this simulation isn't meant to be moving, change the parameters and you will see a change
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📐</span>
+                        <span>Physics Formulas</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">2nt = mλ</div>
+                        <div class="sim-formula-description">Constructive interference condition</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">2nt = (m + ½)λ</div>
+                        <div class="sim-formula-description">Destructive interference condition</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">λ_film = λ_air / n</div>
+                        <div class="sim-formula-description">Wavelength in the film</div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">📚</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Phase shift occurs at denser medium boundary</li>
+                        <li>Path difference = 2 × thickness × refractive index</li>
+                        <li>Different wavelengths interfere differently</li>
+                        <li>Thickness determines which colors appear bright</li>
+                        <li>White light creates rainbow patterns</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Vary thickness to see color changes</li>
+                        <li>Change refractive index (soap vs oil)</li>
+                        <li>Switch to monochromatic light mode</li>
+                        <li>Enable wedge mode for rainbow gradient</li>
+                        <li>Watch colors change with viewing angle</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">⚙️</span>
+                        <span>Film Settings</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Film Thickness</span>
+                            <span class="sim-control-value"><span id="val-thickness">300</span> nm</span>
+                        </div>
+                        <input type="range" id="slider-thickness" min="100" max="800" value="300" step="10" oninput="updateParameter('thickness', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Refractive Index</span>
+                            <span class="sim-control-value"><span id="val-refractiveIndex">1.33</span></span>
+                        </div>
+                        <input type="range" id="slider-refractiveIndex" min="1.2" max="1.6" value="1.33" step="0.01" oninput="updateParameter('refractiveIndex', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Viewing Angle</span>
+                            <span class="sim-control-value"><span id="val-angle">0</span>°</span>
+                        </div>
+                        <input type="range" id="slider-angle" min="0" max="60" value="0" step="5" oninput="updateParameter('angle', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Ray Paths</span>
+                        <div class="sim-toggle-switch active" id="toggle-rays" onclick="toggleRays()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Phase Info</span>
+                        <div class="sim-toggle-switch" id="toggle-phase" onclick="togglePhase()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Wedge Mode</span>
+                        <div class="sim-toggle-switch" id="toggle-wedge" onclick="toggleWedge()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span class="sim-panel-icon">🎭</span>
+                        <span>View Mode</span>
+                    </div>
+                    
+                    <div class="mode-selector">
+                        <button class="mode-btn active" onclick="setViewMode('bubble')">Soap Bubble</button>
+                        <button class="mode-btn" onclick="setViewMode('puddle')">Oil Puddle</button>
+                    </div>
+
+                    <div id="wavelengthPicker" style="display: none; margin-top: 15px;">
+                        <div class="sim-control-label" style="margin-bottom: 10px;">
+                            <span>Wavelength: <span id="val-wavelength">550</span> nm</span>
+                        </div>
+                        <input type="range" id="slider-wavelength" min="380" max="700" value="550" step="10" oninput="updateWavelength(this.value)" style="width: 100%;">
+                    </div>
+
+                    <div style="margin-top: 15px; padding: 10px; background: rgba(107, 158, 255, 0.1); border-radius: 8px; font-size: 0.85rem; color: #aaa;">
+                        <strong style="color: #6b9eff;">Material Presets:</strong>
+                        <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button onclick="setMaterial(1.33)" style="padding: 5px 10px; background: rgba(107, 180, 255, 0.2); border: 1px solid rgba(107, 180, 255, 0.4); border-radius: 5px; color: #6bb4ff; cursor: pointer; font-size: 11px;">Soap (1.33)</button>
+                            <button onclick="setMaterial(1.45)" style="padding: 5px 10px; background: rgba(255, 180, 107, 0.2); border: 1px solid rgba(255, 180, 107, 0.4); border-radius: 5px; color: #ffb46b; cursor: pointer; font-size: 11px;">Oil (1.45)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-pathDiff">0.0</div>
+                        <div class="sim-stat-label">Path Difference (nm)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-order">0</div>
+                        <div class="sim-stat-label">Interference Order</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-type">---</div>
+                        <div class="sim-stat-label">Interference Type</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-intensity">0.0</div>
+                        <div class="sim-stat-label">Intensity (%)</div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+</body>
+</html>
