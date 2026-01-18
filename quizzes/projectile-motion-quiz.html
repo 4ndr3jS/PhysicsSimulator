@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile Motion Quiz - Physics Simulator</title>
+    <link rel="stylesheet" href="quizzes.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+            <a href="../quizzes.html" class="active1">Quizzes</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🎯 Projectile Motion Quiz</h1>
+            <p>Test your understanding of trajectories, range, and time of flight</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-easy">● Easy</span></p>
+        </div>
+
+        <div class="quiz-layout">
+            <div class="quiz-main">
+                <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="progressBar"></div>
+                </div>
+
+                <div class="quiz-info">
+                    <div class="quiz-question-counter">
+                        Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span>
+                    </div>
+                    <div class="quiz-score">
+                        Score: <span id="score">0</span>/<span id="totalScore">0</span>
+                    </div>
+                </div>
+
+                <div class="quiz-card" id="quizCard">
+                    <div class="quiz-question" id="questionText">
+                        
+                    </div>
+                    <div class="quiz-feedback" id="feedback" style="display: none;">
+                        <div class="feedback-content">
+                            <div class="feedback-icon" id="feedbackIcon"></div>
+                            <div class="feedback-text" id="feedbackText"></div>
+                            <div class="feedback-explanation" id="feedbackExplanation"></div>
+                        </div>
+                    </div>
+
+                    <div class="quiz-controls">
+                        <button class="sim-btn sim-btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>← Previous</button>
+                        <button class="sim-btn sim-btn-primary" onclick="nextQuestion()" id="nextBtn" disabled>Next →</button>
+                        <button class="sim-btn sim-btn-primary" onclick="submitAnswer()" id="submitBtn">Submit Answer</button>
+                    </div>
+                </div>
+
+                <div class="quiz-results" id="resultsCard" style="display: none;">
+                    <div class="results-header">
+                        <h2>Quiz Complete! 🎉</h2>
+                    </div>
+                    
+                    <div class="results-score">
+                        <div class="results-percentage" id="finalPercentage">0%</div>
+                        <div class="results-fraction" id="finalScore">0/10</div>
+                        <div class="results-message" id="resultMessage"></div>
+                    </div>
+
+                    <div class="results-breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Correct Answers</span>
+                            <span class="breakdown-value green" id="correctCount">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Incorrect Answers</span>
+                            <span class="breakdown-value red" id="incorrectCount">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Time Spent</span>
+                            <span class="breakdown-value blue" id="timeSpent">0:00</span>
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="sim-btn sim-btn-primary" onclick="retakeQuiz()">🔄 Retake Quiz</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="reviewAnswers()">📝 Review Answers</button>
+                        <a href="../quizzes.html" class="sim-btn sim-btn-secondary">← Back to Quizzes</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>📚</span>
+                        <span>About This Quiz</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li><strong style="color: #6b9eff;">Questions:</strong> 10 multiple choice</li>
+                        <li><strong style="color: #6bffb4;">Topic:</strong> Projectile Motion</li>
+                        <li><strong style="color: #ffeb6b;">Difficulty:</strong> Easy</li>
+                        <li><strong style="color: #ff6b6b;">Time:</strong> No time limit</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>💡</span>
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Horizontal and vertical motion components</li>
+                        <li>Time of flight calculations</li>
+                        <li>Maximum height and range</li>
+                        <li>Launch angle optimization</li>
+                        <li>Parabolic trajectory equations</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>🔬</span>
+                        <span>Formulas to Remember</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">R = (v₀²sin(2θ))/g</div>
+                        <div class="sim-formula-description">Range equation</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">H = (v₀²sin²(θ))/(2g)</div>
+                        <div class="sim-formula-description">Maximum height</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">T = (2v₀sin(θ))/g</div>
+                        <div class="sim-formula-description">Time of flight</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question-nav">
+                    <div class="sim-panel-header">
+                        <span>🗺️</span>
+                        <span>Question Navigator</span>
+                    </div>
+                    <div class="question-grid" id="questionNav">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
