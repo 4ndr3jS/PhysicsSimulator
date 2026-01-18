@@ -1116,3 +1116,58 @@ li::before{
 .b-cross::after {
     transform: rotate(-45deg);
 }
+
+.cycle-phase{
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 10px;
+    border: 2px solid;
+}
+
+.phase-expansion{
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.4);
+}
+
+.phase-transfer{
+    background: rgba(255, 235, 107, 0.2);
+    color: #ffeb6b;
+    border-color: rgba(255, 235, 107, 0.4);
+}
+
+.phase-compression{
+    background: rgba(107, 158, 255, 0.2);
+    color: #6b9eff;
+    border-color: rgba(107, 158, 255, 0.4);
+}
+
+.phase-return{
+    background: rgba(107, 255, 180, 0.2);
+    color: #6bffb4;
+    border-color: rgba(107, 255, 180, 0.4);
+}
+
+@media (max-width: 1024px){
+    .sim-layout{
+        grid-template-columns: 1fr;
+    }
+}
+
+.pv-diagram{
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.pv-title{
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #ccc;
+}

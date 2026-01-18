@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stirling Engine - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>⚙️ Stirling Engine</h1>
+            <p>Watch a heat engine convert temperature differences into mechanical work</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-hard">● Hard</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <div>Curent Cycle Phase: </div>
+                        <div class="cycle-phase phase-expansion" id="phaseIndicator">Hot Expansion</div>
+                    </div>
+
+                    <div class="sim-controls">
+                        <button class="sim-btn" onclick="startEngine()" id="startBtn">▶️ Start Engine</button>
+                        <button class="sim-btn" onclick="pauseEngine()" id="pauseBtn">🔄 Pause</button>
+                        <button class="sim-btn" onclick="resetEngine()">🔄 Reset</button> 
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>📚</span>
+                        <span>How It Works</span>
+                    </div>
+                    <p style="color: #ccc; line-height: 1.6; margin-bottom: 1rem;">
+                        The Sterling engine uses a temprature difference to create motion. A displacer piston moves gas between hot and cold regions, while a power piston converts that big pressure change into mechanical work. It's pretty cool if you ask me.
+                    </p>
+                    <ul class="sim-info-list">
+                        <li><strong style="color: #ff6b6b;">Hot Expansion:</strong> Gas heats up and expands, pushing the power piston</li>
+                        <li><strong style="color: #ffeb6b;">Transfer to Cold:</strong> Displacer moves gas to cold side</li>
+                        <li><strong style="color: #6b9eff;">Cold Compression:</strong> Gas cools and contracts, piston compresses</li>
+                        <li><strong style="color: #6bffb4;">Return to Hot:</strong> Displacer moves gas back to hot side</li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li>Increase temperature difference for more power</li>
+                        <li>Watch the PV diagram trace the thermodynamic cycle</li>
+                        <li>Observe how gas molecules move between chambers</li>
+                        <li>Notice the 90° phase difference between pistons</li>
+                        <li>Try a low temperature difference between the reservoirs, and see what happens</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Hot Side Temp</span>
+                            <span class="sim-control-value"><span id="val-hotTemp">200</span>°C</span>
+                        </div>
+                        <input type="range" id="slider-hotTemp" min="100" max="400" value="200" oninput="updateParameter('hotTemp', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Cold Side Temp</span>
+                            <span class="sim-control-value"><span id="val-coldTemp">20</span>°C</span>
+                        </div>
+                        <input type="range" id="slider-coldTemp" min="0" max="100" value="20" oninput="updateParameter('coldTemp', this.value)">
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Engine Speed</span>
+                            <span class="sim-control-value"><span id="val-speed">1</span>x</span>
+                        </div>
+                        <input type="range" id="slider-speed" min="0.5" max="3" value="1" step="0.5" oninput="updateParameter('speed', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Gas Molecules</span>
+                        <div class="sim-toggle-switch active" id="toggle-molecules" onclick="toggleMolecules()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Vectors</span>
+                        <div class="sim-toggle-switch active" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Labels</span>
+                        <div class="sim-toggle-switch active" id="toggle-labels" onclick="toggleLabels()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value red" id="stat-rpm">0</div>
+                        <div class="sim-stat-label">RPM</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-efficiency">0</div>
+                        <div class="sim-stat-label">Efficiency (%)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value green" id="stat-power">0</div>
+                        <div class="sim-stat-label">Power (W)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-cycles">0</div>
+                        <div class="sim-stat-label">Cycles</div>
+                    </div>
+                </div>
+
+                <div class="pv-diagram">
+                    <div class="pv-title">PV Diagram</div>
+                    <canvas id="pvCanvas" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
