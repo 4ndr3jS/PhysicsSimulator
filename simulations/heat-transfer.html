@@ -17,7 +17,7 @@
             <a href="../learn.html">Learn Physics</a>
         </ul>
     </nav>
-    
+
     <div class="sim-container">
         <div class="sim-header">
             <h1>🔥 Heat Transfer</h1>
@@ -34,7 +34,7 @@
                         <button class="mode-btn" onclick="setMode('radiation')">☀️ Radiation</button>
                     </div>
                     
-                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="480"></canvas>
                     
                     <div class="sim-controls">
                         <button class="sim-btn" onclick="startSimulation()" id="startBtn">▶️ Start</button>
@@ -132,5 +132,439 @@
             </div>
         </div>
     </div>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let simState = {
+            mode: 'conduction',
+            isRunning: false,
+            isPaused: false,
+            time: 0,
+            sourceTemp: 100,
+            conductivity: 0.5,
+            speed: 1,
+            showLabels: true,
+            showGrid: true,
+            grid: [],
+            particles: []
+        };
+
+        const GRID_SIZE = 40;
+        const AMBIENT_TEMP = 20;
+        let animationId = null;
+        let lastTime = 0;
+
+        const modeInfo = {
+            conduction: {
+                description: "Conduction is heat transfer through direct contact. Watch as thermal energy flows from hot to cold regions through the material.",
+                experiments: [
+                    "Increase the heat source temperature",
+                    "Try different materials (change conductivity)",
+                    "Observe the temperature gradient formation",
+                    "Watch how equilibrium is reached"
+                ]
+            },
+            convection: {
+                description: "Convection is heat transfer through fluid motion. Hot particles rise while cool particles sink, creating circulation patterns.",
+                experiments: [
+                    "Watch the convection currents form",
+                    "Increase temperature for faster flow",
+                    "Observe how hot air rises naturally",
+                    "Notice the circulation patterns"
+                ]
+            },
+            radiation: {
+                description: "Radiation is heat transfer through electromagnetic waves. Energy travels through empty space without needing a medium.",
+                experiments: [
+                    "Watch energy radiate outward",
+                    "Increase temperature for more radiation",
+                    "Observe inverse square law effect",
+                    "Notice radiation doesn't need contact"
+                ]
+            }
+        };
+
+        function init() {
+            initGrid();
+            drawCanvas();
+        }
+
+        function initGrid() {
+            simState.grid = [];
+            const rows = Math.floor(canvas.height / GRID_SIZE);
+            const cols = Math.floor(canvas.width / GRID_SIZE);
+            
+            for (let i = 0; i < rows; i++) {
+                simState.grid[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    simState.grid[i][j] = AMBIENT_TEMP;
+                }
+            }
+
+            if (simState.mode === 'convection') {
+                initParticles();
+            }
+        }
+
+        function initParticles() {
+            simState.particles = [];
+            for (let i = 0; i < 200; i++) {
+                simState.particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: 0,
+                    vy: 0,
+                    temp: AMBIENT_TEMP
+                });
+            }
+        }
+
+        function setMode(mode) {
+            simState.mode = mode;
+            resetSimulation();
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('modeDescription').textContent = modeInfo[mode].description;
+            
+            const list = document.getElementById('experimentsList');
+            list.innerHTML = '';
+            modeInfo[mode].experiments.forEach(exp => {
+                const li = document.createElement('li');
+                li.textContent = exp;
+                list.appendChild(li);
+            });
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            
+            if (param === 'temp') {
+                simState.sourceTemp = parseFloat(value);
+            } else if (param === 'conductivity') {
+                simState.conductivity = parseFloat(value);
+            } else if (param === 'speed') {
+                simState.speed = parseFloat(value);
+            }
+        }
+
+        function toggleLabels() {
+            simState.showLabels = !simState.showLabels;
+            document.getElementById('toggle-labels').classList.toggle('active');
+        }
+
+        function toggleGrid() {
+            simState.showGrid = !simState.showGrid;
+            document.getElementById('toggle-grid').classList.toggle('active');
+        }
+
+        function startSimulation() {
+            if (!simState.isRunning) {
+                simState.isRunning = true;
+                simState.isPaused = false;
+                lastTime = performance.now();
+                animate(lastTime);
+                document.getElementById('startBtn').textContent = '▶️ Running...';
+            }
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Resume';
+                document.getElementById('startBtn').textContent = '⏸️ Paused';
+            } else {
+                btn.textContent = '⏸️ Pause';
+                lastTime = performance.now();
+                if (simState.isRunning) animate(lastTime);
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.time = 0;
+            cancelAnimationFrame(animationId);
+            initGrid();
+            drawCanvas();
+            updateStats();
+            document.getElementById('startBtn').textContent = '▶️ Start';
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+        }
+
+        function animate(currentTime) {
+            if (!simState.isRunning || simState.isPaused) return;
+
+            const deltaTime = (currentTime - lastTime) / 1000 * simState.speed;
+            lastTime = currentTime;
+            simState.time += deltaTime;
+
+            updateSimulation(deltaTime);
+            drawCanvas();
+            updateStats();
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function updateSimulation(dt) {
+            if (simState.mode === 'conduction') {
+                updateConduction(dt);
+            } else if (simState.mode === 'convection') {
+                updateConvection(dt);
+            } else if (simState.mode === 'radiation') {
+                updateRadiation(dt);
+            }
+        }
+
+        function updateConduction(dt) {
+            const rows = simState.grid.length;
+            const cols = simState.grid[0].length;
+            const newGrid = simState.grid.map(row => [...row]);
+            
+            const sourceCol = Math.floor(cols / 4);
+            newGrid[Math.floor(rows / 2)][sourceCol] = simState.sourceTemp;
+            
+            for (let i = 1; i < rows - 1; i++) {
+                for (let j = 1; j < cols - 1; j++) {
+                    if (i === Math.floor(rows / 2) && j === sourceCol) continue;
+                    
+                    const avg = (
+                        simState.grid[i-1][j] +
+                        simState.grid[i+1][j] +
+                        simState.grid[i][j-1] +
+                        simState.grid[i][j+1]
+                    ) / 4;
+                    
+                    newGrid[i][j] += (avg - simState.grid[i][j]) * simState.conductivity * dt;
+                }
+            }
+            
+            simState.grid = newGrid;
+        }
+
+        function updateConvection(dt) {
+            const sourceX = canvas.width / 4;
+            const sourceY = canvas.height - 70;
+            
+            simState.particles.forEach(p => {
+                const dx = p.x - sourceX;
+                const dy = p.y - sourceY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 60) {
+                    p.temp = simState.sourceTemp;
+                } else {
+                    p.temp += (AMBIENT_TEMP - p.temp) * 0.01;
+                }
+                
+                const tempDiff = p.temp - AMBIENT_TEMP;
+                p.vy = -tempDiff * 0.05;
+                
+                if (p.y < 50) {
+                    p.vy = 0;
+                    p.vx = (Math.random() - 0.5) * 2;
+                }
+                
+                p.x += p.vx * dt * 30;
+                p.y += p.vy * dt * 30;
+                
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = 0;
+                if (p.y > canvas.height) p.y = canvas.height;
+            });
+        }
+
+        function updateRadiation(dt) {
+            const rows = simState.grid.length;
+            const cols = simState.grid[0].length;
+            const newGrid = simState.grid.map(row => [...row]);
+            
+            const sourceRow = Math.floor(rows / 2);
+            const sourceCol = Math.floor(cols / 2);
+            newGrid[sourceRow][sourceCol] = simState.sourceTemp;
+            
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (i === sourceRow && j === sourceCol) continue;
+                    
+                    const dx = j - sourceCol;
+                    const dy = i - sourceRow;
+                    const distSq = dx * dx + dy * dy + 1;
+                    const radiation = (simState.sourceTemp - AMBIENT_TEMP) / distSq * 2;
+                    
+                    newGrid[i][j] += radiation * dt * simState.conductivity;
+                    newGrid[i][j] += (AMBIENT_TEMP - newGrid[i][j]) * 0.05 * dt;
+                }
+            }
+            
+            simState.grid = newGrid;
+        }
+
+        function drawCanvas() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (simState.showGrid) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= canvas.width; i += GRID_SIZE) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, canvas.height);
+                    ctx.stroke();
+                }
+                for (let i = 0; i <= canvas.height; i += GRID_SIZE) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(canvas.width, i);
+                    ctx.stroke();
+                }
+            }
+
+            if (simState.mode === 'convection') {
+                drawConvection();
+            } else {
+                drawHeatMap();
+            }
+
+            drawHeatSource();
+        }
+
+        function drawHeatMap() {
+            const rows = simState.grid.length;
+            const cols = simState.grid[0].length;
+            
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const temp = simState.grid[i][j];
+                    const color = getHeatColor(temp);
+                    
+                    ctx.fillStyle = color;
+                    ctx.fillRect(j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+                    
+                    if (simState.showLabels && (i + j) % 3 === 0) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                        ctx.font = '10px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(Math.round(temp) + '°', j * GRID_SIZE + GRID_SIZE/2, i * GRID_SIZE + GRID_SIZE/2 + 3);
+                    }
+                }
+            }
+        }
+
+        function drawConvection() {
+            simState.particles.forEach(p => {
+                const color = getHeatColor(p.temp);
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawHeatSource(){
+            let x, y;
+
+            if(simState.mode === 'conduction'){
+                const rows = simState.grid.length;
+                const cols = simState.grid[0].length;
+                x = Math.floor(cols / 4) * GRID_SIZE + GRID_SIZE / 2;
+                y = Math.floor(rows / 2) * GRID_SIZE + GRID_SIZE / 2;
+            }else if(simState.mode === 'convection'){
+                x = canvas.width / 4;
+                y = canvas.height - 50;
+            }else{
+                const rows = simState.grid.length;
+                const cols = simState.grid[0].length;
+                x = Math.floor(cols / 2) * GRID_SIZE + GRID_SIZE / 2;
+                y = Math.floor(rows / 2) * GRID_SIZE + GRID_SIZE / 2;
+            }
+
+            const gradient = ctx.createRadialGradient(x, y, 5, x, y, 25);
+            gradient.addColorStop(0, 'rgba(255, 255, 100, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(255, 150, 50, 0.6)');
+            gradient.addColorStop(1, 'rgba(255, 100, 100, 0)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, 25, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255, 200, 100, 0.9)';
+            ctx.lineWidth = 3;
+            ctx.beginPath()
+            ctx.arc(x, y, 15, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        function getHeatColor(temp){
+            const t = Math.max(0, Math.min(1, (temp - AMBIENT_TEMP) / (simState.sourceTemp - AMBIENT_TEMP)));
+            
+            if(t < 0.25){
+                const ratio = t / 0.25;
+                const r = Math.floor(20 + ratio * 80);
+                const g = Math.floor(20 + ratio * 80);
+                const b = Math.floor(80 + ratio * 80);
+                return `rgb(${r}, ${g}, ${b})`;
+            }else if(t < 0.5){
+                const ratio = (t - 0.25) / 0.25;
+                const r = Math.floor(100 + ratio * 100);
+                const g = Math.floor(100 + ratio * 50);
+                const b = Math.floor(160 - ratio * 80);
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+            if(t < 0.75){
+                const ratio = (t - 0.5) / 0.25;
+                const r = Math.floor(200 + ratio * 55);
+                const g = Math.floor(150 + ratio * 50);
+                const b = Math.floor(80 - ratio * 40);
+                return `rgb(${r}, ${g}, ${b})`;
+            }else{
+                const ratio = (t - 0.75) / 0.25;
+                const r = 255;
+                const g = Math.floor(100 - ratio * 50);
+                const b = Math.floor(40 - ratio * 40);
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+        }
+
+        function updateStats() {
+            let maxTemp = AMBIENT_TEMP;
+            let minTemp = simState.sourceTemp;
+            let sumTemp = 0;
+            let count = 0;
+
+            if (simState.mode === 'convection') {
+                simState.particles.forEach(p => {
+                    maxTemp = Math.max(maxTemp, p.temp);
+                    minTemp = Math.min(minTemp, p.temp);
+                    sumTemp += p.temp;
+                    count++;
+                });
+            } else {
+                simState.grid.forEach(row => {
+                    row.forEach(temp => {
+                        maxTemp = Math.max(maxTemp, temp);
+                        minTemp = Math.min(minTemp, temp);
+                        sumTemp += temp;
+                        count++;
+                    });
+                });
+            }
+
+            const avgTemp = count > 0 ? sumTemp / count : AMBIENT_TEMP;
+
+            document.getElementById('stat-maxTemp').textContent = Math.round(maxTemp);
+            document.getElementById('stat-minTemp').textContent = Math.round(minTemp);
+            document.getElementById('stat-avgTemp').textContent = Math.round(avgTemp);
+            document.getElementById('stat-time').textContent = simState.time.toFixed(1);
+        }
+
+        init();
+    </script>
 </body>
 </html>
