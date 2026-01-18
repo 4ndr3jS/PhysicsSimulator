@@ -1,0 +1,144 @@
+{
+  "quizzes": {
+    "projectile-motion": {
+      "title": "Projectile Motion Quiz",
+      "description": "Test your understanding of trajectories, range, and time of flight",
+      "topic": "Projectile Motion",
+      "difficulty": "Easy",
+      "icon": "🎯",
+      "keyConcepts": [
+        "Horizontal and vertical motion components",
+        "Time of flight calculations",
+        "Maximum height and range",
+        "Launch angle optimization",
+        "Parabolic trajectory equations"
+      ],
+      "formulas": [
+        {
+          "equation": "R = (v₀²sin(2θ))/g",
+          "description": "Range equation"
+        },
+        {
+          "equation": "H = (v₀²sin²(θ))/(2g)",
+          "description": "Maximum height"
+        },
+        {
+          "equation": "T = (2v₀sin(θ))/g",
+          "description": "Time of flight"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A ball is thrown horizontally from a cliff with an initial velocity of 10 m/s. What is the horizontal acceleration of the ball during its flight? (Ignore air resistance)",
+          "options": [
+            "10 m/s²",
+            "9.8 m/s² downward",
+            "0 m/s²",
+            "9.8 m/s² horizontal"
+          ],
+          "correct": 2,
+          "explanation": "In projectile motion with no air resistance, there is no horizontal acceleration. The only acceleration is gravity (9.8 m/s²) acting vertically downward. The horizontal velocity remains constant throughout the flight."
+        },
+        {
+          "question": "At what launch angle will a projectile achieve maximum range on level ground?",
+          "options": [
+            "30°",
+            "45°",
+            "60°",
+            "90°"
+          ],
+          "correct": 1,
+          "explanation": "A projectile launched at 45° achieves maximum range on level ground. This is because sin(2θ) in the range equation R = (v₀²sin(2θ))/g reaches its maximum value of 1 when θ = 45°."
+        },
+        {
+          "question": "A projectile is launched at an angle above the horizontal. At the highest point of its trajectory, which statement is true?",
+          "options": [
+            "Both horizontal and vertical velocities are zero",
+            "The vertical velocity is zero, but horizontal velocity is not",
+            "The horizontal velocity is zero, but vertical velocity is not",
+            "Both velocities are at their maximum"
+          ],
+          "correct": 1,
+          "explanation": "At the highest point of a projectile's trajectory, the vertical velocity becomes zero (the projectile momentarily stops rising before falling). However, the horizontal velocity remains constant throughout the flight, as there is no horizontal acceleration."
+        },
+        {
+          "question": "Two projectiles are launched with the same initial speed. One is launched at 30° and the other at 60°. How do their ranges compare?",
+          "options": [
+            "30° has greater range",
+            "60° has greater range",
+            "They have the same range",
+            "Cannot be determined"
+          ],
+          "correct": 2,
+          "explanation": "Launch angles that are complementary (add up to 90°) produce the same range. Since 30° + 60° = 90°, both projectiles will have the same range. This is because sin(60°) = sin(120°) and sin(2×30°) = sin(60°) = sin(2×60°) = sin(120°)."
+        },
+        {
+          "question": "If you double the initial velocity of a projectile (keeping the angle constant), how does the maximum height change?",
+          "options": [
+            "Doubles",
+            "Quadruples",
+            "Stays the same",
+            "Triples"
+          ],
+          "correct": 1,
+          "explanation": "Maximum height H = (v₀²sin²(θ))/(2g). Since H is proportional to v₀², doubling the initial velocity quadruples the maximum height."
+        },
+        {
+          "question": "A soccer ball is kicked at ground level with an initial velocity of 20 m/s at 30° above horizontal. What is its vertical component of velocity? (sin 30° = 0.5)",
+          "options": [
+            "10 m/s",
+            "17.3 m/s",
+            "20 m/s",
+            "5 m/s"
+          ],
+          "correct": 0,
+          "explanation": "The vertical component of velocity is v₀sin(θ) = 20 × sin(30°) = 20 × 0.5 = 10 m/s."
+        },
+        {
+          "question": "Which of the following is NOT true about projectile motion (ignoring air resistance)?",
+          "options": [
+            "Horizontal velocity remains constant",
+            "Vertical acceleration is constant",
+            "The trajectory is parabolic",
+            "Total velocity remains constant"
+          ],
+          "correct": 3,
+          "explanation": "The total velocity does NOT remain constant in projectile motion. While horizontal velocity stays constant and vertical acceleration is constant, the vertical velocity changes continuously due to gravity, which changes the magnitude of total velocity."
+        },
+        {
+          "question": "A stone is thrown horizontally from a 20m high cliff. If it takes 2 seconds to hit the ground, what was its initial horizontal velocity? (g = 10 m/s²)",
+          "options": [
+            "5 m/s",
+            "10 m/s",
+            "20 m/s",
+            "Cannot determine from given information"
+          ],
+          "correct": 3,
+          "explanation": "We cannot determine the horizontal velocity from the given information. The time to fall depends only on the height and gravity (vertical motion), not on horizontal velocity. We would need to know the horizontal distance traveled to calculate the horizontal velocity."
+        },
+        {
+          "question": "For a projectile launched at 45° with initial speed v₀, what fraction of the maximum height is reached at half the range?",
+          "options": [
+            "1/2",
+            "3/4",
+            "1",
+            "1/4"
+          ],
+          "correct": 2,
+          "explanation": "At 45° launch angle, the trajectory is symmetric. The maximum height occurs at exactly half the range, so at half the range, the projectile is at its maximum height. Therefore, the fraction is 1 (or 100%)."
+        },
+        {
+          "question": "Two projectiles are launched simultaneously from the same point. One is launched horizontally at 10 m/s, the other straight upward at 10 m/s. Which statement is true?",
+          "options": [
+            "They hit the ground at the same time",
+            "The horizontal one hits first",
+            "The vertical one hits first",
+            "They reach the same maximum height"
+          ],
+          "correct": 1,
+          "explanation": "The horizontally launched projectile starts falling immediately, while the upward-launched one must first decelerate, stop, then fall. The horizontal projectile has less vertical distance to cover from its starting point and begins descending immediately, so it hits the ground first."
+        }
+      ]
+    }
+  }
+}

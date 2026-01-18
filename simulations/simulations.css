@@ -267,10 +267,6 @@ nav ul a.active1::after {
     word-wrap: break-word;
 }
 
-.sim-panel:hover{
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
 .sim-panel-header{
     font-size: 1.3rem;
     margin-bottom: 1.25rem;
