@@ -166,5 +166,464 @@
             </div>
         </div>
     </div>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const entropyCanvas = document.getElementById('entropyCanvas');
+        const entropyCtx = entropyCanvas.getContext('2d');
+
+        let simState = {
+            isRunning: false,
+            isPaused: false,
+            particles: [],
+            numParticles: 100,
+            temperature: 300,
+            speed: 1,
+            showVectors: false,
+            showGrid: true,
+            colorBySpeed: true,
+            hasPartition: true,
+            entropyHistory: [],
+            time: 0,
+            collisions: 0
+        };
+
+        let animationId = null;
+        const PI = Math.PI;
+        const kB = 1.380649e-23;
+
+        function init() {
+            initParticles();
+            drawCanvas();
+            drawEntropyGraph();
+            updateStats();
+        }
+
+        function initParticles() {
+            simState.particles = [];
+            const n = simState.numParticles;
+            const speedFactor = Math.sqrt(simState.temperature / 300);
+
+            for (let i = 0; i < n; i++) {
+                const x = 20 + Math.random() * 350;
+                const y = 50 + Math.random() * 400;
+                
+                const angle = Math.random() * 2 * PI;
+                const speed = (0.5 + Math.random() * 1.5) * speedFactor;
+                
+                simState.particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: 4
+                });
+            }
+            
+            simState.entropyHistory = [];
+            simState.time = 0;
+            simState.collisions = 0;
+        }
+
+        function updateParameter(param, value) {
+            document.getElementById(`val-${param}`).textContent = value;
+            
+            if (param === 'particles') {
+                if (simState.isRunning) {
+                    document.getElementById('slider-particles').value = simState.numParticles;
+                    document.getElementById('val-particles').textContent = simState.numParticles;
+                    return;
+                }
+                simState.numParticles = parseInt(value);
+                if (!simState.isRunning) {
+                    initParticles();
+                    drawCanvas();
+                    updateStats();
+                }
+            } else if (param === 'temperature') {
+                const oldTemp = simState.temperature;
+                const newTemp = parseFloat(value);
+                simState.temperature = newTemp;
+                
+                const scaleFactor = Math.sqrt(newTemp / oldTemp);
+                simState.particles.forEach(p => {
+                    p.vx *= scaleFactor;
+                    p.vy *= scaleFactor;
+                });
+            } else if (param === 'speed') {
+                simState.speed = parseFloat(value);
+            }
+            
+            if (!simState.isRunning) {
+                updateStats();
+            }
+        }
+
+        function toggleVectors() {
+            simState.showVectors = !simState.showVectors;
+            document.getElementById('toggle-vectors').classList.toggle('active');
+        }
+
+        function toggleGrid() {
+            simState.showGrid = !simState.showGrid;
+            document.getElementById('toggle-grid').classList.toggle('active');
+        }
+
+        function toggleColor() {
+            simState.colorBySpeed = !simState.colorBySpeed;
+            document.getElementById('toggle-color').classList.toggle('active');
+        }
+
+        function startSimulation() {
+            if (!simState.isRunning) {
+                simState.isRunning = true;
+                simState.isPaused = false;
+                animate();
+                document.getElementById('startBtn').textContent = '▶️ Running...';
+                document.getElementById('slider-particles').style.cursor = 'not-allowed';
+                document.getElementById('slider-particles').style.opacity = '0.5';
+            }
+        }
+
+        function pauseSimulation() {
+            simState.isPaused = !simState.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (simState.isPaused) {
+                btn.textContent = '▶️ Resume';
+                cancelAnimationFrame(animationId);
+            } else {
+                btn.textContent = '⏸️ Pause';
+                if (simState.isRunning) animate();
+            }
+        }
+
+        function resetSimulation() {
+            simState.isRunning = false;
+            simState.isPaused = false;
+            simState.hasPartition = true;
+            cancelAnimationFrame(animationId);
+            initParticles();
+            drawCanvas();
+            drawEntropyGraph();
+            updateStats();
+            document.getElementById('startBtn').textContent = '▶️ Start Simulation';
+            document.getElementById('pauseBtn').textContent = '⏸️ Pause';
+            document.getElementById('slider-particles').style.cursor = 'pointer';
+            document.getElementById('slider-particles').style.opacity = '1';
+        }
+
+        function removePartition() {
+            simState.hasPartition = false;
+        }
+
+        function animate() {
+            if (!simState.isRunning || simState.isPaused) return;
+
+            updateParticles();
+            simState.time += 0.016 * simState.speed;
+            
+            if (Math.floor(simState.time * 10) % 2 === 0) {
+                updateEntropyHistory();
+            }
+            
+            drawCanvas();
+            updateStats();
+            drawEntropyGraph();
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function updateParticles() {
+            const dt = simState.speed;
+            
+            simState.particles.forEach(p => {
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+
+                if (p.x - p.radius < 0 || p.x + p.radius > 800) {
+                    p.vx *= -1;
+                    p.x = p.x - p.radius < 0 ? p.radius : 800 - p.radius;
+                    simState.collisions++;
+                }
+                if (p.y - p.radius < 0 || p.y + p.radius > 500) {
+                    p.vy *= -1;
+                    p.y = p.y - p.radius < 0 ? p.radius : 500 - p.radius;
+                    simState.collisions++;
+                }
+
+                if (simState.hasPartition && p.x + p.radius > 400 && p.x - p.radius < 400) {
+                    p.vx *= -1;
+                    p.x = p.vx > 0 ? 400 + p.radius : 400 - p.radius;
+                    simState.collisions++;
+                }
+            });
+
+            for (let i = 0; i < simState.particles.length; i++) {
+                for (let j = i + 1; j < simState.particles.length; j++) {
+                    const p1 = simState.particles[i];
+                    const p2 = simState.particles[j];
+                    
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < p1.radius + p2.radius) {
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+                        
+                        const dvx = p2.vx - p1.vx;
+                        const dvy = p2.vy - p1.vy;
+                        const dvn = dvx * nx + dvy * ny;
+                        
+                        if (dvn < 0) continue;
+                        
+                        p1.vx += dvn * nx;
+                        p1.vy += dvn * ny;
+                        p2.vx -= dvn * nx;
+                        p2.vy -= dvn * ny;
+                        
+                        const overlap = (p1.radius + p2.radius - dist) / 2;
+                        p1.x -= overlap * nx;
+                        p1.y -= overlap * ny;
+                        p2.x += overlap * nx;
+                        p2.y += overlap * ny;
+                        
+                        simState.collisions++;
+                    }
+                }
+            }
+        }
+
+        function calculateEntropy() {
+            const bins = 8;
+            const binWidth = 800 / bins;
+            const counts = new Array(bins).fill(0);
+            
+            simState.particles.forEach(p => {
+                const bin = Math.min(bins - 1, Math.floor(p.x / binWidth));
+                counts[bin]++;
+            });
+            
+            let entropy = 0;
+            const N = simState.particles.length;
+            counts.forEach(count => {
+                if (count > 0) {
+                    const p = count / N;
+                    entropy -= p * Math.log(p);
+                }
+            });
+            
+            return entropy;
+        }
+
+        function updateEntropyHistory() {
+            const entropy = calculateEntropy();
+            simState.entropyHistory.push({ time: simState.time, entropy: entropy });
+            
+            if (simState.entropyHistory.length > 200) {
+                simState.entropyHistory.shift();
+            }
+        }
+
+        function drawCanvas() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (simState.showGrid) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x <= 800; x += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, 500);
+                    ctx.stroke();
+                }
+                for (let y = 0; y <= 500; y += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(800, y);
+                    ctx.stroke();
+                }
+            }
+
+            if (simState.hasPartition) {
+                ctx.strokeStyle = '#6a6a8a';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(400, 0);
+                ctx.lineTo(400, 500);
+                ctx.stroke();
+
+                ctx.fillStyle = '#6b9eff';
+                ctx.font = 'bold 16px system-ui';
+                ctx.fillText('Left Chamber', 140, 30);
+                ctx.fillStyle = '#ff6b6b';
+                ctx.fillText('Right Chamber', 540, 30);
+            }
+
+            simState.particles.forEach(p => {
+                let color;
+                if (simState.colorBySpeed) {
+                    const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                    const maxSpeed = 3;
+                    const ratio = Math.min(1, speed / maxSpeed);
+                    
+                    const r = Math.floor(107 + ratio * 148);
+                    const g = Math.floor(158 - ratio * 51);
+                    const b = Math.floor(255 - ratio * 148);
+                    color = `rgb(${r}, ${g}, ${b})`;
+                } else {
+                    color = p.x < 400 ? '#6b9eff' : '#ff6b6b';
+                }
+                
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, 2 * PI);
+                ctx.fill();
+
+                if (simState.showVectors) {
+                    ctx.strokeStyle = '#6bffb4';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x + p.vx * 10, p.y + p.vy * 10);
+                    ctx.stroke();
+                    
+                    const angle = Math.atan2(p.vy, p.vx);
+                    const arrowLen = 4;
+                    ctx.fillStyle = '#6bffb4';
+                    ctx.beginPath();
+                    ctx.moveTo(p.x + p.vx * 10, p.y + p.vy * 10);
+                    ctx.lineTo(
+                        p.x + p.vx * 10 - arrowLen * Math.cos(angle - PI/6),
+                        p.y + p.vy * 10 - arrowLen * Math.sin(angle - PI/6)
+                    );
+                    ctx.lineTo(
+                        p.x + p.vx * 10 - arrowLen * Math.cos(angle + PI/6),
+                        p.y + p.vy * 10 - arrowLen * Math.sin(angle + PI/6)
+                    );
+                    ctx.fill();
+                }
+            });
+
+            ctx.strokeStyle = '#4a4a6a';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(0, 0, 800, 500);
+        }
+
+        function drawEntropyGraph() {
+            entropyCtx.fillStyle = '#0a0a0a';
+            entropyCtx.fillRect(0, 0, entropyCanvas.width, entropyCanvas.height);
+
+            entropyCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            entropyCtx.lineWidth = 1;
+            
+            for (let i = 0; i <= 4; i++) {
+                const y = 50 + i * 50;
+                entropyCtx.beginPath();
+                entropyCtx.moveTo(50, y);
+                entropyCtx.lineTo(350, y);
+                entropyCtx.stroke();
+
+                const x = 50 + i * 75;
+                entropyCtx.beginPath();
+                entropyCtx.moveTo(x, 50);
+                entropyCtx.lineTo(x, 250);
+                entropyCtx.stroke();
+            }
+
+            entropyCtx.strokeStyle = '#fff';
+            entropyCtx.lineWidth = 2;
+            entropyCtx.beginPath();
+            entropyCtx.moveTo(50, 250);
+            entropyCtx.lineTo(350, 250);
+            entropyCtx.moveTo(50, 250);
+            entropyCtx.lineTo(50, 50);
+            entropyCtx.stroke();
+
+            entropyCtx.fillStyle = '#aaa';
+            entropyCtx.font = '12px system-ui';
+            entropyCtx.fillText('Time', 180, 280);
+            entropyCtx.save();
+            entropyCtx.translate(20, 150);
+            entropyCtx.rotate(-PI / 2);
+            entropyCtx.fillText('Entropy', -30, 0);
+            entropyCtx.restore();
+
+            if (simState.entropyHistory.length > 1) {
+                entropyCtx.strokeStyle = '#6bffb4';
+                entropyCtx.lineWidth = 2;
+                entropyCtx.beginPath();
+                
+                const graphWidth = 300;
+                
+                const minEntropy = Math.log(4) / 1.1;
+                const maxEntropy = Math.log(8) * 1.02;
+                const entropyRange = maxEntropy - minEntropy;
+                
+                const firstTime = simState.entropyHistory[0].time;
+                const lastTime = simState.entropyHistory[simState.entropyHistory.length - 1].time;
+                const timeRange = lastTime - firstTime;
+                
+                for (let i = 0; i < simState.entropyHistory.length; i++) {
+                    const point = simState.entropyHistory[i];
+                    const normalizedTime = timeRange > 0 ? (point.time - firstTime) / timeRange : 0;
+                    const x = 50 + normalizedTime * graphWidth;
+                    const normalizedEntropy = (point.entropy - minEntropy) / entropyRange;
+                    const y = 250 - normalizedEntropy * 200;
+                    
+                    if (i === 0) {
+                        entropyCtx.moveTo(x, y);
+                    } else {
+                        entropyCtx.lineTo(x, y);
+                    }
+                }
+                entropyCtx.stroke();
+
+                if (simState.entropyHistory.length > 0) {
+                    const lastPoint = simState.entropyHistory[simState.entropyHistory.length - 1];
+                    const x = 50 + graphWidth;
+                    const normalizedEntropy = (lastPoint.entropy - minEntropy) / entropyRange;
+                    const y = 250 - normalizedEntropy * 200;
+                    
+                    entropyCtx.fillStyle = '#ff6b6b';
+                    entropyCtx.beginPath();
+                    entropyCtx.arc(x, y, 5, 0, 2 * PI);
+                    entropyCtx.fill();
+                }
+            }
+        }
+
+        function updateStats() {
+            const entropy = calculateEntropy();
+            document.getElementById('stat-entropy').textContent = entropy.toFixed(2);
+
+            let leftCount = 0;
+            simState.particles.forEach(p => {
+                if (p.x < 400) leftCount++;
+            });
+            const leftPercent = Math.round((leftCount / simState.particles.length) * 100);
+            const rightPercent = 100 - leftPercent;
+            
+            document.getElementById('stat-leftside').textContent = leftPercent;
+            document.getElementById('stat-rightside').textContent = rightPercent;
+            document.getElementById('stat-collisions').textContent = simState.collisions;
+
+            const indicator = document.getElementById('stateIndicator');
+            if (leftPercent > 80 || rightPercent > 80) {
+                indicator.textContent = 'Ordered (Low Entropy)';
+                indicator.className = 'cycle-phase phase-compression';
+            } else if (Math.abs(leftPercent - 50) < 15) {
+                indicator.textContent = 'Equilibrium (High Entropy)';
+                indicator.className = 'cycle-phase phase-expansion';
+            } else {
+                indicator.textContent = 'Mixing (Entropy Increasing)';
+                indicator.className = 'cycle-phase phase-transfer';
+            }
+        }
+
+        init();
+    </script>
 </body>
 </html>
