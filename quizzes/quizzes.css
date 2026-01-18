@@ -7,8 +7,17 @@
 body{
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background: black;
-    background-image: 
-        radial-gradient(ellipse at 20% 30%, rgba(15, 15, 30, 0.3) 0%, transparent 50%),
+    background-image:
+        linear-gradient(
+                -58deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.02) 40%,
+                rgba(255, 255, 255, 0.04) 50%,
+                rgba(255, 255, 255, 0.02) 60%,
+                rgba(255, 255, 255, 0.03) 70%,
+                rgba(255, 255, 255, 0.03) 100%
+            ),
+        radial-gradient(ellipse at 20% 30%, rgba(15, 15, 20, 0.3) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 70%, rgba(15, 7, 15, 0.3) 0%, transparent 50%),
         linear-gradient(135deg, black 0%, rgb(22, 22, 22) 50%, rgb(18, 18, 18) 100%);
     background-attachment: fixed;
@@ -86,7 +95,7 @@ nav ul a.active1::after {
 }
 
 .sim-container{
-    max-width: 1400px;
+    max-width: 1900px;
     margin: 80px auto 0;
     padding: 2rem;
     padding-top: 0;
@@ -225,6 +234,7 @@ nav ul a.active1::after {
     flex-direction: column;
     gap: 1.5rem;
     min-width: 0;
+    max-width: 400px;
 }
 
 .sim-panel{
@@ -236,10 +246,6 @@ nav ul a.active1::after {
     overflow: hidden;
     word-wrap: break-word;
     margin-bottom: 20px;
-}
-
-.sim-panel:hover{
-    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .sim-panel-header{
@@ -425,7 +431,7 @@ input[type="range"]:disabled {
 
 .sim-formula{
     background: rgba(10, 10, 40, 0.6);
-    border-left: 3px solid #6b9eff;
+    border-left: 2px solid #6b9eff;
     padding: 1rem 1.25rem;
     border-radius: 0.5rem;
     margin: 1rem 0;
@@ -549,17 +555,6 @@ input[type="range"]:disabled {
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-bottom: 15px;
-}
-
-.quiz-layout {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.quiz-main {
-    min-height: 600px;
 }
 
 .quiz-progress-bar {
@@ -820,4 +815,21 @@ input[type="range"]:disabled {
 
 li::before{
     transform: translateY(-6px);
+}
+
+.quiz-layout {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.quiz-sidebar1,
+.quiz-sidebar2 {
+    max-width: 400px;
+    width: 100%;
+}
+
+.quiz-main {
+    min-height: 600px;
 }
