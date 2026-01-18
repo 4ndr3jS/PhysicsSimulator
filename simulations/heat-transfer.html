@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heat Transfer - Physics Simulator</title>
+    <link rel="stylesheet" href="simulations.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+        </ul>
+    </nav>
+    
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🔥 Heat Transfer</h1>
+            <p>Explore conduction, convection, and radiation through interactive simulations</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+        </div>
+
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <div class="mode-selector">
+                        <button class="mode-btn active" onclick="setMode('conduction')">🔗 Conduction</button>
+                        <button class="mode-btn" onclick="setMode('convection')">🌊 Convection</button>
+                        <button class="mode-btn" onclick="setMode('radiation')">☀️ Radiation</button>
+                    </div>
+                    
+                    <canvas id="simCanvas" class="sim-canvas" width="800" height="500"></canvas>
+                    
+                    <div class="sim-controls">
+                        <button class="sim-btn" onclick="startSimulation()" id="startBtn">▶️ Start</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="pauseSimulation()" id="pauseBtn">⏸️ Pause</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>📚</span>
+                        <span>About This Mode</span>
+                    </div>
+                    <p id="modeDescription" style="color: #ccc; line-height: 1.6;">
+                        Conduction is heat transfer through direct contact. Watch as thermal energy flows from hot to cold regions through the material.
+                    </p>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>🔬</span>
+                        <span>Try This</span>
+                    </div>
+                    <ul class="sim-info-list" id="experimentsList">
+                        <li>Increase the heat source temperature</li>
+                        <li>Try different materials (change conductivity)</li>
+                        <li>Observe the temperature gradient formation</li>
+                        <li>Watch how equilibrium is reached</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>⚙️</span>
+                        <span>Parameters</span>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Heat Source Temp</span>
+                            <span class="sim-control-value"><span id="val-temp">100</span>°C</span>
+                        </div>
+                        <input type="range" id="slider-temp" min="50" max="200" value="100" oninput="updateParameter('temp', this.value)">
+                    </div>
+
+                    <div class="sim-control-group" id="conductivity-control">
+                        <div class="sim-control-label">
+                            <span>Thermal Conductivity</span>
+                            <span class="sim-control-value"><span id="val-conductivity">0.5</span></span>
+                        </div>
+                        <input type="range" id="slider-conductivity" min="0.1" max="1" value="0.5" step="0.1" oninput="updateParameter('conductivity', this.value)">
+                    </div>
+
+                    <div class="sim-control-group" id="speed-control">
+                        <div class="sim-control-label">
+                            <span>Simulation Speed</span>
+                            <span class="sim-control-value"><span id="val-speed">1</span>x</span>
+                        </div>
+                        <input type="range" id="slider-speed" min="0.5" max="3" value="1" step="0.5" oninput="updateParameter('speed', this.value)">
+                    </div>
+
+                    <div class="sim-divider"></div>
+
+                    <div class="sim-toggle">
+                        <span>Show Temperature Labels</span>
+                        <div class="sim-toggle-switch active" id="toggle-labels" onclick="toggleLabels()"></div>
+                    </div>
+
+                    <div class="sim-toggle">
+                        <span>Show Grid</span>
+                        <div class="sim-toggle-switch active" id="toggle-grid" onclick="toggleGrid()"></div>
+                    </div>
+                </div>
+
+                <div class="sim-stats">
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value red" id="stat-maxTemp">100</div>
+                        <div class="sim-stat-label">Max Temp (°C)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value blue" id="stat-minTemp">20</div>
+                        <div class="sim-stat-label">Min Temp (°C)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value orange" id="stat-avgTemp">60</div>
+                        <div class="sim-stat-label">Avg Temp (°C)</div>
+                    </div>
+                    <div class="sim-stat-card">
+                        <div class="sim-stat-value purple" id="stat-time">0.0</div>
+                        <div class="sim-stat-label">Time (s)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
