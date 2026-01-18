@@ -3,8 +3,6 @@
 An interactive web-based physics simulator that allows users to explore fundamental physics concepts in real-time. Inluded basic formulas and simulations.
 The **Physics Simulator** is designed to make learning physics engaging and visual. Users can experiment with simulations covering classical mechanics, waves, optics, electromagnetism, and thermodynamics. The simulator provides real-time visual feedback, interactive controls, and an intuitive interface.
 
----
-
 ## Features
 
 * Real-time physics simulations
@@ -12,8 +10,6 @@ The **Physics Simulator** is designed to make learning physics engaging and visu
 * Visual representation of abstract physics concepts
 * Multiple topics and experiments for hands-on learning
 * User-friendly, responsive web interface
-
----
 
 ## Physics Topics
 
@@ -35,8 +31,6 @@ The simulator currently includes the following topics:
 
    * Understand heat transfer, gas laws, and energy transformations.
 
----
-
 ## Getting Started
 
 1. **Clone the repository**
@@ -47,8 +41,6 @@ The simulator currently includes the following topics:
 
 2. **Open `index.html` in your browser**
    Double-click the file or open it via a local server for full functionality.
-
----
 
 ## Usage
 
