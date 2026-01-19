@@ -139,6 +139,136 @@
           "explanation": "The horizontally launched projectile starts falling immediately, while the upward-launched one must first decelerate, stop, then fall. The horizontal projectile has less vertical distance to cover from its starting point and begins descending immediately, so it hits the ground first."
         }
       ]
+    },
+    "simple-pendulum":{
+      "title": "Simple Pendulum Quiz",
+      "description": "Test your understanding of periodic motion and pendulum dynamics",
+      "topic": "Simple Pendulum",
+      "difficulty": "Medium",
+      "icon": "⏱️",
+      "keyConcepts": [
+        "Period and frequency of oscillation",
+        "Restoring force and acceleration",
+        "Small angle approximation",
+        "Energy conservation in pendulums",
+        "Factors affecting period"
+      ],
+      "formulas": [
+        {
+          "equation": "T = 2π√(L/g)",
+          "description": "Period of a simple pendulum"
+        },
+        {
+          "equation": "f = 1/T",
+          "description": "Frequency"
+        },{
+          "equation": "F = -mg sin(θ)",
+          "description": "Restoring force"
+        },{
+          "equation": "E = mgh = ½mv²",
+          "description": "Energy conservation"
+        }
+      ],
+      "questions": [
+        {
+          "question": "What is the period of a simple pendulum with length 1m on Earth? (g ≈ 10 m/s², π ≈ 3.14)",
+          "options": [
+            "2 seconds",
+            "1 second",
+            "0.5 seconds",
+            "4 seconds"
+          ],
+          "correct": 0,
+          "explanation": "Using T = 2π√(L/g) = 2(3.14)√(1/10) = 6.28√(0.1) = 6.28(0.316) ≈ 2 seconds."
+        },
+        {
+          "question": "If you quadruple the length of a pendulum, how does the period change?",
+          "options": [
+            "Doubles",
+            "Quadruples",
+            "Stays the same",
+            "Increases by factor of 8"
+          ],
+          "correct": 0,
+          "explanation": "Since T = 2π√(L/g), the period is proportional to √L. If L becomes 4L, then T becomes √4 × T = 2T. The period doubles."
+        },
+        {
+          "question":"Which of the following does NOT affect the period of a simple pendulum?",
+          "options": [
+            "Lenght of the string",
+            "Mass of the bob",
+            "Gravitational acceleration",
+            "Amplitude"
+          ],
+          "correct": 1,
+          "explanation": "From the formula T = 2π√(L/g) we see that the mass does not play a role in the period length so the answer is mass."
+        },
+        {
+          "question": "What happens to the period of a pendulum if you take it to the Moon (where g is about 1/6 of Earth's gravity)?",
+          "options": [
+            "Period decreases by factor of 6",
+            "Period increases by factor of 6",
+            "Period increases by factor of √6 ≈ 2.45",
+            "Period stays the same"
+          ],
+          "correct": 2,
+          "explanation": "Since T = 2π√(L/g), if g becomes g/6, then T becomes √6 times larger. T_moon = 2π√(L/(g/6)) = √6 × 2π√(L/g) ≈ 2.45 × T_earth."
+        },{
+          "question": "For a simple pendulum, the small angle approximation assumes that that sin(θ) ≈ θ. This approximation works well til approximately:",
+          "options": [
+            "5°",
+            "15°",
+            "60°",
+            "90°"
+          ],
+          "correct": 1,
+          "explanation": "The small angle approximation works well till about 15 degrees then the margin of error becomes too big and the formula doesn't work anymore."
+        },
+        {
+          "question": "A pendulum swings back and forth, completing 20 oscillations in 40 seconds. What is its frequency?",
+          "options": [
+            "0.5Hz",
+            "10Hz",
+            "20Hz",
+            "40Hz"
+          ],
+          "correct": 0,
+          "explanation": "Frequency f = number of oscillations / time = 20 / 40s. So the answer is 0.5Hz."
+        },
+        {
+          "question": "At the maximum displacement (amplitude) of a pendulum's swing, which of these is correct?",
+          "options": [
+            "Velocity is maximum, acceleration is zero",
+            "Velocity is zero, acceleration is maximum",
+            "Both velocity and acceleration are zero",
+            "Both velocity and acceleration are maximum"
+          ],
+          "correct": 1,
+          "explanation": "At maximum displacement, the pendulum momentarily stops (velocity = 0) before changing direction. At this point, the restoring force and therefore acceleration are at their maximum values, pulling the bob back toward equilibrium."
+        },
+        {
+          "question": "If you double the mass of a pendulum bob while keeping length constant, what happens to the maximum speed of the bob during its swing?",
+          "options": [
+            "It doubles",
+            "It stays the same",
+            "It halves",
+            "It quadruples"
+          ],
+          "correct": 1,
+          "explanation": "For the same amplitude, the maximum speed remains the same. From energy conservation: v_max = √(2gh), which depends only on the height difference (amplitude), not on mass. The period also doesn't change with mass."
+        },
+        {
+          "question": "A grandfather clock uses a pendulum to keep time. If the clock runs slow, what adjustment should be made?",
+          "options": [
+            "Make the pendulum longer",
+            "Make the pendulum shorter",
+            "Increase the mass of the bob",
+            "Decrease the mass of the bob"
+          ],
+          "correct": 1,
+          "explanation": "If the clock runs slow, the period is too long (T = 2π√(L/g)). To decrease the period, you must decrease the length L. Making the pendulum shorter will increase its frequency and make the clock run faster."
+        }
+      ]
     }
   }
 }

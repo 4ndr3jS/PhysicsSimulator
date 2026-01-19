@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projectile Motion Quiz - Physics Simulator</title>
+    <title>Simple Pendulum Quiz - Physics Simulator</title>
     <link rel="stylesheet" href="quizzes.css">
 </head>
 <body>
@@ -21,9 +21,9 @@
 
     <div class="sim-container">
         <div class="sim-header">
-            <h1>🎯 Projectile Motion Quiz</h1>
-            <p>Test your understanding of trajectories, range, and time of flight</p>
-            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-easy">● Easy</span></p>
+            <h1>⏱️ Simple Pendulum Quiz</h1>
+            <p>Test your knowledge of periodic motion and pendulum dynamics</p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
         </div>
 
         <div class="quiz-layout">
@@ -35,8 +35,8 @@
                     </div>
                     <ul class="sim-info-list">
                         <li><strong style="color: #6b9eff;">Questions:</strong> 10 multiple choice</li>
-                        <li><strong style="color: #6bffb4;">Topic:</strong> Projectile Motion</li>
-                        <li><strong style="color: #ffeb6b;">Difficulty:</strong> Easy</li>
+                        <li><strong style="color: #6bffb4;">Topic:</strong> Simple Pendulum</li>
+                        <li><strong style="color: #ffeb6b;">Difficulty:</strong> Medium</li>
                         <li><strong style="color: #ff6b6b;">Time:</strong> No time limit</li>
                     </ul>
                 </div>
@@ -47,11 +47,11 @@
                         <span>Key Concepts</span>
                     </div>
                     <ul class="sim-info-list">
-                        <li>Horizontal and vertical motion components</li>
-                        <li>Time of flight calculations</li>
-                        <li>Maximum height and range</li>
-                        <li>Launch angle optimization</li>
-                        <li>Parabolic trajectory equations</li>
+                        <li>Period and frequency of oscillation</li>
+                        <li>Restoring force and acceleration</li>
+                        <li>Small angle approximation</li>
+                        <li>Energy conservation in pendulums</li>
+                        <li>Factors affecting period</li>
                     </ul>
                 </div>
             </div>
@@ -131,16 +131,20 @@
                         <span>Formulas to Remember</span>
                     </div>
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">R = (v₀²sin(2θ))/g</div>
-                        <div class="sim-formula-description">Range equation</div>
+                        <div class="sim-formula-equation">T = 2π√(L/g)</div>
+                        <div class="sim-formula-description">Period of a simple pendulum</div>
                     </div>
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">H = (v₀²sin²(θ))/(2g)</div>
-                        <div class="sim-formula-description">Maximum height</div>
+                        <div class="sim-formula-equation">f = 1/T</div>
+                        <div class="sim-formula-description">Frequency</div>
                     </div>
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">T = (2v₀sin(θ))/g</div>
-                        <div class="sim-formula-description">Time of flight</div>
+                        <div class="sim-formula-equation">F = -mg sin(θ)</div>
+                        <div class="sim-formula-description">Restoring force</div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation">E = mgh = ½mv²</div>
+                        <div class="sim-formula-description">Energy conservation</div>
                     </div>
                 </div>
             </div>
@@ -160,7 +164,7 @@
     async function loadQuizData() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const quizId = urlParams.get('quiz') || 'projectile-motion';
+            const quizId = urlParams.get('quiz') || 'simple-pendulum';
             const response = await fetch('quizzes.json');
             const data = await response.json();
             
@@ -267,41 +271,29 @@
     }
 
     function loadQuestion() {
-        console.log('Loading question', quizState.currentQuestion);
         const question = quizState.questions[quizState.currentQuestion];
-        console.log('Question data:', question);
         
         const questionText = document.getElementById('questionText');
-        console.log('Question text element:', questionText);
         if (questionText) {
             questionText.textContent = question.question;
         }
         
         const optionsContainer = document.getElementById('optionsContainer');
-        console.log('Options container:', optionsContainer);
         
         if (optionsContainer) {
             optionsContainer.innerHTML = '';
             
-            console.log('Creating options:', question.options);
             question.options.forEach((option, index) => {
-                console.log('Creating option', index, ':', option);
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'quiz-option';
                 optionDiv.textContent = option;
                 optionDiv.setAttribute('data-index', index);
                 optionDiv.style.cursor = 'pointer';
                 optionDiv.onclick = function() {
-                    console.log('Option clicked:', index);
                     selectOption(index);
                 };
                 optionsContainer.appendChild(optionDiv);
-                console.log('Option appended:', optionDiv);
             });
-            
-            console.log('Final options container HTML:', optionsContainer.innerHTML);
-        } else {
-            console.error('Options container not found!');
         }
         
         const currentQ = document.getElementById('currentQuestion');
@@ -379,12 +371,12 @@
         
         if (isCorrect) {
             if (feedbackText) {
-                feedbackText.textContent = 'Correct!';
+                feedbackText.textContent = '✅ Correct!';
                 feedbackText.className = 'feedback-text correct';
             }
         } else {
             if (feedbackText) {
-                feedbackText.textContent = 'Incorrect';
+                feedbackText.textContent = '❌ Incorrect';
                 feedbackText.className = 'feedback-text incorrect';
             }
         }
@@ -436,12 +428,12 @@
         
         if (userAnswer === question.correct) {
             if (feedbackText) {
-                feedbackText.textContent = 'Correct!';
+                feedbackText.textContent = '✅ Correct!';
                 feedbackText.className = 'feedback-text correct';
             }
         } else {
             if (feedbackText) {
-                feedbackText.textContent = 'Incorrect';
+                feedbackText.textContent = '❌ Incorrect';
                 feedbackText.className = 'feedback-text incorrect';
             }
         }
@@ -537,13 +529,11 @@
         const seconds = timeElapsed % 60;
         
         const finalPercentage = document.getElementById('finalPercentage');
-        const finalScore = document.getElementById('finalScore');
         const correctCount = document.getElementById('correctCount');
         const incorrectCount = document.getElementById('incorrectCount');
         const timeSpent = document.getElementById('timeSpent');
         
         if (finalPercentage) finalPercentage.textContent = percentage + '%';
-        if (finalScore) finalScore.textContent = `${quizState.score}/${quizState.questions.length}`;
         if (correctCount) correctCount.textContent = quizState.score;
         if (incorrectCount) incorrectCount.textContent = quizState.questions.length - quizState.score;
         if (timeSpent) timeSpent.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
