@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inclined Plane Quiz - Physics Simulator</title>
+    <title>Electric Induction Quiz - Physics Simulator</title>
     <link rel="stylesheet" href="quizzes.css">
 </head>
 <body>
@@ -165,7 +165,7 @@
     async function loadQuizData() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const quizId = urlParams.get('quiz') || 'inclined-plane';
+            const quizId = urlParams.get('quiz') || 'electric-induction';
             const response = await fetch('quizzes.json');
             const data = await response.json();
             
