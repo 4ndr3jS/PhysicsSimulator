@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Mass Quiz - Physics Simulator</title>
+    <link rel="stylesheet" href="quizzes.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="../simulations.html">Simulations</a>
+            <a href="../guide.html">Guide</a>
+            <a href="../theory.html">Theory</a>
+            <a href="../learn.html">Learn Physics</a>
+            <a href="../quizzes.html" class="active1">Quizzes</a>
+        </ul>
+    </nav>
+
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1></h1>
+            <p></p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">Medium</span></p>
+        </div>
+
+        <div class="quiz-layout">
+            <div class="quiz-sidebar2">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>About This Quiz</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li><strong style="color: #6b9eff;"></strong></li>
+                        <li><strong style="color: #6bffb4;"></strong></li>
+                        <li><strong style="color: #ffeb6b;"></strong></li>
+                        <li><strong style="color: #ff6b6b;"></strong></li>
+                    </ul>
+                </div>
+
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>Key Concepts</span>
+                    </div>
+                    <ul class="sim-info-list">
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="quiz-main">
+                <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="progressBar"></div>
+                </div>
+
+                <div class="quiz-info">
+                    <div class="quiz-question-counter">
+                        Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span>
+                    </div>
+                    <div class="quiz-score">
+                        Score: <span id="score">0</span>/<span id="totalScore">0</span>
+                    </div>
+                </div>
+
+                <div class="quiz-card" id="quizCard">
+                    <div class="quiz-question" id="questionText">
+
+                    </div>
+                    <div class="quiz-options" id="optionsContainer">
+
+                    </div>
+                    <div class="quiz-feedback" id="feedback" style="display: none;">
+                        <div class="feedback-content">
+                            <div class="feedback-text" id="feedbackText"></div>
+                            <div class="feedback-explanation" id="feedbackExplanation"></div>
+                        </div>
+                    </div>
+
+                    <div class="quiz-controls">
+                        <button class="sim-btn sim-btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>Previous</button>
+                        <button class="sim-btn sim-btn-primary" onclick="nextQuestion()" id="nextBtn" disabled>Next</button>
+                        <button class="sim-btn sim-btn-primary" onclick="submitAnswer()" id="submitBtn">Submit Answer</button>
+                    </div>
+                </div>
+
+                <div class="quiz-results" id="resultsCard" style="display: none;">
+                    <div class="results-header">
+                        <h2>Quiz Complete!</h2>
+                    </div>
+                    
+                    <div class="results-score">
+                        <div class="results-percentage" id="finalPercentage">0%</div>
+                        <div class="results-message" id="resultMessage"></div>
+                    </div>
+
+                    <div class="results-breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Correct Answers</span>
+                            <span class="breakdown-value green" id="correctCount">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Incorrect Answers</span>
+                            <span class="breakdown-value red" id="incorrectCount">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Time Spent</span>
+                            <span class="breakdown-value blue" id="timeSpent">0:00</span>
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="sim-btn sim-btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="reviewAnswers()">Review Answers</button>
+                        <a href="../quizzes.html" class="sim-btn sim-btn-secondary" style="text-align: center;">Back to Quizzes</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-sidebar1">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>Formulas to Remember</span>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    let quizState = {
+        currentQuestion: 0,
+        score: 0,
+        userAnswers: [],
+        startTime: Date.now(),
+        questions: []
+    };
+
+    let quizConfig = null;
+
+    async function loadQuizData() {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const quizId = urlParams.get('quiz') || 'spring-mass-system';
+            const response = await fetch('quizzes.json');
+            const data = await response.json();
+            
+            quizConfig = data.quizzes[quizId];
+            
+            if (!quizConfig) {
+                throw new Error(`Quiz "${quizId}" not found in quizzes.json`);
+            }
+            
+            quizState.questions = quizConfig.questions;
+            
+            document.title = `${quizConfig.title} - Physics Simulator`;
+            
+            const headerH1 = document.querySelector('.sim-header h1');
+            if (headerH1) {
+                headerH1.textContent = `${quizConfig.title}`;
+            }
+            
+            const headerP = document.querySelector('.sim-header p');
+            if (headerP) {
+                headerP.textContent = quizConfig.description;
+            }
+            
+            const badge = document.querySelector('.sim-badge');
+            if (badge) {
+                badge.textContent = `${quizConfig.difficulty}`;
+                badge.className = `sim-badge sim-badge-${quizConfig.difficulty.toLowerCase()}`;
+            }
+            
+            updateSidebarInfo();
+            initQuiz();
+            
+        } catch (error) {
+            console.error('Error loading quiz data:', error);
+            const container = document.querySelector('.sim-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="error-message" style="text-align: center; padding: 3rem; color: #ff6b6b;">
+                        <h2>Error Loading Quiz</h2>
+                        <p>${error.message}</p>
+                        <a href="../quizzes.html" class="sim-btn sim-btn-primary" style="margin-top: 2rem; display: inline-block; text-align: center;">Back to Quizzes</a>
+                    </div>
+                `;
+            } else {
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #ff6b6b;">
+                        <h2>Error Loading Quiz</h2>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    function updateSidebarInfo() {
+        const infoList = document.querySelector('.sim-info-list');
+        if (infoList) {
+            infoList.innerHTML = `
+                <li><strong style="color: #6b9eff;">Questions:</strong> ${quizConfig.questions.length} multiple choice</li>
+                <li><strong style="color: #6bffb4;">Topic:</strong> ${quizConfig.topic}</li>
+                <li><strong style="color: #ffeb6b;">Difficulty:</strong> ${quizConfig.difficulty}</li>
+                <li><strong style="color: #ff6b6b;">Time:</strong> No time limit</li>
+            `;
+        }
+        
+        if (quizConfig.keyConcepts && quizConfig.keyConcepts.length > 0) {
+            const conceptsList = document.querySelectorAll('.sim-info-list')[1];
+            if (conceptsList) {
+                conceptsList.innerHTML = quizConfig.keyConcepts.map(concept => 
+                    `<li>${concept}</li>`
+                ).join('');
+            }
+        }
+        
+        if (quizConfig.formulas && quizConfig.formulas.length > 0) {
+            const formulasPanel = document.querySelectorAll('.sim-panel')[2];
+            if (formulasPanel) {
+                const existingFormulas = formulasPanel.querySelectorAll('.sim-formula');
+                existingFormulas.forEach(f => f.remove());
+                
+                const header = formulasPanel.querySelector('.sim-panel-header');
+                quizConfig.formulas.forEach(formula => {
+                    const formulaDiv = document.createElement('div');
+                    formulaDiv.className = 'sim-formula';
+                    formulaDiv.innerHTML = `
+                        <div class="sim-formula-equation">${formula.equation}</div>
+                        <div class="sim-formula-description">${formula.description}</div>
+                    `;
+                    if (header && header.nextSibling) {
+                        formulasPanel.insertBefore(formulaDiv, header.nextSibling);
+                    } else {
+                        formulasPanel.appendChild(formulaDiv);
+                    }
+                });
+            }
+        }
+    }
+
+    function initQuiz() {
+        updateQuestionNavigator();
+        loadQuestion();
+        updateProgress();
+    }
+
+    function loadQuestion() {
+        const question = quizState.questions[quizState.currentQuestion];
+        
+        const questionText = document.getElementById('questionText');
+        if (questionText) {
+            questionText.textContent = question.question;
+        }
+        
+        const optionsContainer = document.getElementById('optionsContainer');
+        
+        if (optionsContainer) {
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'quiz-option';
+                optionDiv.textContent = option;
+                optionDiv.setAttribute('data-index', index);
+                optionDiv.style.cursor = 'pointer';
+                optionDiv.onclick = function() {
+                    selectOption(index);
+                };
+                optionsContainer.appendChild(optionDiv);
+            });
+        }
+        
+        const currentQ = document.getElementById('currentQuestion');
+        const totalQ = document.getElementById('totalQuestions');
+        if (currentQ) currentQ.textContent = quizState.currentQuestion + 1;
+        if (totalQ) totalQ.textContent = quizState.questions.length;
+        
+        const feedback = document.getElementById('feedback');
+        if (feedback) feedback.style.display = 'none';
+        
+        const prevBtn = document.getElementById('prevBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (prevBtn) prevBtn.disabled = quizState.currentQuestion === 0;
+        if (submitBtn) {
+            submitBtn.style.display = 'block';
+            submitBtn.disabled = true;
+        }
+        if (nextBtn) nextBtn.style.display = 'none';
+        
+        if (quizState.userAnswers[quizState.currentQuestion] !== undefined) {
+            const userAnswer = quizState.userAnswers[quizState.currentQuestion];
+            showPreviousAnswer(userAnswer);
+        }
+    }
+
+    function selectOption(index) {
+        const allOptions = document.querySelectorAll('.quiz-option');
+        allOptions.forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        const selectedOption = document.querySelector(`.quiz-option[data-index="${index}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('selected');
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) submitBtn.disabled = false;
+    }
+
+    function submitAnswer() {
+        const selectedOption = document.querySelector('.quiz-option.selected');
+        
+        if (!selectedOption) return;
+        
+        const selectedIndex = Array.from(document.querySelectorAll('.quiz-option')).indexOf(selectedOption);
+        const question = quizState.questions[quizState.currentQuestion];
+        const isCorrect = selectedIndex === question.correct;
+        
+        quizState.userAnswers[quizState.currentQuestion] = selectedIndex;
+        
+        if (isCorrect) {
+            quizState.score++;
+            selectedOption.classList.add('correct');
+        } else {
+            selectedOption.classList.add('incorrect');
+            const options = document.querySelectorAll('.quiz-option');
+            if (options[question.correct]) {
+                options[question.correct].classList.add('correct');
+            }
+        }
+        
+        document.querySelectorAll('.quiz-option').forEach(opt => {
+            opt.classList.add('disabled');
+            opt.style.pointerEvents = 'none';
+        });
+        
+        const feedback = document.getElementById('feedback');
+        const feedbackText = document.getElementById('feedbackText');
+        const feedbackExplanation = document.getElementById('feedbackExplanation');
+        
+        if (feedback) feedback.style.display = 'block';
+        
+        if (isCorrect) {
+            if (feedbackText) {
+                feedbackText.textContent = 'Correct!';
+                feedbackText.className = 'feedback-text correct';
+            }
+        } else {
+            if (feedbackText) {
+                feedbackText.textContent = 'Incorrect';
+                feedbackText.className = 'feedback-text incorrect';
+            }
+        }
+        
+        if (feedbackExplanation) {
+            feedbackExplanation.textContent = question.explanation;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (submitBtn) submitBtn.style.display = 'none';
+        if (nextBtn) {
+            nextBtn.style.display = 'block';
+            nextBtn.disabled = false;
+        }
+        
+        updateScore();
+        updateProgress();
+        updateQuestionNavigator();
+    }
+
+    function showPreviousAnswer(userAnswer) {
+        const question = quizState.questions[quizState.currentQuestion];
+        const options = document.querySelectorAll('.quiz-option');
+        
+        if (options[userAnswer]) {
+            options[userAnswer].classList.add('selected');
+            
+            if (userAnswer === question.correct) {
+                options[userAnswer].classList.add('correct');
+            } else {
+                options[userAnswer].classList.add('incorrect');
+                if (options[question.correct]) {
+                    options[question.correct].classList.add('correct');
+                }
+            }
+        }
+        
+        options.forEach(opt => {
+            opt.classList.add('disabled');
+            opt.style.pointerEvents = 'none';
+        });
+        
+        const feedback = document.getElementById('feedback');
+        const feedbackText = document.getElementById('feedbackText');
+        const feedbackExplanation = document.getElementById('feedbackExplanation');
+        
+        if (feedback) feedback.style.display = 'block';
+        
+        if (userAnswer === question.correct) {
+            if (feedbackText) {
+                feedbackText.textContent = 'Correct!';
+                feedbackText.className = 'feedback-text correct';
+            }
+        } else {
+            if (feedbackText) {
+                feedbackText.textContent = 'Incorrect';
+                feedbackText.className = 'feedback-text incorrect';
+            }
+        }
+        
+        if (feedbackExplanation) {
+            feedbackExplanation.textContent = question.explanation;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (submitBtn) submitBtn.style.display = 'none';
+        if (nextBtn) {
+            nextBtn.style.display = 'block';
+            nextBtn.disabled = false;
+        }
+    }
+
+    function nextQuestion() {
+        if (quizState.currentQuestion < quizState.questions.length - 1) {
+            quizState.currentQuestion++;
+            loadQuestion();
+            updateProgress();
+            updateQuestionNavigator();
+        } else {
+            showResults();
+        }
+    }
+
+    function previousQuestion() {
+        if (quizState.currentQuestion > 0) {
+            quizState.currentQuestion--;
+            loadQuestion();
+            updateProgress();
+            updateQuestionNavigator();
+        }
+    }
+
+    function updateScore() {
+        const scoreEl = document.getElementById('score');
+        if (scoreEl) scoreEl.textContent = quizState.score;
+    }
+
+    function updateProgress() {
+        const progress = ((quizState.currentQuestion) / quizState.questions.length) * 100;
+        const progressBar = document.getElementById('progressBar');
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+        }
+        
+        const totalScoreEl = document.getElementById('totalScore');
+        if (totalScoreEl) totalScoreEl.textContent = quizState.userAnswers.filter(a => a !== undefined).length;
+    }
+
+    function updateQuestionNavigator() {
+        const nav = document.getElementById('questionNav');
+        if (!nav) return;
+        
+        nav.innerHTML = '';
+        
+        for (let i = 0; i < quizState.questions.length; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'question-dot';
+            dot.textContent = i + 1;
+            
+            if (i === quizState.currentQuestion) {
+                dot.classList.add('current');
+            }
+            
+            if (quizState.userAnswers[i] !== undefined) {
+                dot.classList.add('answered');
+            }
+            
+            dot.onclick = () => {
+                quizState.currentQuestion = i;
+                loadQuestion();
+                updateProgress();
+                updateQuestionNavigator();
+            };
+            
+            nav.appendChild(dot);
+        }
+    }
+
+    function showResults() {
+        const quizCard = document.getElementById('quizCard');
+        const resultsCard = document.getElementById('resultsCard');
+        
+        if (quizCard) quizCard.style.display = 'none';
+        if (resultsCard) resultsCard.style.display = 'block';
+        
+        const percentage = Math.round((quizState.score / quizState.questions.length) * 100);
+        const timeElapsed = Math.floor((Date.now() - quizState.startTime) / 1000);
+        const minutes = Math.floor(timeElapsed / 60);
+        const seconds = timeElapsed % 60;
+        
+        const finalPercentage = document.getElementById('finalPercentage');
+        const correctCount = document.getElementById('correctCount');
+        const incorrectCount = document.getElementById('incorrectCount');
+        const timeSpent = document.getElementById('timeSpent');
+        
+        if (finalPercentage) finalPercentage.textContent = percentage + '%';
+        if (correctCount) correctCount.textContent = quizState.score;
+        if (incorrectCount) incorrectCount.textContent = quizState.questions.length - quizState.score;
+        if (timeSpent) timeSpent.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        let message = '';
+        if (percentage >= 90) {
+            message = 'Outstanding! You have mastered this topic!';
+        } else if (percentage >= 70) {
+            message = 'Great job! You have a solid understanding!';
+        } else if (percentage >= 50) {
+            message = 'Good effort! Review the concepts and try again.';
+        } else {
+            message = 'Keep practicing! Review the material and retake the quiz.';
+        }
+        
+        const resultMessage = document.getElementById('resultMessage');
+        if (resultMessage) resultMessage.textContent = message;
+    }
+
+    function retakeQuiz() {
+        quizState = {
+            currentQuestion: 0,
+            score: 0,
+            userAnswers: [],
+            startTime: Date.now(),
+            questions: quizState.questions
+        };
+        
+        const quizCard = document.getElementById('quizCard');
+        const resultsCard = document.getElementById('resultsCard');
+        
+        if (quizCard) quizCard.style.display = 'block';
+        if (resultsCard) resultsCard.style.display = 'none';
+        
+        initQuiz();
+    }
+
+    function reviewAnswers() {
+        quizState.currentQuestion = 0;
+        
+        const quizCard = document.getElementById('quizCard');
+        const resultsCard = document.getElementById('resultsCard');
+        
+        if (quizCard) quizCard.style.display = 'block';
+        if (resultsCard) resultsCard.style.display = 'none';
+        
+        loadQuestion();
+    }
+
+    window.onload = loadQuizData;
+    </script>
+</body>
+</html>

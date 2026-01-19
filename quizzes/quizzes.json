@@ -416,6 +416,133 @@
           "explanation": "Since a = g sin(θ), acceleration depends only on g and θ. Mass cancels out in the equation (F = ma becomes mg sin(θ) = ma, so a = g sin(θ)). Length affects time but not acceleration."
         }
       ]
+    },
+    "spring-mass-system":{
+      "title": "Spring-Mass System Quiz",
+      "description": "Test your understanding of harmonic motion, Hooke's law, and oscillations",
+      "topic": "Spring-Mass System",
+      "difficulty": "Medium",
+      "icon": "🔧",
+      "keyConcepts": [
+        "Hooke's law and spring constant",
+        "Period and frequency of oscillations",
+        "Energy conservation in oscillations",
+        "Amplitude and phase relationships"
+      ],
+      "formulas": [
+        {
+          "equation": "F = -kx",
+          "description": "Hooke's law (restoring force)"
+        },
+        {
+          "equation": "T = 2π√(m/k)",
+          "description": "Period of oscillation"
+        },
+        {
+          "equation": "ω = √(k/m)",
+          "description": "Angular frequency"
+        },
+        {
+          "equation": "E = ½kA²",
+          "description": "Total mechanical energy"
+        },
+        {
+          "equation": "v_max = A√(k/m)",
+          "description": "Maximum velocity"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A spring with spring constant k = 100 N/m is compressed by 0.2m. What is the restoring force?",
+          "options": [
+            "20 N",
+            "50 N",
+            "100 N",
+            "200 N"
+          ],
+          "correct": 0,
+          "explanation": "Using Hooke's law F = kx = 100 N/m × 0.2 m = 20 N. The negative sign in F = -kx indicates the force opposes the displacement, but the magnitude is 20 N."
+        },{
+          "question": "If you quadruple the mass attached to a spring while keeping the spring constant the same, how does the period change?",
+          "options": [
+            "Doubles",
+            "Quadruples",
+            "Halves",
+            "Stays the same"
+          ],
+          "correct": 0,
+          "explanation": "Since T = 2π√(m/k), the period is proportional to √m. If m becomes 4m, then the period doubles"
+        },{
+          "question": "Which of the following does NOT effect the period of a spring-mass system?",
+          "options": [
+            "Mass of the object",
+            "Spring constant",
+            "Amplitude of oscillation"
+          ],
+          "correct": 2,
+          "explanation": "From T = 2π√(m/k), we see that period depends only on mass and spring constant. The amplitude does not affect the period in simple harmonic motion."
+        },{
+          "question": "At what point in its oscillations does a spring-mass system have maximum kinetic energy?",
+          "options": [
+            "At maximum displacement",
+            "At the equilibrium position",
+            "At half the amplitude",
+            "At any point, kinetic energy is constant"
+          ],
+          "correct": 1,
+          "explanation": "At the equilibrium position (x = 0), all energy is kinetic since potential energy is zero. The mass moves fastest through equilibrium, so kinetic energy is maximum. At maximum displacement, the mass momentarily stops (KE = 0)."
+        },{
+          "question": "If you double both mass and the spring constant, what happens to the period?",
+          "options": [
+            "Doubles",
+            "Halves",
+            "Stays the same",
+            "Quadruples"
+          ],
+          "correct": 2,
+          "explanation": "T = 2π√(m/k). If both m and k are doubled: T_new = 2π√(2m/2k) = 2π√(m/k) = T. The period stays the same because the ratio m/k remains unchanged."
+        },{
+          "question": "A spring-mass system oscillates with amplitude A. At what displacement from equilibrium is the speed equal to half the maximum speed?",
+          "options": [
+            "A/2",
+            "A/√2",
+            "A√3/2",
+            "A/4"
+          ],
+          "correct": 2,
+          "explanation": "Using energy conservation: ½kA² = ½kx² + ½mv². When v = v_max/2, solving gives x = A√3/2 ≈ 0.866A. At this position, the kinetic energy is 1/4 of maximum kinetic energy."
+        },{
+          "question": "What is the total mechanical energy of a spring-mass system with spring constant 200 N/m oscillating with amplitude 0.1 m?",
+          "options": [
+            "1 J",
+            "2 J",
+            "10 J",
+            "20 J"
+          ],
+          "correct": 0,
+          "explanation": "Total energy E = ½kA² = ½(200)(0.1)² = ½(200)(0.01) = 1 J. In the absence of friction, this energy remains constant throughout the oscillation, converting between kinetic and potential energy."
+        },{
+          "question": "Two identical springs (k₁ = k₂ = k) are connected in series and support a mass m. What is the effective spring constant?",
+          "options": [
+            "2k",
+            "k/2",
+            "k",
+            "k²"
+          ],
+          "correct": 1,
+          "explanation": "For springs in series, 1/k_eff = 1/k₁ + 1/k₂ = 1/k + 1/k = 2/k, so k_eff = k/2. Springs in series are easier to stretch (lower effective spring constant) than a single spring."
+        },{
+          "question": "A horizontal spring-mass system oscillates on a frictionless surface. If the same system were oriented vertically, how would the period compare?",
+          "options": [
+            "Vertical period is longer",
+            "Horizontal period is longer",
+            "Periods are the same",
+            "Depends on the amplitude"
+          ],
+          "correct": 2,
+          "explanation": "The period T = 2π√(m/k) is independent of gravity and orientation. In the vertical case, gravity only shifts the equilibrium position but doesn't change the period. The restoring force still follows Hooke's law around the new equilibrium."
+        }
+      ]
     }
   }
 }
