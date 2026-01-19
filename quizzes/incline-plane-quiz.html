@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Pendulum Quiz - Physics Simulator</title>
+    <title>Inclined Plane Quiz - Physics Simulator</title>
     <link rel="stylesheet" href="quizzes.css">
 </head>
 <body>
@@ -21,37 +21,35 @@
 
     <div class="sim-container">
         <div class="sim-header">
-            <h1>⏱️ Simple Pendulum Quiz</h1>
-            <p>Test your knowledge of periodic motion and pendulum dynamics</p>
-            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">● Medium</span></p>
+            <h1></h1>
+            <p></p>
+            <p class="sim-subtitle">Difficulty: <span class="sim-badge sim-badge-medium">Medium</span></p>
         </div>
 
         <div class="quiz-layout">
             <div class="quiz-sidebar2">
                 <div class="sim-panel">
                     <div class="sim-panel-header">
-                        <span>📚</span>
                         <span>About This Quiz</span>
                     </div>
                     <ul class="sim-info-list">
-                        <li><strong style="color: #6b9eff;">Questions:</strong> 10 multiple choice</li>
-                        <li><strong style="color: #6bffb4;">Topic:</strong> Simple Pendulum</li>
-                        <li><strong style="color: #ffeb6b;">Difficulty:</strong> Medium</li>
-                        <li><strong style="color: #ff6b6b;">Time:</strong> No time limit</li>
+                        <li><strong style="color: #6b9eff;"></strong></li>
+                        <li><strong style="color: #6bffb4;"></strong></li>
+                        <li><strong style="color: #ffeb6b;"></strong></li>
+                        <li><strong style="color: #ff6b6b;"></strong></li>
                     </ul>
                 </div>
 
                 <div class="sim-panel">
                     <div class="sim-panel-header">
-                        <span>💡</span>
                         <span>Key Concepts</span>
                     </div>
                     <ul class="sim-info-list">
-                        <li>Period and frequency of oscillation</li>
-                        <li>Restoring force and acceleration</li>
-                        <li>Small angle approximation</li>
-                        <li>Energy conservation in pendulums</li>
-                        <li>Factors affecting period</li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
                     </ul>
                 </div>
             </div>
@@ -85,15 +83,15 @@
                     </div>
 
                     <div class="quiz-controls">
-                        <button class="sim-btn sim-btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>← Previous</button>
-                        <button class="sim-btn sim-btn-primary" onclick="nextQuestion()" id="nextBtn" disabled>Next →</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>Previous</button>
+                        <button class="sim-btn sim-btn-primary" onclick="nextQuestion()" id="nextBtn" disabled>Next</button>
                         <button class="sim-btn sim-btn-primary" onclick="submitAnswer()" id="submitBtn">Submit Answer</button>
                     </div>
                 </div>
 
                 <div class="quiz-results" id="resultsCard" style="display: none;">
                     <div class="results-header">
-                        <h2>Quiz Complete! 🎉</h2>
+                        <h2>Quiz Complete!</h2>
                     </div>
                     
                     <div class="results-score">
@@ -117,9 +115,9 @@
                     </div>
 
                     <div class="results-actions">
-                        <button class="sim-btn sim-btn-primary" onclick="retakeQuiz()">🔄 Retake Quiz</button>
-                        <button class="sim-btn sim-btn-secondary" onclick="reviewAnswers()">📝 Review Answers</button>
-                        <a href="../quizzes.html" class="sim-btn sim-btn-secondary" style="text-align: center;">← Back to Quizzes</a>
+                        <button class="sim-btn sim-btn-primary" onclick="retakeQuiz()">Retake Quiz</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="reviewAnswers()">Review Answers</button>
+                        <a href="../quizzes.html" class="sim-btn sim-btn-secondary" style="text-align: center;">Back to Quizzes</a>
                     </div>
                 </div>
             </div>
@@ -127,31 +125,34 @@
             <div class="quiz-sidebar1">
                 <div class="sim-panel">
                     <div class="sim-panel-header">
-                        <span>🔬</span>
                         <span>Formulas to Remember</span>
                     </div>
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">T = 2π√(L/g)</div>
-                        <div class="sim-formula-description">Period of a simple pendulum</div>
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
                     </div>
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">f = 1/T</div>
-                        <div class="sim-formula-description">Frequency</div>
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
                     </div>
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">F = -mg sin(θ)</div>
-                        <div class="sim-formula-description">Restoring force</div>
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
                     </div>
                     <div class="sim-formula">
-                        <div class="sim-formula-equation">E = mgh = ½mv²</div>
-                        <div class="sim-formula-description">Energy conservation</div>
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
+                    </div>
+                    <div class="sim-formula">
+                        <div class="sim-formula-equation"></div>
+                        <div class="sim-formula-description"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        let quizState = {
+    let quizState = {
         currentQuestion: 0,
         score: 0,
         userAnswers: [],
@@ -164,7 +165,7 @@
     async function loadQuizData() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const quizId = urlParams.get('quiz') || 'simple-pendulum';
+            const quizId = urlParams.get('quiz') || 'inclined-plane';
             const response = await fetch('quizzes.json');
             const data = await response.json();
             
@@ -180,7 +181,7 @@
             
             const headerH1 = document.querySelector('.sim-header h1');
             if (headerH1) {
-                headerH1.textContent = `${quizConfig.icon} ${quizConfig.title}`;
+                headerH1.textContent = `${quizConfig.title}`;
             }
             
             const headerP = document.querySelector('.sim-header p');
@@ -190,7 +191,7 @@
             
             const badge = document.querySelector('.sim-badge');
             if (badge) {
-                badge.textContent = `● ${quizConfig.difficulty}`;
+                badge.textContent = `${quizConfig.difficulty}`;
                 badge.className = `sim-badge sim-badge-${quizConfig.difficulty.toLowerCase()}`;
             }
             
@@ -205,7 +206,7 @@
                     <div class="error-message" style="text-align: center; padding: 3rem; color: #ff6b6b;">
                         <h2>Error Loading Quiz</h2>
                         <p>${error.message}</p>
-                        <a href="../quizzes.html" class="sim-btn sim-btn-primary" style="margin-top: 2rem; display: inline-block; text-align: center;">← Back to Quizzes</a>
+                        <a href="../quizzes.html" class="sim-btn sim-btn-primary" style="margin-top: 2rem; display: inline-block; text-align: center;">Back to Quizzes</a>
                     </div>
                 `;
             } else {
@@ -370,12 +371,12 @@
         
         if (isCorrect) {
             if (feedbackText) {
-                feedbackText.textContent = '✅ Correct!';
+                feedbackText.textContent = 'Correct!';
                 feedbackText.className = 'feedback-text correct';
             }
         } else {
             if (feedbackText) {
-                feedbackText.textContent = '❌ Incorrect';
+                feedbackText.textContent = 'Incorrect';
                 feedbackText.className = 'feedback-text incorrect';
             }
         }
@@ -393,6 +394,7 @@
             nextBtn.disabled = false;
         }
         
+        updateScore();
         updateProgress();
         updateQuestionNavigator();
     }
@@ -427,12 +429,12 @@
         
         if (userAnswer === question.correct) {
             if (feedbackText) {
-                feedbackText.textContent = '✅ Correct!';
+                feedbackText.textContent = 'Correct!';
                 feedbackText.className = 'feedback-text correct';
             }
         } else {
             if (feedbackText) {
-                feedbackText.textContent = '❌ Incorrect';
+                feedbackText.textContent = 'Incorrect';
                 feedbackText.className = 'feedback-text incorrect';
             }
         }
@@ -471,6 +473,11 @@
         }
     }
 
+    function updateScore() {
+        const scoreEl = document.getElementById('score');
+        if (scoreEl) scoreEl.textContent = quizState.score;
+    }
+
     function updateProgress() {
         const progress = ((quizState.currentQuestion) / quizState.questions.length) * 100;
         const progressBar = document.getElementById('progressBar');
@@ -478,11 +485,8 @@
             progressBar.style.width = progress + '%';
         }
         
-        const scoreEl = document.getElementById('score');
         const totalScoreEl = document.getElementById('totalScore');
-        
-        if (scoreEl) scoreEl.textContent = quizState.score;
-        if (totalScoreEl) totalScoreEl.textContent = quizState.currentQuestion;
+        if (totalScoreEl) totalScoreEl.textContent = quizState.userAnswers.filter(a => a !== undefined).length;
     }
 
     function updateQuestionNavigator() {
