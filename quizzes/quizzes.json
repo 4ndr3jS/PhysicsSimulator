@@ -812,6 +812,141 @@
           "explanation": "All points on a rigid rotating object have the same angular velocity ω. However, their tangential speeds differ: v = rω, so the outer point moves twice as fast linearly but rotates at the same angular rate."
         }
       ]
+    },
+    "orbital-mechanics":{
+      "title": "Obrital Mechanics Quiz",
+      "description": "Test your understanding of satalites, gravitatonal orbits, and Kepler's laws",
+      "topic": "Orbital Mechanics",
+      "difficulty": "Medium",
+      "icon": "🚀",
+      "keyConcepts": [
+        "Kepler's trhee laws of planatery momentum",
+        "Orbital velocity and period",
+        "Gravitational potential energy",
+        "Escape velocity",
+        "Geostationary orbits"
+      ],
+      "formulas": [
+        {
+          "equation": "v = √(GM/r)",
+          "description": "Orbital velocity"
+        },{
+          "equation": "T² = (4π²/GM)r³",
+          "description": "Kepler's third law"
+        },{
+          "equation": "T² = (4π²/GM)r³",
+          "description": "Gravitational force"
+        },{
+          "equation": "v_escape = √(2GM/r)",
+          "description": "Escape velocity"
+        },{
+          "equation": "U = -GMm/r",
+          "description": "Gravitational potential energy"
+        }
+      ],
+      "questions": [
+        {
+          "question": "Which of Kepler's laws states that planets sweep out equal areas in equal times?",
+          "options": [
+            "First law (Law of Ellipses)",
+            "Second law (Law of Equal Areas)",
+            "Third law (Law of Periods)",
+            "None of Kepler's laws"
+          ],
+          "correct": 1,
+          "explanation": "Kepler's second law (Law of Equal Areas) states that a line joining a planet and the Sun sweeps out equal areas during equal intervals of time. This means planets move faster when closer to the Sun and slower when farther away."
+        },{
+          "question": "If a satelite's orbital radius is increased by a factor of 4, how does its orbital period change?",
+          "options": [
+            "Doubles",
+            "Quadruples",
+            "Increases by a factor of 8",
+            "Stays the same"
+          ],
+          "correct": 2,
+          "explanation": "Kepler's third law stats, line joining a planet and the Sun sweeps out equal areas during equal intervals of time. This means planets move faster when closer to the Sun and slower when farther away."
+        },{
+          "question": "What is the relationship between orbital velocity and escape velocity from the same point",
+          "options": [
+            "v_escape = v_orbital",
+            "v_escape = √2 × v_orbital",
+            "v_escape = 2 × v_orbital",
+            "v_escape = ½ × v_orbital"
+          ],
+          "correct": 1,
+          "explanation": "Since v_orbital = √(GM/r) and v_escape = √(2GM/r), we have v_escape = √2 × v_orbital ≈ 1.414 × v_orbital. Escape velocity is always √2 times the orbital velocity at the same radius."
+        },{
+          "question": "A geostationary satallite orbits Earth with a period of 24 hours. What is special about its orbit?",
+          "options": [
+            "It orbits over the poles",
+            "It appears stationary relative to Earth's surface",
+            "It has the lowest possible orbital altitude",
+            "It moves faster then Earth's rotation"
+          ],
+          "correct": 1,
+          "explanation": "A geostationary satallite orbits above the equator with a 24-hour period, mathing Earth's rotation. This makes it appear stationary relative to a point on Earth."
+        },{
+          "question": "If a satellite's orbital radius doubles, how does its orbital velocity change?",
+          "options": [
+            "Doubles",
+            "Halves",
+            "Decreases by factor of √2",
+            "Increases by factor of √2"
+          ],
+          "correct": 2,
+          "explanation": "From v = √(GM/r), velocity is proportional to 1/√r. If r doubles, v becomes v/√2 ≈ 0.707v. The satellite moves slower at higher orbits because gravitational force is weaker."
+        },{
+          "question": "What provides the centripetal force that keeps a satellite in orbit around Earth?",
+          "options": [
+            "Air resistance",
+            "The satellite's engine thrust",
+            "Gravitational force from Earth",
+            "Magnetic force"
+          ],
+          "correct": 2,
+          "explanation": "The gravitational force from Earth provides the centripetal force needed for orbital motion. In a stable orbit, F_gravity = F_centripetal, which gives us mv²/r = GMm/r², leading to the orbital velocity formula."
+        },{
+          "question": "According to Kepler's first law, the orbit of a planet is:",
+          "options": [
+            "A perfect circle with the Sun at the center",
+            "An ellipse with the Sun at one focus",
+            "A parabola with the Sun at the vertex",
+            "A hyperbola with the Sun at one focus"
+          ],
+          "correct": 1,
+          "explanation": "Kepler's first law states that planets orbit in ellipses with the Sun at one of the two foci (not at the center). While some orbits are nearly circular, they are technically elliptical."
+        },{
+          "question": "Two satellites orbit Earth at different altitudes. The satellite at lower altitude has:",
+          "options": [
+            "Lower speed and longer period",
+            "Higher speed and longer period",
+            "Lower speed and shorter period",
+            "Higher speed and shorter period"
+          ],
+          "correct": 3,
+          "explanation": "Lower orbits require higher speeds (v = √(GM/r) increases as r decreases) and have shorter periods (T ∝ r^(3/2)). The satellite closer to Earth must move faster to maintain its orbit and completes orbits more quickly."
+        },{
+          "question": "The total mechanical energy of a satellite in a circular orbit is:",
+          "options": [
+            "Positive",
+            "Zero",
+            "Negative",
+            "Equal to its kinetic energy"
+          ],
+          "correct": 2,
+          "explanation": "Total energy E = KE + PE = ½mv² - GMm/r. For a circular orbit, this simplifies to E = -GMm/(2r), which is negative. Negative total energy indicates the satellite is gravitationally bound to Earth."
+        },{
+          "question": "If Earth's mass were doubled while its radius remained the same, how would the escape velocity change?",
+          "options": [
+            "Doubles",
+            "Quadruples",
+            "Increases by factor of √2",
+            "Stays the same"
+          ],
+          "correct": 2,
+          "explanation": "Since v_escape = √(2GM/r), escape velocity is proportional to √M. If M doubles, v_escape becomes √2 × v_escape ≈ 1.414 times the original value."
+        }
+      ]
     }
   }
 }
