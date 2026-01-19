@@ -947,6 +947,141 @@
           "explanation": "Since v_escape = √(2GM/r), escape velocity is proportional to √M. If M doubles, v_escape becomes √2 × v_escape ≈ 1.414 times the original value."
         }
       ]
+    },
+    "rotational-dynamics":{
+      "title": "Rotational Dynamics Quiz",
+      "description": "Test your understanding of torque, moment of inertia, and angular momentum",
+      "topic": "Rotational Dynamics",
+      "difficulty": "Hard",
+      "icon": "🔄",
+      "keyConcepts": [
+        "Torque and rotational quilibrium",
+        "Moment of inertia for different shapes",
+        "Angular momentum conservation",
+        "Rotational kinetic energy",
+        "Newton's second law for rotation"
+      ],
+      "formulas": [
+        {
+          "equation": "τ = rF sin(θ)",
+          "description": "Troque"
+        },{
+          "equation": "τ = Iα",
+          "description": "Newton's second law for rotation"
+        },{
+          "equation": "L = Iω",
+          "description": "Angular momentum"
+        },{
+          "equation": "KE_rot = ½Iω²",
+          "description": "Rotational kinetic energy"
+        },{
+          "equation": "I = Σmr²",
+          "description": "Moment of Inertia"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A force of 10 N is applied perpendicular to a wrench 0.3m from the pivot point. What is the torque produced?",
+          "options": [
+            "3 N·m",
+            "10 N·m",
+            "30 N·m",
+            "0.3 N·m"
+          ],
+          "correct": 0,
+          "explanation": "Using τ = rF sin(θ), where θ = 90° (perpendicular): τ = 0.3 m × 10 N × sin(90°) = 0.3 × 10 × 1 = 3 N·m. The torque represents the rotational effect of the force."
+        },{
+          "question": "Which object has the largest moment of inertia about its center? (If all have the same M and R)",
+          "options": [
+            "Solid sphere: I = (2/5)MR²",
+            "Solid cylinder: I = (1/2)MR²",
+            "Thin hollow sphere: I = (2/3)MR²",
+            "Thin ring: I = MR²"
+          ],
+          "correct": 3,
+          "explanation": "The thin ring has I = MR², which is the largest. Moment of inertia depends on how mass is distributed from the rotation axis. The ring has all its mass at maximum distance R, giving it the highest moment of inertia."
+        },{
+          "question": "If a figure skater pulls her arm inward during a spin, what happens to her angular velocity?",
+          "options": [
+            "Decreases",
+            "Stays the same",
+            "Increases",
+            "Becomes zero"
+          ],
+          "correct": 0,
+          "explanation": "Angular momentum L = Iω is conserved. When she pulls her arms in, her moment of inertia I decreases. To keep L constant, her angular velocity ω must increase, making her spin faster."
+        },{
+          "question": "A disk and a hoop of equal mass and radius roll down an incline without slipping. Which reaches the bottom first?",
+          "options": [
+            "The disk",
+            "The hoop",
+            "They reach at the same time",
+            "Depends on the angle of incline"
+          ],
+          "correct": 0,
+          "explanation": "The disk reaches first because it has a smaller moment of inertia (I_disk = ½MR² vs I_hoop = MR²). Less rotational inertia means more energy goes into translational motion, resulting in higher acceleration down the incline."
+        },{
+          "question": "What is the SI unit of torque?",
+          "options": [
+            "N/m",
+            "N·m",
+            "kg·m²/s",
+            "J/s"
+          ],
+          "correct": 1,
+          "explanation": "Torque has units of N·m (newton-meters). Although this has the same dimensions as joules (energy), torque and energy are different physical quantities, so N·m is preferred over J for torque."
+        },{
+          "question": "A wheel with moment of inertia 2 kg·m² rotates at 5 rad/s. What is its rotational kinetic energy?",
+          "options": [
+            "10 J",
+            "25 J",
+            "50 J",
+            "5 J"
+          ],
+          "correct": 1,
+          "explanation": "Using KE_rot = ½Iω² = ½(2 kg·m²)(5 rad/s)² = ½(2)(25) = 25 J. This represents the energy due to the rotational motion of the wheel."
+        },{
+          "question": "Two forces of equal magnitude are applied to a door. One is applied perpendicular to the door at the edge, the other at 45° to the door at the edge. Which produces greater torque?",
+          "options": [
+            "The perpendicular force",
+            "The 45° force",
+            "Both produce equal torque",
+            "Cannot determine without knowing the force magnitude"
+          ],
+          "correct": 0,
+          "explanation": "Since τ = rF sin(θ), and sin(90°) = 1 > sin(45°) = 0.707, the perpendicular force produces greater torque. Maximum torque occurs when force is applied perpendicular to the lever arm."
+        },{
+          "question": "A solid cylinder and a hollow cylinder of the same mass and radius are released from rest at the top of an incline. Assuming they roll without slipping, which statement is true?",
+          "options": [
+            "The solid cylinder reaches the bottom with greater velocity",
+            "The hollow cylinder reaches the bottom with greater velocity",
+            "Both reach the bottom with the same velocity",
+            "Both reach the bottom with the same kinetic energy"
+          ],
+          "correct": 0,
+          "explanation": "The solid cylinder has smaller moment of inertia (½MR² vs MR² for hollow), so more of its potential energy converts to translational kinetic energy rather than rotational. It reaches the bottom with greater velocity, though both have the same total energy."
+        },{
+          "question": "If you double the angular velocity of a rotating object while keeping its moment of inertia constant, how does the angular momentum change?",
+          "options": [
+            "Doubles",
+            "Quadruples",
+            "Halves",
+            "Stays the same"
+          ],
+          "correct": 0,
+          "explanation": "Since L = Iω, angular momentum is directly proportional to angular velocity when I is constant. Doubling ω doubles L. Angular momentum is a linear function of angular velocity."
+        },{
+          "question": "A rod of length L and mass M rotates about one end. What is its moment of inertia about this axis?",
+          "options": [
+            "(1/12)ML²",
+            "(1/3)ML²",
+            "(1/2)ML²",
+            "ML²"
+          ],
+          "correct": 1,
+          "explanation": "For a rod rotating about one end, I = (1/3)ML². This is larger than rotating about the center (I = (1/12)ML²) because the average distance of mass from the axis is greater when rotating about an end."
+        }
+      ]
     }
   }
 }

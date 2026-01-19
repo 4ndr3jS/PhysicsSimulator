@@ -460,6 +460,10 @@
             updateProgress();
             updateQuestionNavigator();
         } else {
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = 100 + '%';
+            }
             showResults();
         }
     }
