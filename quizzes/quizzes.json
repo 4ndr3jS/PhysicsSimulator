@@ -1217,6 +1217,141 @@
           "explanation": "The visible spectrum from longest to shortest wavelength is: Red (≈700 nm), Orange, Yellow, Green, Blue, Indigo, Violet (≈400 nm). This is remembered by the acronym ROYGBIV."
         }
       ]
+    },
+    "standing-waves": {
+      "title": "Standing Waves Quiz",
+      "description": "",
+      "topic": "Standing Waves",
+      "difficulty": "Easy",
+      "icon": "🌊",
+      "keyConcepts": [
+        "Formation of standing waves",
+        "Nodes and antinode",
+        "Harmonics and overtones",
+        "Standing waves in strings and pipes",
+        "Resonance and frequency relationships"
+      ],
+      "formulas": [
+        {
+          "equation": "λ = 2L/n",
+          "description": "Wavelength for string fixed at both ends"
+        },{
+          "equation": "f_n = nv/(2L)",
+          "description": "Frequency of nth harmonic (string)"
+        },{
+          "equation": "λ = 4L/n",
+          "description": "Wavelength for pipe open at one end (n odd)"
+        },{
+          "equation": "f_1 = v/(2L)",
+          "description": "Fundamental frequency (string)"
+        },{
+          "equation": "v = fλ",
+          "description": "Wave speed relationship"
+        }
+      ],
+      "questions": [
+        {
+          "question": "Standing waves are formed by the interference of: ",
+          "options": [
+            "Two waves travelling in the same direction",
+            "Two waves of different frequencies",
+            "Two identical waves travelling in opposite directions",
+            "A single wave reflecting off a barrier"
+          ],
+          "correct": 2,
+          "explanation": "Standing waves form when two identical waves (same frequency and amplitude) traveling in opposite directions interfere. This typically occurs when a wave reflects back on itself, creating a pattern of nodes and antinodes."
+        },{
+          "question": "What is a node in a standing waves",
+          "options": [
+            "A point of maximum displacement",
+            "A point of zero displacement",
+            "A point where the wave speed is maximum",
+            "A point where frequency changes"
+          ],
+          "correct": 1,
+          "explanation": "A node is a point of zero displacement that remains stationary in a standing wave. Nodes occur where destructive interference is complete. They are separated by half a wavelength."
+        },{
+          "question": "A string fixed at both ends is 2 m long and vibrates in its fundamental mode. What is the wavelength of the standing wave?",
+          "options": [
+            "1 m",
+            "2 m",
+            "4 m",
+            "0.5 m"
+          ],
+          "correct": 2,
+          "explanation": "For the fundamental mode (n = 1) of a string fixed at both ends, λ = 2L = 2 × 2 m = 4 m. The fundamental mode has one antinode in the middle with nodes at both ends, fitting half a wavelength in the length."
+        },{
+          "question": "How many antinodes are present in the thrid harmonic of a string fixed at both ends?",
+          "options": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "correct": 2,
+          "explanation": "The third harmonic (n = 3) has 3 antinodes. The number of antinodes equals the harmonic number for a string fixed at both ends. It contains 1.5 complete wavelengths within the string length."
+        },{
+          "question": "If the fundamental frequency of a vibrating string is 100 Hz, what is the frequency of the second harmonic?",
+          "options": [
+            "50 Hz",
+            "100 Hz",
+            "200 Hz",
+            "400 Hz"
+          ],
+          "correct": 2,
+          "explanation": "For a string fixed at both ends, f_n = n × f_1. The second harmonic (n = 2) has frequency f_2 = 2 × 100 Hz = 200 Hz. Each harmonic is an integer multiple of the fundamental frequency."
+        },{
+          "question": "A pipe is open at one end and closed at the other. Which harmonics can it support?",
+          "options": [
+            "All harmonics (1st, 2nd, 3rd, etc.)",
+            "Only even harmonics (2nd, 4th, 6th, etc.)",
+            "Only odd harmonics (1st, 3rd, 5th, etc.)",
+            "No harmonics can form"
+          ],
+          "correct": 2,
+          "explanation": "A pipe open at one end and closed at the other can only support odd harmonics (n = 1, 3, 5, ...). This is because it must have an antinode at the open end and a node at the closed end, which only allows odd multiples of λ/4."
+        },{
+          "question": "The distance between two consecutive nodes in a standing wave is:",
+          "options": [
+            "λ/4",
+            "λ/2",
+            "λ",
+            "2λ"
+          ],
+          "correct": 1,
+          "explanation": "Consecutive nodes are separated by λ/2 (half a wavelength). Similarly, consecutive antinodes are also separated by λ/2, and the distance from a node to the nearest antinode is λ/4."
+        },{
+          "question": "A string of length 1.2 m vibrates at 300 Hz in its third harmonic. What is the wave speed on the string?",
+          "options": [
+            "120 m/s",
+            "180 m/s",
+            "240 m/s",
+            "360 m/s"
+          ],
+          "correct": 2,
+          "explanation": "For the third harmonic, λ = 2L/n = 2(1.2)/3 = 0.8 m. Using v = fλ = 300 Hz × 0.8 m = 240 m/s. The wave speed depends on the string's tension and mass per unit length."
+        },{
+          "question": "What happens to the fundamental frequency of a string if you double its tension while keeping length and mass constant?",
+          "options": [
+            "Doubles",
+            "Quadruples",
+            "Increases by factor of √2",
+            "Halves"
+          ],
+          "correct": 2,
+          "explanation": "Wave speed v = √(T/μ), where T is tension. If tension doubles, v increases by √2. Since f = v/(2L), frequency also increases by √2. Doubling tension increases the fundamental frequency by approximately 1.414 times."
+        },{
+          "question": "A pipe open at both ends has a fundamental frequency of 200 Hz. What is the fundamental frequency of a pipe of the same length but closed at one end? (Same wave speed)",
+          "options": [
+            "100 Hz",
+            "200 Hz",
+            "400 Hz",
+            "50 Hz"
+          ],
+          "correct": 0,
+          "explanation": "For a pipe open at both ends, f = v/(2L). For a pipe closed at one end, f = v/(4L). Since v and L are the same, the closed pipe has half the frequency: 200 Hz / 2 = 100 Hz. The closed pipe fits only λ/4 instead of λ/2."
+        }
+      ]
     }
   }
 }
