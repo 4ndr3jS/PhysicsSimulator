@@ -1082,6 +1082,141 @@
           "explanation": "For a rod rotating about one end, I = (1/3)ML². This is larger than rotating about the center (I = (1/12)ML²) because the average distance of mass from the axis is greater when rotating about an end."
         }
       ]
+    },
+    "prism": {
+      "title": "Dispersion and Prism Quiz",
+      "description": "Test your understanding",
+      "topic": "Dispersion and Prism",
+      "difficulty": "Easy",
+      "icon": "🌈",
+      "keyConcepts": [
+        "Refraction and Snell's law",
+        "Dispersion of white light",
+        "Deviation angle in prisms",
+        "Refractive index variation with wavelength",
+        "Rainbow formation and spectrum"
+      ],
+      "formulas": [
+        {
+          "equation": "n₁sin(θ₁) = n₂sin(θ₂)",
+          "description": "Snell's law of refraction"
+        },{
+          "equation": "δ = (n - 1)A",
+          "description": "Deviation for small angles"
+        },{
+          "equation": "δ_min = (n - 1)A",
+          "description": "Minimum deiation (when i = e)"
+        },{
+          "equation": "n = sin[(A + δ_min)/2] / sin(A/2)",
+          "description": "Refractive index from minimum deviation"
+        },{
+          "equation": "v = c/n",
+          "description": "Speed of light in medium"
+        }
+      ],
+      "questions": [
+        {
+          "question": "What causes white light to split int odifferent colors when passing through a prism?",
+          "options": [
+            "Refraction",
+            "Reflection",
+            "Diffraction",
+            "Dispersion"
+          ],
+          "correct": 3,
+          "explanation": "Dispersion occurs because the refractive index of the prism material varies with wavelength. Different colors (wavelengths) refract by different amoutns, causing white light to separate into component colors."
+        },{
+          "question": "Which color of visable light has the highest refractive index in glass?",
+          "options": [
+            "Red",
+            "Green",
+            "Blue",
+            "Violet"
+          ],
+          "correct": 3,
+          "explanation": "Violet light has the heighest refractive index in glass because it has the shortest waelength. The refractive index generally increases as wavelength decreases, so violet bends the most and red bends the least."
+        },{
+          "question": "A ray of light enters a glass prism with an angle of incidence of 30°. If the refractive index of glass is 1.5, what is the angle of refraction? (sin 30° = 0.5)",
+          "options": [
+            "19.5°",
+            "30°",
+            "45°",
+            "60°"
+          ],
+          "correct": 0,
+          "explanation": "Using Snell's law: 1.0 × sin(30°) = 1.5 × sin(θ₂), so 0.5 = 1.5 × sin(θ₂), giving sin(θ₂) = 0.333, thus θ₂ ≈ 19.5°. Light bends toward the normal when entering a denser medium."
+        },{
+          "question": "In a rainbow, which color appears on the outer edge?",
+          "options": [
+            "Violet",
+            "Blue",
+            "Green",
+            "Red"
+          ],
+          "correct": 3,
+          "explanation": "Red appears on the outer edge of a rainbow because it refracts the least in water droplets. The order from outer to inner is: red, orange, yellow, green, blue, indigo, violet (ROYGBIV)."
+        },{
+          "question": "What is the angle of minimum deviation for a prism?",
+          "options": [
+            "The smallest angle between incident and emergent rays",
+            "The largest angle between incident and emergent rays",
+            "When the angle of incidence is 90°",
+            "When the light does not refract"
+          ],
+          "correct": 0,
+          "explanation": "Minimum deviation occurs when the ray inside the prism is parallel to the base, making the angle of incidence equal to the angle of emergence. This produces the smallest deviation angle between incident and emergent rays."
+        },{
+          "question": "A prism has a refracting angle of 60°. If the refractive index is 1.5, what is the approximate angle of minimum deviation?",
+          "options": [
+            "20°",
+            "30°",
+            "40°",
+            "60°"
+          ],
+          "correct": 1,
+          "explanation": "Using δ_min ≈ (n - 1)A for small angles: δ_min = (1.5 - 1) × 60° = 0.5 × 60° = 30°. The minimum deviation depends on both the prism angle and the refractive index."
+        },{
+          "question": "Why doesn't a rectangular glass slab produce dispersion like a prism does?",
+          "options": [
+            "Glass slabs don't refract light",
+            "The emergent ray is parallel to the incident ray, canceling dispersion",
+            "Rectangular slabs have no refractive index variation",
+            "Glass slabs only work with monochromatic light"
+          ],
+          "correct": 1,
+          "explanation": "Although dispersion occurs at the first surface of a glass slab, the second refraction cancels this effect. The emergent ray is parallel to the incident ray with only lateral displacement, so the colors recombine."
+        },{
+          "question": "Which of the following is NOT a condition for observing a rainbow?",
+          "options": [
+            "Water droplets in the atmosphere",
+            "Sun behind the observer",
+            "Sun in front of the observer",
+            "Refraction and internal reflection in droplets"
+          ],
+          "correct": 2,
+          "explanation": "For a rainbow to be visible, the Sun must be behind the observer. Sunlight refracts entering the water droplet, reflects internally, and refracts again upon exiting, with the observer seeing the dispersed light."
+        },{
+          "question": "If a prism is immersed in water (n = 1.33) instead of air, what happens to the dispersion?",
+          "options": [
+            "Dispersion increases",
+            "Dispersion decreases",
+            "Dispersion remains the same",
+            "No dispersion occurs"
+          ],
+          "correct": 1,
+          "explanation": "Dispersion decreases because the relative refractive index (n_glass/n_water) is smaller than (n_glass/n_air). The difference in refraction between colors is reduced, resulting in less separation of the spectrum."
+        },{
+          "question": "What is the sequence of colors in the visible spectrum from longest to shortest wavelength?",
+          "options": [
+            "Violet, Indigo, Blue, Green, Yellow, Orange, Red",
+            "Red, Orange, Yellow, Green, Blue, Indigo, Violet",
+            "Red, Yellow, Green, Blue, Violet",
+            "Violet, Blue, Green, Yellow, Red"
+          ],
+          "correct": 1,
+          "explanation": "The visible spectrum from longest to shortest wavelength is: Red (≈700 nm), Orange, Yellow, Green, Blue, Indigo, Violet (≈400 nm). This is remembered by the acronym ROYGBIV."
+        }
+      ]
     }
   }
 }
