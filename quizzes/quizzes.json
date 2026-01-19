@@ -214,7 +214,7 @@
           "correct": 2,
           "explanation": "Since T = 2π√(L/g), if g becomes g/6, then T becomes √6 times larger. T_moon = 2π√(L/(g/6)) = √6 × 2π√(L/g) ≈ 2.45 × T_earth."
         },{
-          "question": "For a simple pendulum, the small angle approximation assumes that that sin(θ) ≈ θ. This approximation works well til approximately:",
+          "question": "For a simple pendulum, the small angle approximation assumes that sin(θ) ≈ θ. This approximation works well til approximately:",
           "options": [
             "5°",
             "15°",
@@ -290,7 +290,7 @@
         },
         {
           "equation": "F⊥ = mg cos(θ)",
-          "description": "Parallel component of weight"
+          "description": "Perpendicular component of weight"
         },
         {
           "equation": "N = mg cos(θ)",
@@ -307,7 +307,7 @@
       ],
       "questions": [
         {
-          "question" : "A block rests on a frictionless inclined plane at 30°. What is the acceleration of the block down the plane? (g = 10 m/s², sim 30° = 0.5)",
+          "question" : "A block rests on a frictionless inclined plane at 30°. What is the acceleration of the block down the plane? (g = 10 m/s², sin 30° = 0.5)",
           "options": [
             "10 m/s²",
             "5 m/s²",
@@ -315,7 +315,7 @@
             "0 m/s²"
           ],
           "correct": 1,
-          "explanation": "On a frictionless incline, a = g sin(θ) = 10 × sin(30°) = 10 × 0.5 = 5 m/s². The accelereation depends only on the angle and gravity when there's no friction."
+          "explanation": "On a frictionless incline, a = g sin(θ) = 10 × sin(30°) = 10 × 0.5 = 5 m/s². The acceleration depends only on the angle and gravity when there's no friction."
         },
         {
           "question": "A 10 kg block sits on an incline at 30°. What is the component of the weight parallel to the incline? (g = 10 m/s², sin 30° = 0.5)",          "options": [
@@ -675,6 +675,141 @@
           ],
           "correct": 1,
           "explanation": "For elastic collisions, |v₁ᵢ - v₂ᵢ| = |v₂f - v₁f|. The magnitude of relative velocity is preserved, so they separate at 10 m/s. This is a fundamental property of elastic collisions and relates to e = 1."
+        }
+      ]
+    },
+    "circular-motion":{
+      "title": "Circula Motion Quiz",
+      "description": "Test your understanding of centripical force, angular velocity, and rotational dynamics",
+      "topic": "Circular Motion",
+      "difficulty": "Medium",
+      "icon": "🌀",
+      "keyConcepts": [
+        "Centripental acceleration and force",
+        "Angular velocity and frequency",
+        "Period and tangential velocity",
+        "Banking of curves",
+        "Vertical circular motion dynamics"
+      ],
+      "formulas": [
+        {
+          "equation": "a_c = v²/r",
+          "description": "Centripental acceleration"
+        },{
+          "equation": "F_c = mv²/r",
+          "description": "Centripental force"
+        },{
+          "equation": "ω = 2π/T = 2πf",
+          "description": "Angular velocity"
+        },{
+          "equation": "v = rω",
+          "description": "Tangential velocity"
+        },{
+          "equation": "a_c = rω²",
+          "description": "Centripental acceleration (angular form)"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A car travels around a circular track of raduis 50 m at a constant speed of 20m/s. What is its centripental acceleration?",
+          "options": [
+            "4 m/s²",
+            "8 m/s²",
+            "10 m/s²",
+            "20 m/s²"
+          ],
+          "correct": 1,
+          "explanation": "Using a_c = v²/r = (20)²/50 = 400/50 = 8 m/s². This acceleration is directed toward the center of the circular path and is constant in magnitude but continuously changing in direction."
+        },{
+          "question": "What provides the centripental force for a car makeing a turn on the road?",
+          "options": [
+            "Normal force",
+            "Gravitational force",
+            "Friction between tires and road",
+            "Air resistance"
+          ],
+          "correct": 2,
+          "explanation": "Friction between the tires and road provides the centripental force needed for turning. Without sufficient friction (like on ice), the car cannot turn effectively and will sile outward."
+        },{
+          "question": "If you double the speed of an object in circular motion while keeping the radius constant, how does that affect the centripental force?",
+          "options": [
+            "Doubles",
+            "Quadruples",
+            "Halves",
+            "Stays the same"
+          ],
+          "correct": 1,
+          "explanation": "Since F_c = mv²/r, the centripental force is proportional to v². So if the speed doubles, 2² = 4, F_c quadruples."
+        },{
+          "question": "An object completes 10 revolutions in 5 seconds. What is it's frequency?",
+          "options": [
+            "0.5 Hz",
+            "2 Hz",
+            "5 Hz",
+            "10 Hz"
+          ],
+          "correct": 1,
+          "explanation": "Frequency f = number of oscillations / time = 10 / 5s. So the answer is 2Hz."
+        },{
+          "question": "A 0.5 kg ball on a 1 m string is swung in a horizontal circle at 4 m/s. What is the tension in the string?",
+          "options": [
+            "2 N",
+            "4 N",
+            "8 N",
+            "idk bro"
+          ],
+          "correct": 2,
+          "explanation": "The tension provides the centripental force F_c = mv²/r = 0.5 × (4)² / 1 = 0.5 × 16 / 1 = 8 N. The tension must equal the required centripetal force to maintain circular motion."
+        },{
+          "question": "What is the direction of the centripental acceleration in uniform circular motion?",
+          "options": [
+            "Tangent to the circle",
+            "Towaard the center of the circle",
+            "Away from the center of the circle",
+            "In the direction of motion"
+          ],
+          "correct": 1,
+          "explanation": "Centripental acceleration always points toward the center of the circular path. This is what causes the object to continuously change direction and move in a circle rather then a straight line"
+        },{
+          "question": "A sitelite orbits the Earth at a constant speed. Which statement is true?",
+          "options": [
+            "Its velocity is constant",
+            "Its acceleration is zero",
+            "Its speed is constant but velocity is changing",
+            "Both spee dand velocity are changing"
+          ],
+          "correct": 2,
+          "explanation": "Speed(magnitude) is constant, but velocity (which includesa direction) is continuously changing because the satelite is always changing direction."
+        },{
+          "question": "A wheel of radius 0.5 m rotates with angular velocity 4 rad/s. What is the tangential speed of a point on its rim?",
+          "options": [
+            "0.5 m/s",
+            "2 m/s",
+            "4 m/s",
+            "8 m/s"
+          ],
+          "correct": 1,
+          "explanation": "Using v = rω = 0.5 m × 4 rad/s = 2 m/s. The tangential speed is the linear speed of a point on the rim, perpendicular to the radius."
+        },{
+          "question": "At the top of a vertical circular loop, a roller coaster car experiences a normal force of zero. What is the car's speed? (r = 10 m, g = 10 m/s²)",
+          "options": [
+            "5 m/s",
+            "10 m/s",
+            "15 m/s",
+            "20 m/s"
+          ],
+          "correct": 1,
+          "explanation": "At the top with N = 0, gravity alone provides centripetal force: mg = mv²/r, so v = √(gr) = √(10 × 10) = √100 = 10 m/s. This is the minimum speed to maintain contact with the track at the top."
+        },{
+          "question": "Two points on a rotating disk are located at distances r and 2r from the center. How do their angular velocities compare?",
+          "options": [
+            "The outer point has twice the angular velocity",
+            "The inner point has twice the angular velocity",
+            "Both have the same angular velocity",
+            "The outer point has four times the angular velocity"
+          ],
+          "correct": 2,
+          "explanation": "All points on a rigid rotating object have the same angular velocity ω. However, their tangential speeds differ: v = rω, so the outer point moves twice as fast linearly but rotates at the same angular rate."
         }
       ]
     }
