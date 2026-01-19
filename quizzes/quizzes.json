@@ -1352,6 +1352,134 @@
           "explanation": "For a pipe open at both ends, f = v/(2L). For a pipe closed at one end, f = v/(4L). Since v and L are the same, the closed pipe has half the frequency: 200 Hz / 2 = 100 Hz. The closed pipe fits only λ/4 instead of λ/2."
         }
       ]
+    },
+    "wave-interference": {
+      "title": "Wave Interference Quiz",
+      "discription": "Test your understanding superposition, constructive and destructive interference",
+      "topic": "Wave Interference",
+      "difficulty": "Medium",
+      "icon": "〰️",
+      "keyConcepts": [
+        "Principle of superposition",
+        "Constructive and destructive interference",
+        "Path difference and phase difference",
+        "Coherent sources and wave conditions"
+      ],
+      "formulas": [
+        {
+          "equation": "Δx = nλ",
+          "description": "Path difference for constructive interference"
+        },{
+          "equation": "Δx = (n + ½)λ",
+          "description": "Path difference for destructive interference"
+        },{
+          "equation": "Δφ = (2π/λ)Δx",
+          "description": "Phase difference from path difference"
+        }
+      ],
+      "questions": [
+        {
+          "question": "What is the principle of superposition?",
+          "options": [
+            "Waves cannot pass through each other",
+            "The resultant displacement is the sum of individual displacement",
+            "Waves always cancel each other out",
+            "Only waves of the same frequency can interfere"
+          ],
+          "correct": 1,
+          "explanation": "The principle of superposition states that when two or more waves overlap, the resultant displacement at any point is the algebraic sum of the individual displacements. This principle allows both for constructive and destructive interference"
+        },{
+          "question": "Constructive interference occurs when the path difference between two waves is:",
+          "options": [
+            "An odd multiple of λ/2",
+            "An integer multiple of λ",
+            "Always zero",
+            "Any random value"
+          ],
+          "correct": 1,
+          "explanation": "Constructive interference occurs when the path difference Δx = nλ, where n = 0, 1, 2, 3, ... This means the waves arrive in phase, and their amplitudes add together to produce maximum amplitude."
+        },{
+          "question": "What phase difference corresponds to destructive interference?",
+          "options": [
+            "0°, 360°, 720°, ...",
+            "90°, 270°, 450°, ...",
+            "180°, 540°, 900°, ...",
+            "45°, 135°, 225°, ..."
+          ],
+          "correct": 2,
+          "explanation": "Destructive interference occurs when the phase difference is an odd multiple of 180° (π radians): 180°, 540°, 900°, etc. This corresponds to waves being exactly out of phase, causing them to cancel each other."
+        },{
+          "question": "Two coherent sources produce waves with wavelength 2 m. What path difference produces the first destructive interference?",
+          "options": [
+            "0.5 m",
+            "1 m",
+            "2 m",
+            "4 m"
+          ],
+          "correct": 1,
+          "explanation": "The first destructive interference (n = 0) occurs at path difference Δx = (n + ½)λ = (0 + ½) × 2 m = 1 m. This is half a wavelength, which puts the waves exactly out of phase."
+        },{
+          "question": "In Young's double slit experiment, what happens to the fringe spacing if the wavelength of light is increased?",
+          "options": [
+            "Fringe spacing decreases",
+            "Fringe spacing increases",
+            "Fringe spacing remains the same",
+            "Fringes disappear"
+          ],
+          "correct": 1,
+          "explanation": "Fringe spacing is given by Δy = λL/d, which is directly proportional to wavelength λ. If wavelength increases, the spacing between bright (or dark) fringes increases proportionally."
+        },{
+          "question": "What is required for two wave sources to be coherent?",
+          "options": [
+            "Same amplitude only",
+            "Same frequency and constant phase relationship",
+            "Different frequencies",
+            "Large amplitude difference"
+          ],
+          "correct": 1,
+          "explanation": "Coherent sources must have the same frequency and maintain a constant phase relationship. This ensures a stable interference pattern. Without coherence, the interference pattern would constantly shift and blur."
+        },{
+          "question": "In a double slit experiment, the distance between slits is 0.5 mm, screen distance is 2 m, and wavelength is 500 nm. What is the spacing between bright fringes?",
+          "options": [
+            "1 mm",
+            "2 mm",
+            "3 mm",
+            "4 mm"
+          ],
+          "correct": 1,
+          "explanation": "Using Δy = λL/d = (500 × 10⁻⁹ m × 2 m) / (0.5 × 10⁻³ m) = (1000 × 10⁻⁹) / (0.5 × 10⁻³) = 2 × 10⁻³ m = 2 mm. The fringe spacing is uniform across the pattern."
+        },{
+          "question": "Two waves with equal amplitudes A interfere constructively. What is the amplitude of the resultant wave?",
+          "options": [
+            "A",
+            "2A",
+            "A²",
+            "0"
+          ],
+          "correct": 1,
+          "explanation": "In constructive interference, the amplitudes add directly. Two waves of amplitude A produce a resultant amplitude of 2A. The intensity, which is proportional to amplitude squared, becomes 4 times larger."
+        },{
+          "question": "What type of interference occurs when the path difference is 2.5λ?",
+          "options": [
+            "Constructive",
+            "Destructive",
+            "Partially constructive",
+            "No interference"
+          ],
+          "correct": 1,
+          "explanation": "A path difference of 2.5λ = (2 + 0.5)λ = (n + ½)λ where n = 2, which is the condition for destructive interference. The waves are out of phase by an odd multiple of π radians."
+        },{
+          "question": "In Young's double slit experiment, if the slit separation is doubled while keeping other factors constant, what happens to the fringe width?",
+          "options": [
+            "Doubles",
+            "Halves",
+            "Quadruples",
+            "Remains the same"
+          ],
+          "correct": 1,
+          "explanation": "Fringe width Δy = λL/d is inversely proportional to slit separation d. If d is doubled, the fringe width is halved. The fringes become closer together, making the pattern more compressed."
+        }
+      ]
     }
   }
 }
