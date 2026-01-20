@@ -2682,6 +2682,145 @@
           "explanation": "Transformers require changing magnetic flux to induce voltage in secondary coil. DC creates constant magnetic field (dΦ/dt = 0), so no EMF is induced in secondary after initial transient."
         }
       ]
+    },
+    "lc-circuits": {
+      "title": "LC Circuits Quiz",
+      "description": "Test your understanding of LC oscillators, energy exchange in inductors and capacitors, and electromagnetic oscillations",
+      "topic": "LC Circuits",
+      "difficulty": "Hard",
+      "icon": "🔄",
+      "keyConcepts": [
+        "Energy conservation in LC circuits",
+        "Electrical oscillations",
+        "Resonant frequency",
+        "Charge and current phase relationships",
+        "Damped vs undamped oscillations",
+        "Electromechanical analogs"
+      ], 
+      "formulas": [
+        {
+          "equation": "ω = 1/√(LC)",
+          "description": "Angular frequency of LC oscillation"
+        },{
+          "equation": "f = 1/(2π√(LC))",
+          "description": "Resonant frequency"
+        },{
+          "equation": "Q = Q_max cos(ωt + φ)",
+          "description": "Charge oscillation in LC circuits"
+        },{
+          "equation": "I = -ωQ_max sin(ωt + φ)",
+          "description": "Current oscillation in LC circiuts"
+        },{
+          "equation": "U_total = ½LI² + ½Q²/C",
+          "description": "Total energy in LC circuit"
+        },{
+          "equation": "T = 2π√(LC)",
+          "description": "Period of oscillation"
+        }
+      ],
+      "questions": [
+        {
+          "question": "In an ideal Lc circuit, what remains constant over time?",
+          "options": [
+            "Charge on capacitor",
+            "Current through inductor",
+            "Total electromagnetic energy",
+            "Voltage across capacitor"
+          ],
+          "correct": 2,
+          "explanation": "In an ideal LC circuit (no resistance), total energy is conserved and oscillates between capacitor (electric field) and inductor (magnetic field): U_total = ½CV² + ½LI² = constant."
+        },{
+          "question": "Whta is the resonant frequency of an LC circuit with L = 10 mH and C = 100 μF?",
+          "options": [
+            "50 Hz",
+            "159 Hz",
+            "500 Hz",
+            "1590 Hz"
+          ],
+          "correct": 1,
+          "explanation": "f = 1/(2π√(LC)) = 1/(2π√(0.01 × 0.0001)) = 1/(2π√(10⁻⁶)) = 1/(2π × 0.001) = 1/(0.00628) ≈ 159 Hz."
+        },{
+          "question": "When maximum energy is stored in the capacitor in an LC circuit, what is the current through the inductor?",
+          "options": [
+            "Maximum",
+            "Zero",
+            "Half maximum",
+            "Cannot determine"
+          ],
+          "correct": 1,
+          "explanation": "Energy oscillates between capacitor and inductor. When capacitor has maximum energy (Q_max), inductor has zero energy (I = 0). When current is maximum, capacitor has zero charge."
+        },{
+          "question": "What is the phase relationship between charge on capacitor and current in an LC circuit?",
+          "options": [
+            "In phase",
+            "90° out of phase (current leads)",
+            "90° out of phase (charge leads)",
+            "180° out of phase"
+          ],
+          "correct": 2,
+          "explanation": "Current is derivative of charge: I = dQ/dt. For Q = Q_max cos(ωt), I = -ωQ_max sin(ωt) = ωQ_max cos(ωt + 90°). So current leads charge by 90° (or charge leads current by 90°)."
+        },{
+          "question": "What is the derivative of charge: I = dQ/dt. For Q = Q_max cos(ωt), I = -ωQ_max sin(ωt) = ωQ_max cos(ωt + 90°). So current leads charge by 90° (or charge leads current by 90°).",
+          "options": [
+            "T/8",
+            "T/4",
+            "T/2",
+            "T"
+          ],
+          "correct": 1,
+          "explanation": "Energy transfers from capacitor to inductor in quarter period (T/4). Complete energy exchange occurs every T/4. After T/2, energy returns to capacitor but with opposite polarity."
+        },{
+          "question": "What happens if resistance is added to an LC circuit?",
+          "options": [
+            "Frequency increases",
+            "Frequency decreases",
+            "Oscillations become damped",
+            "Energy increases"
+          ],
+          "correct": 2,
+          "explanation": "Resistance causes energy loss through heating, leading to damped oscillations. The resonant frequency decreases slightly: ω' = √(1/(LC) - (R/2L)²) for underdamped case."
+        },{
+          "question": "An LC circuit has C = 25 μF and oscillates at 1000 Hz. What is the inductance L?",
+          "options": [
+            "0.1 mH",
+            "1.0 mH",
+            "10 mH",
+            "100 mH"
+          ],
+          "correct": 1,
+          "explanation": "From f = 1/(2π√(LC)), solve for L: L = 1/(4π²f²C) = 1/(4π² × (1000)² × 25×10⁻⁶) = 1/(4π² × 10⁶ × 2.5×10⁻⁵) ≈ 1/(0.986) ≈ 1.01 mH."
+        },{
+          "question": "In an LC circuit, when current is maximum, what is the voltage across the capacitor?",
+          "options": [
+            "Maximum",
+            "Zero",
+            "Half maximum",
+            "Negative maximum"
+          ],
+          "correct": 1,
+          "explanation": "When current is maximum, all energy is in magnetic field (inductor). Capacitor has zero energy, so Q = 0 and V = Q/C = 0. Voltage and charge are in phase, both zero when current is maximum."
+        },{
+          "question": "What mechanical system is analogous to an LC circuit?",
+          "options": [
+            "Pendulum",
+            "Spring-mass system",
+            "Rotating wheel",
+            "All of the above"
+          ],
+          "correct": 1,
+          "explanation": "LC circuit is analogous to spring-mass system: L ↔ mass (inertia), 1/C ↔ spring constant (restoring force), Q ↔ displacement, I ↔ velocity. Both exhibit simple harmonic oscillation."
+        },{
+          "question": "If capacitance is quadrupled in an LC circuit, what happens to the oscillation period?",
+          "options": [
+            "Doubles",
+            "Halves",
+            "Quadruples",
+            "Reduced to one-fourth"
+          ],
+          "correct": 0,
+          "explanation": "T = 2π√(LC). If C → 4C, then T → 2π√(L×4C) = 2π×2√(LC) = 2× original period. Period doubles when capacitance quadruples."
+        }
+      ]
     }
   }
 }
