@@ -1612,6 +1612,142 @@
           "explanation": "When a glass lens is immersed in water, the relative refractive index (n_glass/n_water) decreases compared to air. From the lens maker's formula, a smaller refractive index difference leads to a longer focal length, making the lens less powerful."
         }
       ]
+    },
+    "doppler-effect": {
+      "title": "Doppler Effect Quiz",
+      "description": "Test your understanding of frequency shifts due to relative motion",
+      "topic": "Doppler Effect",
+      "difficulty": "Medium",
+      "icon": "🔊",
+      "keyConcepts": [
+        "Apparent frequency change",
+        "Source and observer motion",
+        "Doppler shift in sound waves",
+        "Approaching vs receding sources",
+        "Applications in atronomy and medicine"
+      ],
+      "formulas": [
+        {
+          "equation": "f' = f(v ± v₀)/(v ∓ vₛ)",
+          "description": "General Doppler formula"
+        },{
+          "equation": "f' = f(v + v₀)/(v - vₛ)",
+          "description": "Source approaching, observer approaching"
+        },{
+          "equation": "f' = f(v - v₀)/(v + vₛ)",
+          "description": "Source receding, observer receding"
+        },{
+          "equation": "Δf/f = v_rel/v",
+          "description": "Fractional frequency shift (small velocities)"
+        },{
+          "equation": "λ' = λ(v ∓ vₛ)/(v ± v₀)",
+          "description": "Wavelength change"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A fire truck with a 500 Hz siren approaches a stationary observer. What happens to the frequency heard by the observer?",
+          "options": [
+            "Frequency decreases below 500 Hz",
+            "Frequency increases above 500 Hz",
+            "Frequency remains 500 Hz",
+            "Frequency becomes zero"
+          ],
+          "correct": 1,
+          "explanation": "When a source approaches a stationary observer, the observed frequency increases above the source frequency. The sound waves are compressed, resulting in a higher pitch. This is the classic Doppler effect."
+        },{
+          "question": "A car horn emits sound at 400 Hz while moving away from a stationary observer at 20 m/s. What is the observed frequency? (speed of sound = 340 m/s)",
+          "options": [
+            "377 Hz",
+            "400 Hz",
+            "423 Hz",
+            "450 Hz"
+          ],
+          "correct": 0,
+          "explanation": "Using f' = f × v/(v + vₛ) = 400 × 340/(340 + 20) = 400 × 340/360 = 377.8 Hz ≈ 377 Hz. The frequency decreases when the source moves away from the observer."
+        },{
+          "lmao": "lol",
+          "question": "In the Doppler effect formula for sound, what does 'v' represent?",
+          "options": [
+            "Velocity of the source",
+            "Velocity of the observer",
+            "Velocity of sound in the medium",
+            "Relative velocity"
+          ],
+          "correct": 2,
+          "explanation": "In the Doppler formula, 'v' represents the velocity of sound in the medium (e.g., air, water). The source velocity (vₛ) and observer velocity (v₀) are separate variables that modify this base speed."
+        },{
+          "question": "An observer moves toward a stationary sound source emitting 600 Hz. The observer measures 650 Hz. What can you conclude?",
+          "options": [
+            "The observer is moving at the speed of sound",
+            "The observer is moving toward the source",
+            "The source is moving toward the observer",
+            "Both are stationary"
+          ],
+          "correct": 1,
+          "explanation": "The increased frequency (650 > 600 Hz) indicates relative approach. Since the source is stationary, the observer must be moving toward it. When the observer approaches, f' = f(v + v₀)/v > f."
+        },{
+          "question": "What happens to the observed frequency when both source and observer move toward each other?",
+          "options": [
+            "Maximum increase in frequency",
+            "Maximum decrease in frequency",
+            "No change in frequency",
+            "Frequency becomes zero"
+          ],
+          "correct": 0,
+          "explanation": "When both source and observer move toward each other, the Doppler shift is maximized. Using f' = f(v + v₀)/(v - vₛ), both numerator increases and denominator decreases, giving the maximum frequency increase."
+        },{
+          "question": "A train whistle has a frequency of 800 Hz. As the train passes a stationary observer, what change is noticed?",
+          "options": [
+            "Sudden increase in frequency",
+            "Sudden decrease in frequency",
+            "Gradual increase then gradual decrease",
+            "No change"
+          ],
+          "correct": 1,
+          "explanation": "As the train approaches, the frequency is higher. As it recedes, the frequency is lower. At the moment of passing, there's a sudden drop from high to low frequency, creating the characteristic 'whoosh' sound we associate with passing vehicles."
+        },{
+          "question": "The Doppler effect is used in radar guns to measure:",
+          "options": [
+            "Temperature of objects",
+            "Speed of moving objects",
+            "Distance to objects",
+            "Color of objects"
+          ],
+          "correct": 1,
+          "explanation": "Radar guns use the Doppler effect to measure speed. They emit electromagnetic waves and measure the frequency shift of reflected waves. The frequency change is proportional to the object's velocity, allowing speed calculation."
+        },{
+          "question": "A source emits sound at 1000 Hz and moves at 34 m/s toward a stationary observer. What is the observed frequency? (v = 340 m/s)",
+          "options": [
+            "900 Hz",
+            "1000 Hz",
+            "1100 Hz",
+            "1111 Hz"
+          ],
+          "correct": 3,
+          "explanation": "Using f' = f × v/(v - vₛ) = 1000 × 340/(340 - 34) = 1000 × 340/306 ≈ 1111 Hz. The source moving at 10% of sound speed increases frequency by approximately 11%."
+        },{
+          "question": "In astronomy, a galaxy's light is observed to be shifted toward longer wavelengths (redshift). This indicates the galaxy is:",
+          "options": [
+            "Moving toward Earth",
+            "Moving away from Earth",
+            "Stationary relative to Earth",
+            "Rotating"
+          ],
+          "correct": 1,
+          "explanation": "Redshift (shift toward longer wavelengths/lower frequencies) indicates the source is moving away. This is the Doppler effect for light. Most distant galaxies show redshift, evidence for the expanding universe."
+        },{
+          "question": "Which factor does NOT affect the Doppler shift in sound?",
+          "options": [
+            "Velocity of the source",
+            "Velocity of the observer",
+            "Frequency of the source",
+            "Color of the source"
+          ],
+          "correct": 3,
+          "explanation": "The color (appearance) of the source doesn't affect the Doppler shift in sound. The shift depends on: source velocity, observer velocity, sound speed in the medium, and source frequency. Color is irrelevant to acoustic phenomena."
+        }
+      ]
     }
   }
 }
