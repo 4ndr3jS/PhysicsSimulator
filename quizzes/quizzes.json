@@ -2018,6 +2018,144 @@
           "explanation": "Using β = λD/d = (0.1 × 10⁻⁹ × 0.5)/(1 × 10⁻⁶) = 5 × 10⁻¹¹/10⁻⁶ = 5 × 10⁻⁵ m = 50 μm. Even matter waves like electrons produce measurable interference patterns, demonstrating quantum mechanical wave-particle duality."
         }
       ]
+    },
+    "electric-fields": {
+      "title": "Electric Fields Quiz",
+      "description": "Test your understanding of electric fields, forces, annd calculations involving point charges and distributions",
+      "topic": "Electric Fields",
+      "difficulty": "Easy",
+      "icon": "⚡",
+      "keyConcepts": [
+        "Electric field definition and direction",
+        "Coulomb's Law",
+        "Superposition principle",
+        "Field lines and their properties",
+        "Continous charge distributions"
+      ],
+      "formulas": [
+        {
+          "equation": "E = Fq₀",
+          "description": "Electric field definition (force per unit test charge)"
+        },{
+          "equation": "E = k|Q|/r²",
+          "description": "Electric field due to a point charge"
+        },{
+          "equation": "E_dipole = k|q₁q₂|/r²",
+          "description": "Coulomb'x Law (force between point charges)"
+        },{
+          "equation": "E_dipole ≈ kp/r³ (on axis)",
+          "description": "Electric field of a dipole (far field approximation)"
+        },{
+          "equation": "E_line = 2kλ/r",
+          "description": "Electric field due to infinite line charge"
+        },{
+          "equation": "E_sheet = σ/(2ε₀)",
+          "description": "Electric field due to infinite sheet of charge"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A positive test charge placed in an electric field experiences a force to the east. What is the direction of the electric field at that point",
+          "options": [
+            "East",
+            "West",
+            "North",
+            "South"
+          ],
+          "correct": 0,
+          "explanation": "By definition, the electric field direction is the same as the directionm of the force experienced by a positive test charge. Since the force is eastward, the electric field direction is also east."
+        },{
+          "question": "Two point charges, 3 μC and -5 μC, are separated by 0.2 m. What is the magnitude of the force between them? (k = 9 × 10⁹ N·m²/C²)",
+          "options": [
+            "0.675 N",
+            "1.35 N",
+            "3.375 N",
+            "6.75 N"
+          ],
+          "correct": 2,
+          "explanation": "Using Coulomb's Law: F = k|q₁q₂|/r² = (9×10⁹) × (3×10⁻⁶) × (5×10⁻⁶) / (0.2)² = (135×10⁻³)/0.04 = 3.375 N. The charges are opposite, so the force is attractive."
+        },{
+          "question": "A charge of +4 μC is placed at the origin. What is the electric field at a point 0.3 m away along the x-axis?",
+          "options": [
+            "2 × 10⁵ N/C away from the charge",
+            "4 × 10⁵ N/C toward the charge",
+            "4 × 10⁵ N/C away from the charge",
+            "8 × 10⁵ N/C away from the charge"
+          ],
+          "correct": 2,
+          "explanation": "E = kQ/r² = (9×10⁹) × (4×10⁻⁶) / (0.3)² = (36×10³)/0.09 = 4×10⁵ N/C. Since Q is positive, the field points away from the charge."
+        },{
+          "question": "Which of the following statements about electric field lines is FALSE?",
+          "options": [
+            "They never cross each other",
+            "They start on positive charges and end on negative charges",
+            "Their density is proportional to the field strength",
+            "They indicate the path a test charge would follow"
+          ],
+          "correct": 3,
+          "explanation": "Electric field lines show the direction of force on a positive test charge, but not necessarily the path it would follow. The actual path depends on initial velocity and acceleration. The other statements are true properties of field lines."
+        },{
+          "question": "Three charges are arranged at the corners of an equilateral triangle: +q, +q, and -q. What is the direction of the net electric field at the center?",
+          "options": [
+            "Toward the negative charge",
+            "Away from the negative charge",
+            "Zero magnitude",
+            "Tangential to the triangle"
+          ],
+          "correct": 0,
+          "explanation": "The two positive charges produce fields that cancel at the center due to symmetry. The negative charge produces a field pointing toward itself. Thus, the net field points toward the negative charge."
+        },{
+          "question": "What is the electric field at a distance r from an infinitely long straight wire with uniform linear charge density λ?",
+          "options": [
+            "kλ/r, radial outward",
+            "2kλ/r, radial outward",
+            "kλ/r², radial outward",
+            "2kλ/r², radial outward"
+          ],
+          "correct": 1,
+          "explanation": "For an infinite line charge, E = 2kλ/r, directed radially outward from the wire if λ is positive. This result comes from integrating contributions from infinitesimal charge elements along the wire."
+        },{
+          "question": "An electric dipole consists of charges +q and -q separated by distance d. What is the electric field at a point on the perpendicular bisector, far from the dipole?",
+          "options": [
+            "Proportional to 1/r",
+            "Proportional to 1/r²",
+            "Proportional to 1/r³",
+            "Proportional to 1/r⁴"
+          ],
+          "correct": 2,
+          "explanation": "Along the perpendicular bisector of a dipole, the field magnitude is E = kp/r³, where p = qd is the dipole moment. The dipole field falls off faster (1/r³) than a point charge field (1/r²)."
+        },{
+          "question": "Two parallel plates with equal but opposite surface charge densities ±σ are separated by a small distance. What is the electric field between the plates?",
+          "options": [
+            "σ/ε₀, from positive to negative",
+            "σ/(2ε₀), from positive to negative",
+            "σ/ε₀, from negative to positive",
+            "Zero everywhere"
+          ],
+          "correct": 0,
+          "explanation": "For parallel plates with surface charge densities ±σ, the fields add between plates: E = σ/(2ε₀) + σ/(2ε₀) = σ/ε₀, directed from the positive to the negative plate. Outside the plates, the fields cancel."
+        },{
+          "question": "A charge q is placed at the center of a cube. What is the electric flux through one face of the cube?",
+          "options": [
+            "q/(6ε₀)",
+            "q/(4ε₀)",
+            "q/(2ε₀)",
+            "q/ε₀"
+          ],
+          "correct": 0,
+          "explanation": "By Gauss's Law, total flux through the closed cube is q/ε₀. Due to symmetry, the flux is equally distributed through all 6 faces. Therefore, flux through one face = (q/ε₀)/6 = q/(6ε₀)."
+        },{
+          "question": "What happens to the electric field strength between two point charges when the distance between them is tripled?",
+          "options": [
+            "Increases by factor of 3",
+            "Decreases by factor of 3",
+            "Increases by factor of 9",
+            "Decreases by factor of 9"
+          ],
+          "correct": 3,
+          "explanation": "The electric field due to a point charge follows an inverse square law: E ∝ 1/r². When distance triples (r → 3r), the field becomes E' ∝ 1/(3r)² = 1/(9r²), so it decreases by a factor of 9."
+        }
+      ]
     }
   }
 }
