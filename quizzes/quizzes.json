@@ -2821,6 +2821,135 @@
           "explanation": "T = 2π√(LC). If C → 4C, then T → 2π√(L×4C) = 2π×2√(LC) = 2× original period. Period doubles when capacitance quadruples."
         }
       ]
+    },
+    "ideal-gas-law": {
+      "title": "Ideal Gas Law Quiz",
+      "description": "Test your understanding of the ideal gas kaw, gas properties and thermodynamic relastionship",
+      "topic": "Ideal Gas Law",
+      "difficulty": "Easy",
+      "icon": "💨",
+      "keyConcepts": [
+        "Ideal Gas equation",
+        "Moles and Avogadro's number",
+        "Gas constants (R values)",
+        "Standard temperature and pressure",
+        "Partial pressures and Dalton's Law",
+        "Kinetic theory of gases"
+      ],
+      "formulas": [
+        {
+          "equation": "PV = nRT",
+          "description": "THE ideal gas law"
+        },{
+          "equation": "PV = nkT",
+          "description": "Ideal gas law, with the Boltzmann constant"
+        },{
+          "equation": "P_total = P₁ + P₂ + ...",
+          "description": "Dalton's Law of partial pressures"
+        },{
+          "equation": "v_rms = √(3RT/M)",
+          "description": "Root mean square speed of gas molecules"
+        },{
+          "equation": "KE_avg = (3/2)kT",
+          "description": "Average kinetic energy per molecule"
+        },{
+          "equation": "P₁V₁/T₁ = P₂V₂/T₂",
+          "description": "Combined gas law (constant amount of gas)"
+        }
+      ],
+      "questions": [
+        {
+          "question": "What is the volume of 1 mole of an ideal gas at STP (Standard Temperature and Pressure)?",
+          "options": [
+            "22. 4 L",
+            "24.5 L",
+            "22.4 mL",
+            "24.5 mL"
+          ],
+          "correct": 0,
+          "explanation": "At STP (0°C = 273.15 K and 1 atm), 1 mole of ideal gas occupies 22.4 L. This is a fundamental constant derived from PV = nRT with R = 0.0821 L·atm/mol·K."
+        },{
+          "question": "If the temperature of a fixed amount of ideal gas is doubled while pressure is held constant, what happens to its volume?",
+          "options": [
+            "Doubles",
+            "Halves",
+            "Quadruples",
+            "Stays the same"
+          ],
+          "correct": 0,
+          "explanation": "From ideal gas law: PV = nRT. If P constant and n constant, then V ∝ T. So doubling T doubles V (Charles' Law)."
+        },{
+          "question": "What is the value of the ideal gas constant R in /(mol·K)?",
+          "options": [
+            "0.08216",
+            "1.382",
+            "8.314",
+            "62.44"
+          ],
+          "correct": 2,
+          "explanation": "R = 8.314 J/(mol·K). Other common values: 0.0821 L·atm/(mol·K) and 62.4 L·torr/(mol·K). 1.38 × 10^-23 J/K is Boltzmann constant k."
+        },{
+          "question": "A gas mixture contains 0.2 mol O₂, 0.3 mol N₂, and 0.5 mol CO₂ at total pressure 2 atm. What is partial pressure of O₂?",
+          "options": [
+            "0.2 atm",
+            "0.4 atm",
+            "0.6 atm",
+            "1.0 atm"
+          ],
+          "correct": 1,
+          "explanation": "Dalton's law states that P_O₂ = X_O₂ × P_total, where X_O₂ = 0.2/(0.2+0.3+0.5) = 0.2. So P_O₂ = 0.2 × 2 atm = 0.4 atm."
+        },{
+          "question": "What is the average kinetc energy of an ideal gas molecule at temperature T?",
+          "options": [
+            "(1/2)kT",
+            "kT",
+            "(3/2)kT",
+            "2kT"
+          ],
+          "correct": 2,
+          "explnation": "From kinetic theory, average translational KE per molecule = (3/2)kT, where k is Boltzmann constant. For one mole: KE_total = (3/2)RT."
+        },{
+          "question": "A balloon contains 0.5 mol of gas at 25°C and 1 atm. What is its volume? (R = 0.0821 L·atm/mol·K)",
+          "options": [
+            "153 m/s",
+            "267 m/s",
+            "483 m/s",
+            "692 m/s"
+          ],
+          "correct": 2,
+          "explanation": "v_rms = √(3RT/M) = √(3 × 8.31 × 300 / 0.032) = √(7479/0.032) = √(233,719) ≈ 483 m/s. Note: M must be in kg/mol (0.032 kg/mol)."
+        },{
+          "question": "A gas at 2 atm pressure and 300 K occupies 5 L. If compressed to 2.5 L at 400 K, what is the new pressure?",
+          "options": [
+            "2.67 atm",
+            "5.33 atm",
+            "8.00 atm",
+            "10.67 atm"
+          ],
+          "correct": 1,
+          "explanation": "Using combined gas law: P₁V₁/T₁ = P₂V₂/T₂. P₂ = P₁V₁T₂/(V₂T₁) = (2 × 5 × 400)/(2.5 × 300) = 4000/750 = 5.33 atm." 
+        },{
+          "question": "Which assumption is NOT part of the kinetic theory of ideal gases?",
+          "options": [
+            "Molecules have negligible volume",
+            "Molecules undergo elastic collisions",
+            "Molecules have intermolecular forces",
+            "Molecular motion is random"
+          ],
+          "correct": 2,
+          "explanation": "Ideal gas assumptions: 1) Negligible volume, 2) No intermolecular forces (except during collisions), 3) Elastic collisions, 4) Random motion. Real gases deviate at high P/low T."
+        },{
+          "question": "At what temperature do Celsius and Kelvin scales give the same numerical value for ideal gas pressure (with fixed volume and moles)?",
+          "options": [
+            "-273°C",
+            "0°C",
+            "100°C",
+            "Never the same"
+          ],
+          "correct": 3,
+          "explanation": "From PV = nRT, P ∝ T (Kelvin). Since T_K = T_C + 273, they can never be numerically equal because that would require T = T + 273, which is impossible. 0°C = 273 K, -273°C = 0 K."
+        }
+      ]
     }
   }
 }
