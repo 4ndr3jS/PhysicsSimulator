@@ -1480,6 +1480,138 @@
           "explanation": "Fringe width Δy = λL/d is inversely proportional to slit separation d. If d is doubled, the fringe width is halved. The fringes become closer together, making the pattern more compressed."
         }
       ]
+    },
+    "lens-refraction": {
+      "title": "Refraction & Snell's law",
+      "description": "Test your understanding of lens behavior, image formation, and optical properties",
+      "topic": "Lens Refraction",
+      "difficulty": "Medium",
+      "icon": "🔍",
+      "keyConcepts": [
+        "Converging and diverging lenses",
+        "Lens formula and magnification",
+        "Image characteristics (real/virtual, inverted/upright)",
+        "Ray diagram and principal rays",
+        "Power of lens and focal length"
+      ],
+      "formulas": [
+        {
+          "equation": "1/f = 1/v - 1/u",
+          "description": "Lens formula"
+        },{
+          "equation": "m = v/u = h'/h",
+          "description": "Magnification"
+        },{
+          "equation": "1/f = (n-1)(1/R₁ - 1/R₂)",
+          "description": "Lens maker's formula"
+        },{
+          "equation": "P_total = P₁ + P₂",
+          "description": "Power of lenses in contact"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A convex lens has a focal length of 20 cm. An object is placed 30 cm from the lens. Where is the image formed?",
+          "options": [
+            "60 cm on the same side",
+            "60 cm on the opposite side",
+            "12 cm on the same side",
+            "12 cm on the opposite side"
+          ],
+          "correct": 1,
+          "explanation": "Using 1/f = 1/v - 1/u: 1/20 = 1/v - 1/(-30), so 1/v = 1/20 - 1/30 = 3/60 - 2/60 = 1/60, giving v = 60 cm. The positive value indicates a real image on the opposite side of the lens."
+        },{
+          "question": "What type of image is formed by a convex lens when the object is placed between the focal point and the lens",
+          "options": [
+            "Real, inverted, and magnified",
+            "Real, upright, and diminished",
+            "Virtual, upright, and magnified",
+            "Virtual, inverted, and diminished"
+          ],
+          "correct": 2,
+          "explanation": "WHen an object is placed between F and the lens (u < f), a convex lens produces a virtual, upright, and magnified image. This is how magnifying glasses work. The image appears on the same side as the object."
+        },{
+          "question": "A concave lens has a focal length of -15cm. What is its power?",
+          "options": [
+            "+6.67 D",
+            "-6.67 D",
+            "+15 D",
+            "-15 D"
+          ],
+          "correct": 1,
+          "explanation": "Power P = 1/f = 1/(-0.15 m) = -6.67 D. The negative sign indicates a diverging (concave) lens. Power is mesured in diopters (D), which is m⁻¹."
+        },{
+          "question": "Which statement is true about concave lenses?",
+          "options": [
+            "They always form real images",
+            "They always form virtual images",
+            "They can form both real and virtual images",
+            "They cannot form any images"
+          ],
+          "correct": 1,
+          "explanation": "Concave (diverging) lenses always form virtual, upright, and diminished images regardless of object position. The diverging rays appear to come from a virtual focal point on the same side as the object."
+        },{
+          "question": "An object of height 5 cm produces an image of height 15 cm. What is the magnification?",
+          "options": [
+            "+3",
+            "-3",
+            "+0.33",
+            "-0.33"
+          ],
+          "correct": 0,
+          "explanation": "Magnification m = h'/h = 15/5 = 3. If the image is upright, m = +3 (typical for virtual images). If inverted, m = -3. The question states heights without direction, so the positive value indicates the magnitude is 3 times."
+        },{
+          "question": "Two thin lenses of power +5 D and +3 D are placed in contact. What is the power of the combination?",
+          "options": [
+            "+2 D",
+            "+8 D",
+            "+15 D",
+            "+1.875 D"
+          ],
+          "correct": 1,
+          "explanation": "For thin lenses in contact, P_total =  P₁ + P₂ = 5 D + 3 D = 8 D."
+        },{
+          "question": "A convex lens forms a real, inverted image of the same size as the object. What is the object located?",
+          "options": [
+            "At F (focal point)",
+            "At 2F (twice the focal length)",
+            "Between F and 2F",
+            "Beyond 2F"
+          ],
+          "correct": 1,
+          "explanation": "When m = -1 (same size, inverted), the object is at 2F. Both object distance and image distance equal 2f, making u = v = 2f. This is a special case where the image and object are equidistant from the lens."
+        },{
+          "question": "Which ray always passes through the optical center of a lens without bending?",
+          "options": [
+            "Ray parallel to principal axis",
+            "Ray passing through focal point",
+            "Ray passing through optical center",
+            "Ray perpendicular to the lens surface"
+          ],
+          "correct": 2,
+          "explanation": "A ray passing through the optical center of a thin lens passes straight through without deviation. This is one of the three principal rays used in ray diagrams for image construction."
+        },{
+          "question": "A lens has a focal length of 25 cm. An object is placed at infinity. Where will the image form?",
+          "options": [
+            "At infinity",
+            "At the focal point (25 cm)",
+            "At twice the focal length (50 cm)",
+            "No image is formed"
+          ],
+          "correct": 1,
+          "explanation": "When an object is at infinity (u = ∞), parallel rays from the object converge at the focal point after passing through the lens. Thus, the image forms at F, which is 25 cm from the lens."
+        },{
+          "question": "What happens to the focal length of a convex lens when it is immersed in water (n = 1.33) instead of air?",
+          "options": [
+            "Focal length decreases",
+            "Focal length increases",
+            "Focal length remains the same",
+            "The lens becomes diverging"
+          ],
+          "correct": 1,
+          "explanation": "When a glass lens is immersed in water, the relative refractive index (n_glass/n_water) decreases compared to air. From the lens maker's formula, a smaller refractive index difference leads to a longer focal length, making the lens less powerful."
+        }
+      ]
     }
   }
 }
