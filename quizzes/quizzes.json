@@ -1748,6 +1748,141 @@
           "explanation": "The color (appearance) of the source doesn't affect the Doppler shift in sound. The shift depends on: source velocity, observer velocity, sound speed in the medium, and source frequency. Color is irrelevant to acoustic phenomena."
         }
       ]
+    },
+    "thin-film-interference": {
+      "title": "Thin Film Interefernce Quiz",
+      "description": "Test your understanding of interference in thin film and optical coatings",
+      "topic": "Thin Film Interference",
+      "difficulty": "Medium",
+      "icon": "🫧",
+      "keyConcepts": [
+        "Phase change on reflection",
+        "Optical path difference",
+        "Constructive and destructive interference",
+        "Anti-reflective coatings",
+        "Colors in soap bubbles and oil films"
+      ],
+      "formulas": [
+        {
+          "equation": "2nt = mλ",
+          "description": "Constructive interference(with phase change)"
+        },{
+          "equation": "2nt = (m + ½)λ",
+          "description": "Destructive interference (with phase change)"
+        },{
+          "equation": "Δφ = π",
+          "description": "Phase change at denser medium"
+        },{
+          "equation": "OPD = 2nt cos(r)",
+          "description": "Optical path difference (at angle)"
+        },{
+          "equation": "t_min = λ/(4n)",
+          "description": "Minimum thickness for constructive interference"
+        }
+      ],
+      "questions": [
+        {
+          "question": "When does a phase change of π (or 180°) occur during reflection?",
+          "options": [
+            "When light reflects from a less dense mdium",
+            "When light reflects from a denser medium",
+            "Phase change always occurs",
+            "Phase change never occurs"
+          ],
+          "correct": 1,
+          "explanation": "A phase change of π (or 180°) occurs when light reflects fro a medium with higher refractive index (denser medium). No phase change occurs when reflecting from a less dense medium. This is crucial for thin film interference calculations."
+        },{
+          "question": "A soap film ( n = 1.33) in air appears dark in reflected light at a certain point. What is the minimum thickness at that point for λ = 600 nm?",
+          "options": [
+            "113 nm",
+            "225 nm",
+            "450 nm",
+            "600 nm"
+          ],
+          "correct": 0,
+          "explanation": "For a film with both surfaces having phase change (or neither), destructive interference occurs at 2nt = (m + ½)λ. For minimum thickness (m = 0): t = λ/(4n) = 600/(4 × 1.33) ≈ 113 nm. This gives the thinnest dark region."
+        },{
+          "question": "What causes the colorful patterns seen in soap bubbles?",
+          "options": [
+            "Dispersion",
+            "Diffraction",
+            "Thin film interference",
+            "Polarization"
+          ],
+          "correct": 2,
+          "explanation": "The colors in soap bubbles result from thin film interference. Light reflecting from the top and bottom surfaces of the soap film interferes. Different wavelengths (colors) constructively interfere at different thicknesses, creating the colorful patterns."
+        },{
+          "question": "An anti-reflective coating (n = 1.38) is applied to glass (n = 1.52). For minimum reflection at λ = 550 nm, what should be the coating thickness?",
+          "options": [
+            "100 nm",
+            "200 nm",
+            "275 nm",
+            "550 nm"
+          ],
+          "correct": 0,
+          "explanation": "For anti-reflective coating, we want destructive interference. With one phase change (at air-coating interface), 2nt = (m + ½)λ. For minimum thickness (m = 0): t = λ/(4n) = 550/(4 × 1.38) ≈ 100 nm."
+        },{
+          "question": "A thin film of oil (n = 1.45) on water (n = 1.33) appears bright for a certain wavelength. Which condition applies?",
+          "options": [
+            "2nt = mλ (constructive with phase change)",
+            "2nt = (m + ½)λ (destructive with phase change)",
+            "2nt = mλ (no phase change)",
+            "Cannot determine without thickness"
+          ],
+          "correct": 0,
+          "explanation": "Light reflects from air-oil (less to more dense: phase change) and oil-water (more to less dense: no phase change). With one phase change, constructive interference requires 2nt = mλ for brightness."
+        },{
+          "question": "Why do oil slicks on water display rainbow colors?",
+          "options": [
+            "Oil is naturally colored",
+            "Different wavelengths interfere constructively at different points",
+            "Oil disperses light like a prism",
+            "Water beneath reflects different colors"
+          ],
+          "correct": 1,
+          "explanation": "The varying thickness of the oil film causes different wavelengths to constructively interfere at different locations. Where the film thickness satisfies 2nt = mλ for red light, it appears red; where it satisfies the condition for blue, it appears blue, etc."
+        },{
+          "question": "A film of thickness 200 nm with n = 1.5 is illuminated with white light. Which wavelength experiences constructive interference (m = 1) in reflection? (Assume one phase change)",
+          "options": [
+            "400 nm",
+            "600 nm",
+            "800 nm",
+            "1200 nm"
+          ],
+          "correct": 1,
+          "explanation": "With one phase change, constructive interference: 2nt = mλ. For m = 1: λ = 2nt = 2 × 1.5 × 200 = 600 nm. This wavelength (orange-red) will be strongly reflected."
+        },{
+          "question": "What happens to the interference pattern in a thin film as the film thickness increases?",
+          "options": [
+            "Pattern disappears",
+            "Fringes become more widely spaced",
+            "Fringes become more closely spaced",
+            "No change in pattern"
+          ],
+          "correct": 2,
+          "explanation": "As thickness increases, more wavelengths satisfy the interference conditions within a given area. The fringes (regions of constructive/destructive interference) become more closely spaced. This is why thicker soap films show more intricate color patterns."
+        },{
+          "question": "A Newton's rings experiment shows dark spot at the center when viewed in reflected light. This indicates:",
+          "options": [
+            "Zero thickness with destructive interference",
+            "Maximum thickness",
+            "No interference occurring",
+            "The glass is opaque"
+          ],
+          "correct": 0,
+          "explanation": "At the center where the lens touches the flat glass, thickness t = 0. With one phase change at the bottom surface, the optical path difference is just π (phase change), causing destructive interference and a dark spot."
+        },{
+          "question": "For a thin film in air with refractive index n > 1, how many phase changes occur for reflected light?",
+          "options": [
+            "None",
+            "One (at top surface)",
+            "One (at bottom surface)",
+            "Two (at both surfaces)"
+          ],
+          "correct": 1,
+          "explanation": "For a film in air: light reflecting from the top surface goes from less dense (air) to more dense (film), causing a phase change. Light reflecting from the bottom surface goes from more dense (film) to less dense (air), causing no phase change. Total: one phase change."
+        }
+      ]
     }
   }
 }
