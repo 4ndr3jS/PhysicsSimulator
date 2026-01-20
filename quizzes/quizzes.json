@@ -2554,6 +2554,134 @@
           "explanation": "For conventional current (positive charge flow) to right, v is right. B into page gives F = q(v × B) upward for positive charges. So positive charges accumulate at top, creating Hall voltage with top positive."
         }
       ]
+    },
+    "electric-induction": {
+      "title": "Electromagnetic Induction Quiz",
+      "description": "Test your understanding of Faraday's Law, Lenz's Law, and electromagnetic induction phenomena",
+      "topic": "Electromagnetic Induction",
+      "difficulty": "Medium",
+      "icon": "⚙️",
+      "keyConcepts": [
+        "Faraday's Law of Induction",
+        "Lenz's Law and direction of induced current",
+        "Motional EMF",
+        "Self-inductance and mutual inductance",
+        "Eddy currents",
+        "Transformers and generators"
+      ],
+      "formulas": [
+        {
+          "equation": "ε = -dΦ_B/dt",
+          "description": "Faraday's Law of Induction (with Lenz's Law sign)"
+        },{
+          "equation": "Φ_B = ∫B·dA",
+          "description": "Magnetic flux through a surface"
+        },{
+          "equation": "ε = Bℓv",
+          "description": "Motional EMF for moving conductor"
+        },{
+          "equation": "ε = -L dI/dt",
+          "description": "Self-induced EMF in an inductor"
+        },{
+          "equation": "U = ½LI²",
+          "description": "Energy stored in an inductor"
+        },{
+          "equation": "V_p/V_s = N_p/N_s",
+          "description": "Transformer voltage ratio"
+        }
+      ],
+      "questions": [
+        {
+          "question": "According to Faraday's Law, what induces an EMF in a circuit?",
+          "options": [
+            "A constant magnetic field",
+            "A changing magnetic field",
+            "A constant electric field",
+            "A changing electric field"
+          ],
+          "correct": 0,
+          "explanation": "Lenz's Law: induced current opposes the change. North pole approaching increases flux into loop. To oppose this, induced current creates field pointing away (north pole facing magnet), which requires clockwise current (right-hand rule)."
+        },{
+          "question": "A 0.5 m wire moves at 4 m/s perpendicular to a 0.2 T magnetic field. What is the induced EMF?",
+          "options": [
+            "0.04 V",
+            "0.4 V",
+            "4.0 V",
+            "40 V"
+          ],
+          "explanation": "Motional EMF: ε = Bℓv = 0.2 × 0.5 × 4 = 0.4 V. This works when v, B, and wire are mutually perpendicular."
+        },{
+          "question": "The magnetic flux though a coil changes from 0.02 Wb to 0.08Wb in 0.3 seconds. What is the magnitude of induced EMF in a 100-turn coil?",
+          "options": [
+            "2 V",
+            "20 V",
+            "60 V",
+            "200 V"
+          ],
+          "correct": 1,
+          "explanation": "|ε| = N|ΔΦ/Δt| = 100 × |(0.08 - 0.02)/0.3| = 100 × (0.06/0.3) = 100 × 0.2 = 20 V. The negative sign from Lenz's Law gives direction, not magnitude."
+        },{
+          "question": "What does Lenz's Law state about the direction of induced current?",
+          "options": [
+            "It enhances the change causing it",
+            "It opposes the change causing it",
+            "It follows the right-hand rule regardless",
+            "It is random and unpredictable"
+          ],
+          "correct": 1,
+          "explanation": "Lenz's Law: The direction of induced current is such that it opposes the change in magnetic flux that produced it. This is a consequence of energy conservation."
+        },{
+          "question": "A coil has self-inductance 0.2 H. If the current changes from 3 A to 0 A in 0.01 s, what is the magnitude of self-induced EMF?",
+          "options": [
+            "6 V",
+            "60 V",
+            "600 V",
+            "6000 V"
+          ],
+          "correct": 1,
+          "explanation": "|ε| = L|ΔI/Δt| = 0.2 × |(0 - 3)/0.01| = 0.2 × 300 = 60 V. The induced EMF opposes the decrease in current."
+        },{
+          "question": "A transformer has 100 primary turns and 400 secondary turns. If input voltage is 120 V AC, what is output voltage?",
+          "options": [
+            "30 V",
+            "120 V",
+            "480 V",
+            "1200 V"
+          ],
+          "correct": 2,
+          "explanation": "V_s/V_p = N_s/N_p, so V_s = V_p × (N_s/N_p) = 120 × (400/100) = 120 × 4 = 480 V. This is a step-up transformer."
+        },{
+          "question": "What are eddy currents?",
+          "options": [
+            "Currents induced in bulk conductors by changing magnetic fields",
+            "Currents flowing in wires only",
+            "Ocean currents affecting magnetic fields",
+            "Steady currents in superconductors"
+          ],
+          "correct": 0,
+          "explanation": "Eddy currents are circulating currents induced in bulk conductors when exposed to changing magnetic fields. They cause energy loss through heating and are used in magnetic braking."
+        },{
+          "question": "A square loop of side 0.1 m is perpendicular to a magnetic field that increases from 0 to 0.5 T in 0.2 s. What is induced EMF?",
+          "options": [
+            "0.0025 V",
+            "0.025 V",
+            "0.25 V",
+            "2.5 V"
+          ],
+          "correct": 1,
+          "explanation": "Area = (0.1)² = 0.01 m². ΔΦ = B_final × A - B_initial × A = 0.5×0.01 - 0 = 0.005 Wb. |ε| = |ΔΦ/Δt| = 0.005/0.2 = 0.025 V."
+        },{
+          "question": "Why can't a transformer work with DC voltage?",
+          "options": [
+            "DC creates too much heat",
+            "DC magnetic field doesn't change",
+            "DC would short circuit the transformer",
+            "DC reverses polarity too slowly"
+          ],
+          "correct": 1,
+          "explanation": "Transformers require changing magnetic flux to induce voltage in secondary coil. DC creates constant magnetic field (dΦ/dt = 0), so no EMF is induced in secondary after initial transient."
+        }
+      ]
     }
   }
 }
