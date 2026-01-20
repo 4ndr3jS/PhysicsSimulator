@@ -2428,6 +2428,132 @@
           "explanation": "From r = mv/(qB), we get q/m = v/(rB) = 10^6/(0.1 × 0.5) = 10^6/0.05 = 2 × 10^7 C/kg. This is a mass spectrometer principle."
         }
       ]
+    },
+    "lorentz-force": {
+      "title": "Lorentz Force Quiz",
+      "description": "Test your understanding of Lorentz force law, which describes the force on charged particles in electromagnetic fields",
+      "topic": "Lorentz Force",
+      "difficulty": "Medium",
+      "icon": "🌀",
+      "keyConcepts": [
+        "Lorentz force equation",
+        "Cross product in force calculation",
+        "Motion in combined E and B fields",
+        "Velocity selector",
+        "Mass spectrometer principle",
+        "Hall effect"
+      ],
+      "formulas": [
+        {
+          "equation": "F = q(E + v × B)",
+          "description": "Complete Lorentz force law"
+        },{
+          "equation": "F_magnetic = q(v × B)",
+          "description": "Magnetic component of Lorentz force"
+        },{
+          "equation": "F_electric = qE",
+          "description": "Electric component of Lorentz force"
+        },{
+          "equation": "v = E/B",
+          "description": "Velocity selector condition"
+        },{
+          "equation": "r = mv/(qB)",
+          "description": "Cyclotron radius"
+        }
+      ],
+      "questions": [
+        {
+          "question": "What is the direction of the magnetic force on a positive charge moving east in a magnetic field pointing north?",
+          "options": [
+            "Upward",
+            "Downward",
+            "West",
+            "South"
+          ],
+          "correct": 0,
+          "explanation": "Using the famous right-hand rule: fingers point east (velocity), curl toward north (B-field), thumb points upward (force direction). For positive charges, use right hand; for negative, use left hand or reverse direction."
+        },{
+          "question": "A proto moves with velocity v in a region where E = 0 but B ≠ 0. Which statement is always true?",
+          "options": [
+            "The proton accelerates in direction of v",
+            "The proton moves in a straight line",
+            "The proton's kinetic energy remains constant",
+            "Doesn't make sense, this is a trick question."
+          ],
+          "correct": 2,
+          "explanation": "This is not a trick question, magnetic force is always perpendicular to velocity, so it does no work. Thus, kinetic energy (and speed) remains constant. The proton undergoes circular or helical motion, not straight line unless v is parallel to B."
+        },{
+          "question": "In a velocity selector, electric and magnetic fields are perpendicular. What velocity passes through undeflected?",
+          "options": [
+            "E/B",
+            "B/E",
+            "qE/B",
+            "qB/E"
+          ],
+          "correct": 0,
+          "explanation": "For undeflected motion, electric force qE must equal magnetic force qvB, giving v = E/B. This works when v, E, and B are mutually perpendicular with E perpendicular to B and v perpendicular to both."
+        },{
+          "question": "An electron enters a region with E pointing up and B pointing north. To go straight through, its velocity should be: ",
+          "options": [
+            "East",
+            "West",
+            "Up",
+            "Down"
+          ],
+          "correct": 1,
+          "explanation": "For straight motion, forces must balance: qE = q(v × B). With E up and B north, v must be west for v × B to point upward (using right-hand rule). East would give downward v × B, opposite to E."
+        },{
+          "question": "What is the work done by the magnetic force on a charged particle?",
+          "options": [
+            "qB/m",
+            "mv/(qB)",
+            "qB/(mv)",
+            "m/(qB)"
+          ],
+          "correct": 0,
+          "explanation": "Cyclotron frequency ω_c = v/r, and r = mv/(qB), so ω_c = v/(mv/(qB)) = qB/m. Notably, this frequency is independent of velocity - all particles with same q/m rotate at same frequency."
+        },{
+          "question": "In a mass spectrometer, ions with the same charge but different masses are accelerated through the same voltage. Which has a larger radius in the magnetic field?",
+          "options": [
+            "Lighter ion",
+            "Heavier ion",
+            "Same raduis",
+            "Cannot determine"
+          ],
+          "correct": 1,
+          "explanation": "From energy: qV = ½mv², so v = √(2qV/m). Radius r = mv/(qB) = m/(qB) × √(2qV/m) = √(2mV/q)/B. So r ∝ √m - heavier ions have larger radii."
+        },{
+          "question": "A charged particle moves in helical path in a magnetic field. What determines the pitch of the helix?",
+          "options": [
+            "Only parallel velocity component",
+            "Only perpendicular velocity component",
+            "Both velocity components",
+            "Magnetic field strength only"
+          ],
+          "correct": 0,
+          "explanation": "Helical motion results from velocity having both parallel (v_∥) and perpendicular (v_⊥) components to B. The pitch = v_∥ × T = v_∥ × (2πm/(qB)). So pitch depends only on v_∥, while radius depends on v_⊥."
+        },{
+          "question": "For a particle to experience maximum magnetic force, what should be the angle between v and B?",
+          "options": [
+            "0°",
+            "45°",
+            "90°",
+            "180°"
+          ],
+          "correct": 2,
+          "explanation": "F_magnetic = qvB sinθ, maximum when sinθ = 1, i.e., θ = 90° (v perpendicular to B). At θ = 0° or 180°, sinθ = 0 and force is zero."
+        },{
+          "question": "In Hall effect, which side of a conductor becomes positive when current flows right in a magnetic field pointing into the page?",
+          "options": [
+            "Top",
+            "Bottom",
+            "Left",
+            "Right"
+          ],
+          "correct": 0,
+          "explanation": "For conventional current (positive charge flow) to right, v is right. B into page gives F = q(v × B) upward for positive charges. So positive charges accumulate at top, creating Hall voltage with top positive."
+        }
+      ]
     }
   }
 }
