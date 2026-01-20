@@ -2156,6 +2156,142 @@
           "explanation": "The electric field due to a point charge follows an inverse square law: E ∝ 1/r². When distance triples (r → 3r), the field becomes E' ∝ 1/(3r)² = 1/(9r²), so it decreases by a factor of 9."
         }
       ]
+    },
+    "capacitors": {
+      "title": "Capacitors Quiz",
+      "description": "Test your understanding of capacitors, capacitance, energy storage, and circuit combinations",
+      "topic": "Capacitors",
+      "difficulty": "Medium",
+      "icon": "🔋",
+      "keyConcepts": [
+        "Capacitance definition",
+        "Parallel plate capacitor",
+        "Series and parallel combinations",
+        "Energy stored in capacitors",
+        "Dielectrics and their effects",
+        "Charging and discharging proccesses"
+      ],
+      "formulas": [
+        {
+          "equation": "C = Q/V",
+          "description": "Capacitance definition (charge per unit voltage)"
+        },{
+          "equation": "C = ε₀A/d",
+          "description": "Capacitance of parallel plate capacitor"
+        },{
+          "equation": "U = ½CV² = ½Q²/C = ½QV",
+          "description": "Energy stored in a capacitor"
+        },{
+          "equation": "E_eq = C₁ + C₂ + ...",
+          "description": "Equivalent capacitance for parallel combination"
+        },{
+          "equation": "1/C_eq = 1/C₁ + 1/C₂ + ...",
+          "description": "Equivalent capacitance for series combination"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A parallel plate capacitor has plates of area 0.1 m² separated by 1 mm. What is its capacitance in vacuum (ε₀ = 8.85 × 10⁻¹² F/m)",
+          "options": [
+            "8.85 pF",
+            "88.5 pF",
+            "885 pF",
+            "8.85 nF"
+          ],
+          "correct": 2,
+          "explanation": "C = ε₀A/d = (8.85×10⁻¹² × 0.1)/(0.001) = 8.85×10⁻¹³/0.001 = 8.85×10⁻¹⁰ F = 885 pF. Note: 1 pF = 10⁻¹² F."
+        },{
+          "question": "Two capacitors, 3μF and 6 μF, are connected in parallel across a 12 V battery. What is the total charge stored?",
+          "options": [
+            "36 μC",
+            "72 μC",
+            "108 μC",
+            "144 μC"
+          ],
+          "correct": 2,
+          "explanation": "Parallel combination: C_eq = 3 + 6 = 9 μF. Total charge Q = C_eqV = 9 μF × 12 V = 108 μC. In parallel, each capacitor gets the full voltage."
+        },{
+          "question": "A capacitor stores 20 μC of charge when connected to a 10 V battery. What is its capacitance?",
+          "options": [
+            "0.5 μF",
+            "2 μF",
+            "5 μF",
+            "20 μF"
+          ],
+          "correct": 1,
+          "explanation": "Using C = Q/V = (20×10⁻⁶ C)/(10 V) = 2×10⁻⁶ F = 2 μF. This is the basic definition of capacitance."
+        },{
+          "question": "A 100 μF capacitor is charged to 50 V. How much energy is stored?",
+          "options": [
+            "0.125 J",
+            "0.25 J",
+            "0.5 J",
+            "1.0 J"
+          ],
+          "correct": 0,
+          "explanation": "U = ½CV² = 0.5 × (100×10⁻⁶) × (50)² = 0.5 × 10⁻⁴ × 2500 = 0.125 J. Alternatively, U = ½QV where Q = CV = 5 mC."
+        },{
+          "question": "Three identical capacitors C are connected in series. What is their equivalent capacitance?",
+          "options": [
+            "C/3",
+            "C/√3",
+            "3C",
+            "C³"
+          ],
+          "correct": 0,
+          "explanation": "For series capacitors: 1/C_eq = 1/C + 1/C + 1/C = 3/C. Therefore, C_eq = C/3. Series combinations always give smaller equivalent capacitance than individual capacitors."
+        },{
+          "question": "A dielectric material with k = 4 is inserted between the plates of a charged capacitor (disconnected from a battery). What happens to the voltage?",
+          "options": [
+            "Increases by factor of 4",
+            "Decreases by factor of 4",
+            "Stays the same",
+            "I have no idea"
+          ],
+          "correct": 1,
+          "explanation": "When disconnected, charge Q is constant. With dielectric, capacitance increases: C' = kC = 4C. Voltage V' = Q/C' = Q/(4C) = V/4. So voltage decreases by factor of 4."
+        },{
+          "question": "What is the equivalent capacitance between points A and B if C₁ in series with (C₂ and C₃ in parallel)?",
+          "options": [
+            "1.0 μF",
+            "1.6 μF",
+            "2.0 μF",
+            "4.0 μF"
+          ],
+          "correct": 1,
+          "explanation": "First, C₂ and C₃ in parallel: C_parallel = 4 + 4 = 8 μF. Then C₁ (2 μF) in series with 8 μF: 1/C_eq = 1/2 + 1/8 = 4/8 + 1/8 = 5/8, so C_eq = 8/5 = 1.6 μF." 
+        },{
+          "question": "A capacitor is charging through a resistor. When does the current through the circuit drop to half its initial value?",
+          "options": [
+            "After one time constant",
+            "After 0.693 time constants",
+            "After two time constants",
+            "When capacitor is 50% charged"
+          ],
+          "correct": 1,
+          "explanation": "For RC charging, current decays exponentially: I = I₀e^(-t/RC). Set I = I₀/2: 0.5 = e^(-t/τ). Taking ln: -t/τ = ln(0.5) = -0.693. So t = 0.693τ ≈ 0.7 time constants."
+        },{
+          "question": "Two capacitors, 2 μF and 4 μF, are charged to 30 V and 20 V respectively, then connected positive to positive. What is their common final voltage?",
+          "options": [
+            "22.0 V",
+            "23.3 V",
+            "25.0 V",
+            "26.7 V"
+          ],
+          "correct": 1,
+          "explanation": "Total charge Q_total = Q₁ + Q₂ = (2×30) + (4×20) = 60 + 80 = 140 μC. Total capacitance in parallel = 2 + 4 = 6 μF. Common voltage V = Q_total/C_total = 140/6 ≈ 23.3 V."
+        },{
+          "question": "How does inserting a dielectric affect the energy stored in a capacitor that remains connected to a battery?",
+          "options": [
+            "Energy increases by factor of κ",
+            "Energy decreases by factor of κ",
+            "Energy increases by factor of κ²",
+            "Energy stays the same"
+          ],
+          "correct": 0,
+          "explanation": "When connected to battery, voltage V is constant. With dielectric, capacitance increases: C' = κC. Energy U' = ½C'V² = ½(κC)V² = κU. So energy increases by factor κ (dielectric constant)."
+        }
+      ]
     }
   }
 }
