@@ -2292,6 +2292,142 @@
           "explanation": "When connected to battery, voltage V is constant. With dielectric, capacitance increases: C' = κC. Energy U' = ½C'V² = ½(κC)V² = κU. So energy increases by factor κ (dielectric constant)."
         }
       ]
+    },
+    "magnetic-fields": {
+      "title": "Magnetic Fields Quiz",
+      "description": "Test your understanding of magnetic fields, forces on charges and currents, and applications of electromagnetism",
+      "topic": "Magnetic Fields",
+      "difficulty": "Medium",
+      "icon": "🧲",
+      "keyConcepts": [
+        "Magnetic forces on moving charges",
+        "Lorentz force law",
+        "Magnetic force on current-carrying wires",
+        "Motion of charged particles in magnetic fields",
+        "Magnetic field sources",
+        "Biot-Savart Law and Ampere's Law"
+      ],
+      "formulas": [
+        {
+          "equation": "F = q(v × B)",
+          "description": "Magnetic force on a moving charge (Lorentz force)"
+        },{
+          "equation": "F = I(L × B)",
+          "description": "Magnetic forces on a current-carrying wire"
+        },{
+          "equation": "r = mv/(qB)",
+          "description": "Radius of a circlar motion in uniform B-field"
+        },{
+          "equation": "B_wire = μ₀I/(2πr)",
+          "description": "Magnetic field around a long straight wire"
+        },{
+          "equation": "B_loop = μ₀I/(2R)",
+          "description": "Magnetic field at center of current loop"
+        }
+      ],
+      "questions": [
+        {
+          "question": "A proton moves with velocity 10^6 m/s perpendicular to a 0.5 T magnetic field. What is the magnitude of the magnetic force? (q = 1.6 × 10^-19 C)",
+          "options": [
+            "0.8 × 10^-13 N",
+            "8.0 × 10^-14 N",
+            "8.0 × 10^-13 N",
+            "8.0 × 10^-12 N"
+          ],
+          "correct": 2,
+          "explanation": "F = qvB sinθ = (1.6×10^-19) × (10^6) × (0.5) × sin(90°) = 0.8 × 10^-13 N = 8.0 × 10^-14 N? Wait recalculating: 1.6e-19 × 1e6 = 1.6e-13; ×0.5 = 8e-14 N. So 8.0 × 10^-14 N is correct."
+        },{
+          "question": "A current-carrying wire is placed perpendicular to a magnetic field. If the current is doubled and the magnetic field is halved, what happens to the force on the wire?",
+          "options": [
+            "Doubles",
+            "Halves",
+            "Quadruples",
+            "Stays the same"
+          ],
+          "correct": 3,
+          "explanation": "F = ILB sinθ. Initial force F₁ = ILB. New force F₂ = (2I)L(B/2) = ILB = F₁. So the force stays the same. The doubling of current exactly compensates for the halving of field."
+        },{
+          "question": "An electron enters a uniform magnetic field perpendicularly with speed v. What is the shape of its path?",
+          "options": [
+            "Straight line",
+            "Parabola",
+            "Helix",
+            "Circle"
+          ],
+          "correct": 2,
+          "explanation": "When velocity is perpendicular to a magnetic field, the force is always perpendicular to both, causing a uniform circular motion. The radius is r = mv/(qB). For non-perpendicular velocity, the path would be helical."
+        },{
+          "question": "Two parallel wires carry currents in the same direction. What is the nature of the force between them?",
+          "options": [
+            "Attractive",
+            "Repulsive",
+            "Zero",
+            "Perpendicular"
+          ],
+          "correct": 0,
+          "explanation": "Parallel currents in the same direction attract each other. This can be understood using the right-hand rule: each wire creates a magnetic field that exerts an attractive force on the other wire."
+        },{
+          "question": "A charged particle moves through a region with both electric and magnetic fields. Under what condition will it experience no net force?",
+          "options": [
+            "When fields are perpendicular",
+            "When v is parallel to B",
+            "When qE = qvB",
+            "When E = vB and fields are perpendicular"
+          ],
+          "correct": 3,
+          "explanation": "For no net force, electric and magnetic forces must cancel: qE = qvB, so E = vB. Additionally, the fields must be perpendicular to each other and to v for the forces to be opposite. This is the principle behind a velocity selector."
+        },{
+          "question": "A long straight wire carries 10 A current. What is the magnetic field at a point 5 cm away? (μ₀ = 4π × 10^-7 T·m/A)",
+          "options": [
+            "2 × 10^-5 T",
+            "4 × 10^-5 T",
+            "2π × 10^-5 T",
+            "4π × 10^-5 T"
+          ],
+          "correct": 1,
+          "explanation": "B = μ₀I/(2πr) = (4π×10^-7 × 10)/(2π × 0.05) = (4π×10^-6)/(0.1π) = 4×10^-5 T. The π cancels out in the calculation."
+        },{
+          "question": "A current loop of radius R carries current I. What is the magnetic field at its center?",
+          "options": [
+            "μ₀I/(2R)",
+            "μ₀I/(2πR)",
+            "μ₀I/(πR)",
+            "μ₀I/R"
+          ],
+          "correct": 0,
+          "explanation": "For a circular loop, B = μ₀I/(2R) at the center. This can be derived from the Biot-Savart Law. For N turns, multiply by N: B = Nμ₀I/(2R)."
+        },{
+          "question": "A proton and an electron with the same kinetic energy enter a uniform magnetic field perpendicularly. Which has the larger radius of curvature?",
+          "options": [
+            "Proton",
+            "Electron",
+            "Same radius",
+            "Cannot determine"
+          ],
+          "correct": 0,
+          "explanation": "r = mv/(qB) and kinetic energy K = ½mv², so v = √(2K/m). Then r = (m/qB)√(2K/m) = (1/qB)√(2Km). For same K, r ∝ √(m)/q. Proton has larger m but same |q|, so proton has larger radius."
+        },{
+          "question": "What is the magnetic force on a current-carrying wire that is parallel to the magnetic field?",
+          "options": [
+            "Maximum",
+            "Zero",
+            "Perpendicular to both",
+            "Depends on current"
+          ],
+          "correct": 1,
+          "explanation": "F = I(L × B) = ILB sinθ. When wire is parallel to B, θ = 0°, so sinθ = 0, and force is zero. Maximum force occurs when wire is perpendicular to field (θ = 90°)."
+        },{
+          "question": "A charged particle moves in a circle of radius 0.1 m in a 0.5 T magnetic field. If its speed is 10^6 m/s, what is its charge-to-mass ratio?",
+          "options": [
+            "2 × 10^7 C/kg",
+            "2 × 10^8 C/kg",
+            "5 × 10^7 C/kg",
+            "5 × 10^8 C/kg"
+          ],
+          "correct": 0,
+          "explanation": "From r = mv/(qB), we get q/m = v/(rB) = 10^6/(0.1 × 0.5) = 10^6/0.05 = 2 × 10^7 C/kg. This is a mass spectrometer principle."
+        }
+      ]
     }
   }
 }
