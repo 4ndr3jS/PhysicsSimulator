@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestions - Physics Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    .heroSection {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        height: 520px;
+        padding-top: 40px;
+    }
+</style>
+<body>
+    <nav>
+        <a href="index.html">Physics Simulator</a>
+        <ul>
+            <a href="index.html">Home</a>
+            <a href="simulations.html">Simulations</a>
+            <a href="guide.html">Guide</a>
+            <a href="theory.html">Theory</a>
+            <a href="learn.html">Learn Physics</a>
+            <a href="quizzes.html">Quizzes</a>
+            <a href="suggestions.html" class="active1">Suggestions</a>
+        </ul>
+    </nav>
+
+    <div class="heroSection" style="height: 480px; position: relative;">
+        <h1 class="title" style="margin-top: 0;">Suggestions</h1>
+        <p class="intro">Got an idea, got a suggestion? Don't like something, found a bug? Want to share some appreciation? Send it!</p>
+
+        <div class="suggestionForm">
+            <input type="text" id="name" placeholder="Your name (optional)">
+            <textarea id="suggestion" placeholder="Write your suggestion here..." rows="6"></textarea>
+            <div class="buttonContainer">
+                <button class="button1" onclick="submitSuggestion()">Send Suggestion</button>
+            </div>
+        </div>
+
+        <p class="thanksMessage" style="display:none; color:#9f9;">Thanks for your feedback!</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.34.0/dist/supabase.min.js"></script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        // i am not sure but i think its ok to expose this key and url.
+        const supabaseUrl = 'https://uzomctakuxdyeczbtyii.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6b21jdGFrdXhkeWVjemJ0eWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwMjAzMjcsImV4cCI6MjA4NDU5NjMyN30.2LPpA_ycGTIuWkh_kLcDJ5U9DLGKhN8_AB_BfbvGKSY';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        window.submitSuggestion = async function() {
+            const name = document.getElementById('name').value;
+            const suggestion = document.getElementById('suggestion').value;
+
+            if(!suggestion.trim()) {
+                alert("Write a suggestion before sending.");
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('suggestions')
+                .insert([{ name: name || null, suggestion }]);
+
+            if(error) {
+                console.error(error);
+                alert("Something went wrong, try again!");
+                return;
+            }
+            const thanksMsg = document.querySelector('.thanksMessage');
+            thanksMsg.style.display = 'block';
+
+            thanksMsg.style.animation = 'none';
+            void thanksMsg.offsetWidth;
+
+            thanksMsg.style.animation = 'move 4.5s forwards';
+
+            document.querySelector('.thanksMessage').style.display = 'block';
+            document.getElementById('name').value = '';
+            document.getElementById('suggestion').value = '';
+        }
+</script>
+</body>
+</html>
