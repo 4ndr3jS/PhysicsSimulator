@@ -164,7 +164,7 @@ nav ul a.active1::after {
     gap: 30px;
     align-items: center;
     justify-content: center;
-    padding-bottom: 80px;
+    padding-bottom: 60px;
 }
 
 .topics{
@@ -177,6 +177,7 @@ nav ul a.active1::after {
     background: rgba(20, 20, 20, 0.6);
     transition: 0.3s ease;
     padding: 2rem;
+    padding-bottom: 2.5rem;
     max-height: 120px;
 }
 
@@ -401,6 +402,8 @@ nav ul a.active1::after {
     max-width: 1400px;
     margin: 3rem auto;
     padding: 2rem;
+    padding-top: 1px;
+    margin-top: 40px;
 }
 
 .page-title {
@@ -649,7 +652,7 @@ nav ul a.active1::after {
 }
 
 .journey-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-1px);
     border-color: rgba(255, 255, 255, 0.3);
 }
 
@@ -694,7 +697,7 @@ nav ul a.active1::after {
 }
 
 .resource-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     border-color: rgba(255, 255, 255, 0.3);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
@@ -940,7 +943,8 @@ nav ul a.active1::after {
 
 .button1 {
     width: 175px;
-    font-size: 14px;
+    font-family: 'roboto', sans-serif;
+    font-size: 15px;
     padding: 12px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.123);
@@ -963,7 +967,7 @@ nav ul a.active1::after {
 
 .dropdown {
     position: relative;
-    cursor: default;
+    cursor: pointer;
 }
 
 .dropdown > a {
@@ -1062,4 +1066,35 @@ nav ul a.active1::after {
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
     border-bottom: 8px solid rgba(3, 3, 5, 0.98);
+}
+.dropdown::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #b8c0ff;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition:
+        width 0.15s ease,
+        left 0.15s ease,
+        transform 0.15s ease;
+}
+
+.dropdown:hover::after {
+    width: 50%;
+}
+.dropdown:hover > a {
+    color: #b8c0ff;
+}
+.dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: transparent;
 }
