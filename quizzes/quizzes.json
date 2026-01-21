@@ -3091,7 +3091,7 @@
     },
     "phase-changes": {
       "title": "Phase Changes Quiz",
-      "description": "Test your understanding of ",
+      "description": "Test your understanding of phase transitions, latent heat, and the behavior of substances during phase changes",
       "topic": "Phase Changes",
       "difficulty": "Medium",
       "icon": "♨️",
@@ -3224,6 +3224,144 @@
           ],
           "correct": 0,
           "explanation": "Ice is less dense than liquid water (0.917 g/cm³ vs 1.00 g/cm³) due to hydrogen bonding creating an open crystalline structure. This unusual property prevents lakes/oceans from freezing solid."
+        }
+      ]
+    },
+    "sterling-engine": {
+      "title": "Sterling Engine Quiz",
+      "description": "Test your understanding of Stirling engines, their operation principles, efficiency, and applications",
+      "topic": "Stirling Engine",
+      "difficulty": "Medium",
+      "icon": "⚙️",
+      "keyConcepts": [
+        "Stirling cycle phases",
+        "External combustion engine",
+        "Regenerator function",
+        "Thermodynamic efficiency",
+        "Aplha, Beta, Gamma configurations",
+        "Pratical applications and limitations"
+      ],
+      "formulas": [
+        {
+          "equation": "η = 1 - T_C/T_H",
+          "description": "Carnot efficiency (maximum theoretical for Stirling engine)"
+        },{
+          "equation": "P = (nRT_H/V_H) - (nRT_C/V_C)",
+          "description": "Ideal Sterling cycle work per cycle"
+        },{
+          "equation": "Q_in = nRT_H ln(V_max/V_min)",
+          "description": "Heat input during isothermal expansion"
+        },{
+          "equation": "Q_reg = nC_v(T_H - T_C)",
+          "description": "Heat stored/released by regenerator"
+        },{
+          "equation": "W_net = Q_in - Q_out",
+          "description": "Net work output"
+        },{
+          "equation": "η_actual = W_net/Q_in",
+          "description": "Actual efficiency"
+        }
+      ],
+      "questions": [
+        {
+          "question": "What is the main advantage of Stirling engines over internal combustion engines?",
+          "options": [
+            "Higher maximum RPM",
+            "Can use external heat sources",
+            "Simpler mechanical design",
+            "Lower cost to produce"
+          ],
+          "correct": 1,
+          "explanation": "Stirling engines are external combustion engines, meaning they can use ANY heat source (solar, geothermal, biomass, nuclear, waste heat) rather than requiring specific fuels like gasoline."
+        },{
+          "question": "How many distint phases are in the ideal Stirling cycle?",
+          "options": [
+            "2",
+            "4",
+            "6",
+            "8"
+          ],
+          "explanation": "The ideal Stirling cycle has 4 phases: 1) Isothermal expansion (heat addition), 2) Constant-volume cooling (heat to regenerator), 3) Isothermal compression (heat rejection), 4) Constant-volume heating (heat from regenerator)."
+        },{
+          "question": "What is the primary function of the regenerator in a Stirling engine?",
+          "options": [
+            "Increase compression ratio",
+            "Store and release heat internally",
+            "Convert linear to rotary motion",
+            "Mix air and fuel"
+          ],
+          "correct": 1,
+          "explanation": "The regenrator is a porous matrix that temporaraily stores heat during the constant-volume cooling phase and releases it during constant-volume heating, dramatically improving efficiency efficiency by recycling heat internally."
+        },{
+          "question": "What theoretical efficiency limit applies to Stirling engines?",
+          "options": [
+            "Otto cycle efficiency",
+            "Diesel cycle efficiency",
+            "Carnot efficiency",
+            "Brayton cycle efficiency"
+          ],
+          "correct": 2,
+          "explanation": "With perfect regeneration, the Sterling cycle achives Carnot efficiency: η = 1 - T_C/T_H, where T_H and T_C are absolute temperatures of hot and cold reservoirs."
+        },{
+          "question": "In a beta-type Stirling engine, what is the phase relationship between the displacer and power pistons?",
+          "options": [
+            "In phase",
+            "90° out of phase",
+            "180° out of phase",
+            "No fixed relationship"
+          ],
+          "correct": 1,
+          "explanation": "In beta configuration (single cylinder with displacer and power piston), they are typically 90° out of phase. The displacer moves gas between hot and cold spaces, while the power piston compresses/expands the gas."
+        },{
+          "question": "Why are Stirling engines particularly suitable for solar power applications?",
+          "options": [
+            "They operate at low temperatures",
+            "They can use focused sunlight as heat source",
+            "They have high power-to-weight ratio",
+            "They work well with photovoltaic cells"
+          ],
+          "correct": 1,
+          "explanation": "Stirling engines can use concentrated solar thermal energy as their heat source. Parabolic mirrors focus sunlight to heat the engine's hot end, making them efficient for solar-to-mechanical energy conversion."
+        },{
+          "question": "What is a major practical limitation of Stirling engines?",
+          "options": [
+            "Low efficiency",
+            "High noise levels",
+            "Poor power-to-weight ratio",
+            "Requires expensive fuels"
+          ],
+          "correct": 2,
+          "explanation": "Stirling engines typically have lower power-to-weight and power-to-volume ratios compared to internal combustion engines, making them less suitable for vehicles but excellent for stationary applications."
+        },{
+          "question": "During which Stirling cycle phase is heat rejected to the cold reservoir?",
+          "options": [
+            "Isothermal expansion",
+            "Constant-volume cooling",
+            "Isothermal compression",
+            "Constant-volume heating"
+          ],
+          "correct": 2,
+          "explanation": "Heat is rejected during isothermal compression when the gas is in contact with the cold reservoir, maintaining constant temperature as it's compressed."
+        },{
+          "question": "What distinguishes gamma-type from beta-type Stirling engines?",
+          "options": [
+            "Number of cylinders",
+            "Type of fuel used",
+            "Presence of regenerator",
+            "Direction of rotation"
+          ],
+          "correct": 0,
+          "explanation": "Gamma configuration uses separate cylinders for displacer and power piston, while beta uses both in same cylinder. Alpha configuration uses two separate power pistons in separate cylinders."
+        },{
+          "question": "Why do Stirling engines typically require a flywheel?",
+          "options": [
+            "To generate electricity",
+            "To store heat energy",
+            "To smooth rotational motion",
+            "To increase compression ratio"
+          ],
+          "correct": 2,
+          "explanation": "The Stirling cycle produces non-uniform torque through its cycle. A flywheel stores kinetic energy during power strokes and releases it during other phases, smoothing out rotational motion."
         }
       ]
     }
