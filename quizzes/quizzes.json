@@ -3088,6 +3088,144 @@
           "explanation": "R-value = thickness/thermal conductivity = d/k. Higher R-value means better insulation (greater resistance to heat flow). Used in building insulation ratings."
         }
       ]
+    },
+    "phase-changes": {
+      "title": "Phase Changes Quiz",
+      "description": "Test your understanding of ",
+      "topic": "Phase Changes",
+      "difficulty": "Medium",
+      "icon": "♨️",
+      "keyConcepts": [
+        "Latent heat of fuision and vaporazation",
+        "Phase quilibrium",
+        "Phase diagrams (P vs T)",
+        "Melting, freezing, vaporazation, condensation",
+        "Sublimation and deposition",
+        "Triple point and crucial point"
+      ],
+      "formulas": [
+        {
+          "equation": "Q = mL_f",
+          "description": "Heat for melting/freeying (latent heat of fusion)"
+        },{
+          "equation": "Q = mL_v",
+          "description": "Heat for vaporazation/condazation (latent heat of vaporazation)"
+        },{
+          "equation": "P = P_0 e^{-L_v/(RT)}",
+          "description": "Clausius-Clapeyron equation (approximate)"
+        },{
+          "equation": "ΔU = Q - W",
+          "description": "First Law of thermodynamics during phase change"
+        },{
+          "equation": "Q_total = mcΔT + mL",
+          "description": "Heat for temperature change plus phase change"
+        },{
+          "equation": "L_v > L_f",
+          "description": "Latent heat relationship (vaporization > fusion)"
+        }
+      ],
+      "questions": [
+        {
+          "question": "During a phase change at constant temperature, what happens to the heat added?",
+          "options": [
+            "Increases temperature",
+            "Increases kinetic energy of molecules",
+            "Overcomes intermolecular forces",
+            "Increases pressure"
+          ],
+          "correct": 2,
+          "explanation": "During phase change at constant temperature, added heat (latent heat) goes into overcoming intermolecular forces, not increasing kinetic energy. Temperature remains constant until phase change completes."
+        },{
+          "question": "What is the latent heat of fusion for water?",
+          "options": [
+            "334 J/g",
+            "Avogadro's number",
+            "4184 J/g",
+            "2.26 × 10^6 J/kg"
+          ],
+          "correct": 0,
+          "explanation": "Latent heat of fusion for water (melting/freezing) is 334 J/g or 3.34 × 10^5 J/kg. Latent heat of vaporization is 2260 J/g or 2.26 × 10^6 J/kg."
+        },{
+          "question": "Why does steam at 100°C cause more severe burns then water at 100°C?",
+          "options": [
+            "Steam has higher temperature",
+            "Steam is less dense",
+            "Steam releases latent heat when condensing",
+            "Water has higher specific heat"
+          ],
+          "correct": 2,
+          "explanation": "Steam at 100°C releases 2260 J/g of latent heat when it condenses on skin, in addition to the heat from cooling to body temperature. Water at 100°C only releases heat from cooling."
+        },{
+          "question": "On a phase diagram, what does the triple point represent?",
+          "options": [
+            "Maximum temperature for liquid existance",
+            "Temerature above which has cannot liquefy",
+            "Normal boiling point",
+            "Point where all three phases coexist"
+          ],
+          "correct": 3
+        },{
+          "question": "What happens to the boiling point of water at high altitude?",
+          "options": [
+            "Increases",
+            "Decreases",
+            "Stays the same",
+            "Deoesn't exist"
+          ],
+          "correct": 1,
+          "explanation": "Boiling point decreases with decreasing atmospheric pressure. At high altitude, pressure is lower, so water boils below 100°C."
+        },{
+          "question": "How much heat is needed to melt 50 g of ice at 0°C? (L_f = 334 J/g)",
+          "options": [
+            "1.67 kJ",
+            "3.34 kJ",
+            "16.7 kJ",
+            "33.4 kJ"
+          ],
+          "correct": 2,
+          "explanation": "Q = mL_f = 50 g × 334 J/g = 16,700 J = 16.7 kJ. No temperature change occurs during melting."
+        },{
+          "question": "What is sublimation?",
+          "options": [
+            "Solid to Liquid",
+            "Liquid to gas",
+            "Solid directly to gas",
+            "Gas directly to solid"
+          ],
+          "correct": 2,
+          "explanation": "Sublimation is solid → gas without passing through liquid phase. Examples: dry ice (CO₂), iodine crystals, snow evaporating. Reverse process is deposition (gas → solid)."
+        },{
+          "question": "During vaporization at constant temperature and pressure, what is true about internal energy change?",
+          "options": [
+            "ΔU = 0",
+            "ΔU = Q (heat added)",
+            "ΔU = Q - W",
+            "ΔU = -W"
+          ],
+          "correct": 2,
+          "explanation": "From the 1st Law we know that ΔU = Q - W. During vaporazation at constant P, heat Q = mL_v is added, and work W = PΔV is done as liquid expands to gas. So ΔU = mL_v - PΔV."
+        },{
+          "question": "What does the critical point on a phase diagram represent?",
+          "options": [
+            "Highest temperature where solid exists",
+            "Temperature above which liquid and gas are indistinguishable",
+            "Lowest temperature where gas exists",
+            "Point where all phases have same density"
+          ],
+          "correct": 1,
+          "explanation": "The critical point is the temperature above which a gas cannot be liquefied by pressure alone. Liquid and gas phases become indistinguishable (supercritical fluid). For water: 374°C, 218 atm."
+        },{
+          "question": "Why does ice float on water?",
+          "options": [
+            "Ice has lower density than water",
+            "Ice has higher latent heat",
+            "Water has high surface tension",
+            "Ice melts at constant temperature"
+          ],
+          "correct": 0,
+          "explanation": "Ice is less dense than liquid water (0.917 g/cm³ vs 1.00 g/cm³) due to hydrogen bonding creating an open crystalline structure. This unusual property prevents lakes/oceans from freezing solid."
+        }
+      ]
     }
   }
 }
