@@ -5,22 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sandbox</title>
     <link rel="stylesheet" href="styles.css">
-</head>
-<style>
-    .sandbox-thing{
-        background: rgba(20, 20, 20, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        transition: border-color 0.3s;
-        width: 1000px;
-        justify-self: center;
-        height: 500px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    <style>
+        .sandbox-thing {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            width: 1000px;
+            margin: 0 auto;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .sandbox-thing:hover{
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            height: 498px;
+            width: 998px;
+        }
+        
+        .helper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .container5, .container6 {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 2rem;
+            padding-top: 0;
+        }
+        
+        .sim-canvas-wrapper {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            width: 100%;
+            height: 700px;
+        }
+        
+        .sim-canvas {
+            width: 100%;
+            height: 700px;
+            border-radius: 0.5rem;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 1200px) {
+            .sandbox-thing {
+                width: 90%;
+                max-width: 900px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sandbox-thing {
+                height: 400px;
+                padding: 1rem;
+            }
+            
+            .helper span {
+                font-size: 60px;
+            }
+        }
     </style>
+</head>
 <body>
     <nav>
         <a href="index.html">Physics Simulator</a>
@@ -31,23 +98,45 @@
             <a href="theory.html">Theory</a>
             <a href="learn.html">Learn Physics</a>
             <div class="dropdown">
-                <a href="#">Extras ▼</a>
+                <a href="#">Extras <span style="font-size: 16px;">▼</span></a>
                 <div class="dropdown-content">
-                    <a href="sandbox.html" class="active2">Sandbox</a>
-                    <a href="quizzes.html">Quizzes</a>
+                    <a href="sandbox.html">Sandbox</a>
+                    <a href="quizzes.html" class="active2">Quizzes</a>
                     <a href="suggestions.html">Suggestions</a>
                 </div>
             </div>
         </ul>
     </nav>
 
-    <div class="container5">
+    <div class="container5" id="createSandboxContainer">
         <h1 class="page-title">Sandbox</h1>
         <p class="subtitle">An open environment where you can build, design, tweak parameters and test your own physics experiments from scratch</p>
 
-        <div class="sandbox-thing">
-            <p>Create your first sandbox</p>
+        <div class="sandbox-thing" id="createSandboxBtn">
+            <div class="helper">
+                <span style="font-size: 100px;">+</span>
+                <p style="margin-top: 0; transform: translateY(-10px);">Create your first sandbox</p>
+            </div>
         </div>
     </div>
+    
+    <div class="container6 hidden" id="sandboxCanvasContainer">
+        <div class="sim-canvas-wrapper">
+            <div class="sim-canvas" id="sandboxCanvas">
+                <p>Drag and drop objects here to build your experiment</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const createSandboxBtn = document.getElementById('createSandboxBtn');
+        const createSandboxContainer = document.getElementById('createSandboxContainer');
+        const sandboxCanvasContainer = document.getElementById('sandboxCanvasContainer');
+        
+        createSandboxBtn.addEventListener('click', () => {
+            createSandboxContainer.classList.add('hidden');
+            sandboxCanvasContainer.classList.remove('hidden');
+        });
+    </script>
 </body>
 </html>
