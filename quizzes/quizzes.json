@@ -3231,7 +3231,7 @@
       "title": "Sterling Engine Quiz",
       "description": "Test your understanding of Stirling engines, their operation principles, efficiency, and applications",
       "topic": "Stirling Engine",
-      "difficulty": "Medium",
+      "difficulty": "Hard",
       "icon": "⚙️",
       "keyConcepts": [
         "Stirling cycle phases",
@@ -3362,6 +3362,143 @@
           ],
           "correct": 2,
           "explanation": "The Stirling cycle produces non-uniform torque through its cycle. A flywheel stores kinetic energy during power strokes and releases it during other phases, smoothing out rotational motion."
+        }
+      ]
+    },
+    "Heat Engines": {
+      "title": "Heat Engines Quiz",
+      "description": "Test your understanding of",
+      "topic": "Heat Engine",
+      "difficulty": "Hard",
+      "keyConcepts": [
+        "Thermodynamic cycles",
+        "Carnot efficiency",
+        "First and Second Law",
+        "Work, heat, and efficiency calculations",
+        "Otoo, Diesel, and Brayton cycles"
+      ],
+      "formulas": [
+        {
+          "equation": "η = W/Q_H = 1 - Q_C/Q_H",
+          "description": "Thermal efficiency definition"
+        },{
+          "equation": "η_Carnot = 1 - T_C/T_H",
+          "description": "Maximum theoretical efficiency (Carnot)"
+        },{
+          "equation": "W_net = Q_H - Q_C",
+          "description": "Net work output from energy conservation"
+        },{
+          "equation": "ΔS_univ ≥ 0",
+          "description": "Second Law (entropy never decreases)"
+        },{
+          "equation": "COP_heat pump = Q_H/W",
+          "description": "Coefficient of performance (heat pump)"
+        },{
+          "equation": "r = V_max/V_min",
+          "description": "Compression ratio"
+        }
+      ],
+      "questions": [
+        {
+          "question": "What is the fundamental purpose of a heat engine?",
+          "options": [
+            "Convert heat completely to work",
+            "Transfer heat from cold to hot reservoir",
+            "Convert heat partially to work",
+            "Create energy from nothing"
+          ],
+          "correct": 2,
+          "explanation": "A heat engine converts heat from a high-temperature reservoir partially into useful work while rejecting waste heat to a low-temperature reservoir, as governed by the Second Law of thermodynamics."
+        },{
+          "question": "Which cycle has the highest possible efficiency between two temperature reservoirs?",
+          "options": [
+            "Otoo cycle",
+            "Diesel cycle",
+            "Carnot cycle",
+            "Stirling cycle"
+          ],
+          "correct": 2,
+          "explanation": "The Carnot cycle represent the maximum possible for any heat engine operating between two temperatures: η_max = 1 - T_C/T_H (temperatures in Kelvin)."
+        },{
+          "question": "A heat engine absorbs 1000 J from a hot reservoir and rejects 600 J to a cold reservoir. What is its efficiency?",
+          "options": [
+            "20%",
+            "40%",
+            "60%",
+            "80%"
+          ],
+          "correct": 1,
+          "explanation": "η = 1 - Q_C/Q_H = 1 - 600/1000 = 1 - 0.6 = 0.4 = 40%. Alternatively, W = Q_H - Q_C = 400 J, η = W/Q_H = 400/1000 = 40%."
+        },{
+          "question": "Why can no real heat engine achieve Carnot efficiency?",
+          "options": [
+            "Friction and turbulence",
+            "Heat leaks and finite temperature differences",
+            "Material strength limitations",
+            "All of the above"
+          ],
+          "correct": 3,
+          "explanation": "Real engines have irreversibilites: friction, turbulence, heat conduction through finite temperature differences, and other pracitcal limitations. Carnot efficiency is an ideal, unattainable limit."
+        },{
+          "question": "What does the Second Law of Thermodynamics say about heat engines?",
+          "options": [
+            "Energy is conserved",
+            "No engine can be 100% efficient",
+            "Heat flows from hot to cold spontaneously",
+            "Both B and C"
+          ],
+          "correct": 3,
+          "explanation": "The Second Law has multiple equivalent statements: 1) No heat engine can convert all heat input to work (Kelvin-Planck), 2) Heat flows spontaneously from hot to cold (Clausius), 3) Total entropy never decreases."
+        },{
+          "question": "What is the compression ratio in an Otto cycle engine if V_max = 500 cm³ and V_min = 50 cm³?",
+          "options": [
+            "5:1",
+            "10:1",
+            "50:1",
+            "100:1"
+          ],
+          "correct": 1,
+          "explanation": "Compression ratio r = V_max/V_min = 500/50 = 10:1. Higher compression ratios generally lead to higher efficiency in spark-ignition engines."
+        },{
+          "question": "What distinguishes a Diesel cycle from an Otto cycle?",
+          "options": [
+            "Fuel type used",
+            "Constant-pressure vs constant-volume heat addition",
+            "Number of cylinders",
+            "Cooling system"
+          ],
+          "correct": 1,
+          "explanation": "Otto cycle has constant-volume heat addition (spark ignition), while Diesel cycle has constant-pressure heat addition (compression ignition). Diesel engines typically have higher compression ratios."
+        },{
+          "question": "A Carnot engine operates between 500 K and 300 K. What is its maximum possible efficiency?",
+          "options": [
+            "20%",
+            "40%",
+            "60%",
+            "80%"
+          ],
+          "correct": 1,
+          "explanation": "η_Carnot = 1 - T_C/T_H = 1 - 300/500 = 1 - 0.6 = 0.4 = 40%. This represents the absolute maximum possible efficiency for any engine between these temperatures."
+        },{
+          "question": "What is the coefficient of performance (COP) of a refrigerator that removes 300 J from a cold space with 100 J of work input?",
+          "options": [
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "correct": 1,
+          "explanation": "COP_refrigerator = Q_C/W = 300 J/100 J = 3. This means it removes 3 times more heat from the cold space than the work input. COP can be greater than 1, unlike efficiency."
+        },{
+          "question": "Why do power plants use steam turbines rather than trying to approach Carnot efficiency with other cycles?",
+          "options": [
+            "Steam turbines are less efficient",
+            "Steam allows larger temperature differences",
+            "Water is cheaper than other working fluids",
+            "Steam turbines have fewer moving parts"
+          ],
+          "correct": 1,
+          "explanation": "The Carnot efficiency depends on temperature difference. Steam allows very high T_H (superheated steam) and low T_C (condensation), maximizing T_H - T_C. Practical considerations like material limits at high temperatures also play a role."
         }
       ]
     }
