@@ -3365,7 +3365,7 @@
         }
       ]
     },
-    "Heat Engines": {
+    "heat-engines": {
       "title": "Heat Engines Quiz",
       "description": "Test your understanding of",
       "topic": "Heat Engine",
@@ -3499,6 +3499,151 @@
           ],
           "correct": 1,
           "explanation": "The Carnot efficiency depends on temperature difference. Steam allows very high T_H (superheated steam) and low T_C (condensation), maximizing T_H - T_C. Practical considerations like material limits at high temperatures also play a role."
+        }
+      ]
+    },
+    "entropy": {
+      "title": "Entropy & Statistical Mechanics Quiz",
+      "description": "Advanced questions on entropy, statistical ensembles, partition functions, and the microscopic foundations of thermodynamics",
+      "topic": "Entropy & Statistical Mechanics",
+      "difficulty": "Hard",
+      "icon": "🎲",
+      "keyConcepts": [
+        "Boltzmann entropy formula",
+        "Microstates and macrostates",
+        "Statistical ensembels (microcanonical, canonical, grand canonical)",
+        "Partition functions",
+        "Gibbs paradox and indistinguishables",
+        "Maxwell-Boltzmann, Bose-Einstein, and Fermi-Dirac statistics",
+        "Third Law of Thermodynamics"
+      ],
+      "formulas": [
+        {
+          "equation": "S = k_B ln Ω",
+          "description": "Boltzmann entropy (microcanonical)"
+        },
+        {
+          "equation": "Z = Σ e^{-βE_i}",
+          "description": "Canonical partition function"
+        },
+        {
+          "equation": "F = -k_B T ln Z",
+          "description": "Helmholtz free energy from partition function"
+        },
+        {
+          "equation": "⟨E⟩ = -∂/∂β ln Z",
+          "description": "Average energy from partition function"
+        },
+        {
+          "equation": "S = -k_B Σ p_i ln p_i",
+          "description": "Gibbs entropy formula"
+        },
+        {
+          "equation": "Ω = N!/(n_1! n_2! ...)",
+          "description": "Multinomial coefficient for MB statistics"
+        }
+      ],
+      "questions": [
+        {
+          "question": "For a system with Ω microscopic, what is the probability of observing a system in a specific microstate at equilibrium in the microcanonical ensemble",
+          "options": [
+            "1",
+            "1/Ω",
+            "e^{-E/kT}/Z",
+            "Depends on energy"
+          ],
+          "correct": 1,
+          "explanation": "In the microcanonical ensemble, all accessible microstates have equal probability (fundamental postulate of statistical mechanics). For Ω microstates, probability of each is 1/Ω."
+        },{
+          "question": "Two ideal gas systems initially separate with Ω₁ and Ω₂ microstates are allowed to mix. What is the total number of microstates after mixing if the gases are distinguishable?",
+          "options": [
+            "Ω₁ + Ω₂",
+            "Ω₁ × Ω₂",
+            "(Ω₁ + Ω₂)!",
+            "Ω₁! × Ω₂!"
+          ],
+          "correct": 1,
+          "explanation": "For statistically independent systems, total microstates multiply: Ω_total = Ω₁ × Ω₂. Entropy is additive: S = k_B ln(Ω₁Ω₂) = k_B ln Ω₁ + k_B ln Ω₂ = S₁ + S₂."
+        },{
+          "question": "What is the Sackur-Tetrode equation for the entropy of a monatomic ideal gas?",
+          "options": [
+            "S = Nk_B ln V",
+            "S = (3/2)Nk_B ln T",
+            "S = Nk_B [ln(V/Nλ³) + 5/2]",
+            "S = Nk_B ln T^(3/2)"
+          ],
+          "correct": 2,
+          "explanation": "Sackur-Tetrode: S = Nk_B[ln(V/Nλ_T³) + 5/2], where λ_T = h/√(2πmk_BT) is thermal wavelength. This incorporates quantum effects (indistinguishability) missing in classical treatment."
+        },{
+          "question": "The Gibbs paradox concers the entropy change when two identical gases mix. How is it resloved quantum mechanically?",
+          "options": [
+            "By including factor 1/N! for indistinguibshable poarticles",
+            "By considering interparticle forces",
+            "By accouting for zero-point energy",
+            "By using Bose-Einstein statistics"
+          ],
+          "correct": 0,
+          "explanation": "Gibbs paradox: Classical entropy increases when identical gases mix, but experimentally it doesn't. Resolution: Particles are indistinguishable, so divide ohase space volume by N! (correct Boltzmann counting)."
+        },{
+          "question": "For a two-level system with energies 0 and ε, what is the partition function Z at temperature T?",
+          "options": [
+            "1 + e^{-βε}",
+            "1 + e^{βε}",
+            "e^{-βε}",
+            "2"
+          ],
+          "correct": 0,
+          "explanation": "Z = Σ_i e^{-βE_i} = e^{-β·0} + e^{-βε} = 1 + e^{-βε}, where β = 1/(k_B T). The probability of being in excited state is e^{-βε}/Z."
+        },{
+          "question": "What does the canonical partition function Z(N, V, T) fundamentally contain?",
+          "options": [
+            "All possible microstates weighted by Boltzmann factors",
+            "Only ground state information",
+            "Pressure-volume work terms",
+            "Heat capacity at constant volume"
+          ],
+          "correct": 0,
+          "explanation": "Z = Σ_{microstates} e^{-βE} = Σ_{energy levels} g(E)e^{-βE}, where g(E) is degeneracy. It's a sum over all microstates with Boltzmann weighting e^{-E/kT}."
+        },{
+          "question": "For N distinguishable harmonic oscillators with frequency ω, what is the heat capacity at high temperature?",
+          "options": [
+            "0",
+            "Nk_B",
+            "(3/2)Nk_B",
+            "3Nk_B"
+          ],
+          "correct": 1,
+          "explanation": "Each 1D quantum harmonic oscillator has ⟨E⟩ = ħω/(e^{βħω}-1) + ħω/2. At high T (βħω ≪ 1): ⟨E⟩ ≈ k_B T, so C = d⟨E⟩/dT = k_B per oscillator, or Nk_B total."
+        },{
+          "question": "The third law of thermodynamics states that as T → 0, entropy S → 0 for a perfect crystal. Why?",
+          "options": [
+            "All molecular motion ceases",
+            "System reaches unique ground state (Ω = 1)",
+            "Heat capacity becomes zero",
+            "Chemical reactions stop"
+          ],
+          "correct": 1,
+          "explanation": "At T = 0, a perfect crystal is in its unique quantum ground state (Ω = 1). By Boltzmann: S = k_B ln 1 = 0. Residual entropy occurs if ground state is degenerate (e.g., glassy systems)."
+        },{
+          "question": "For a paramagnetic system of N spin-1/2 particles in magnetic field B, what is the entropy at infinite temperature?",
+          "options": [
+            "0",
+            "Nk_B ln 2",
+            "(3/2)Nk_B",
+            "∞"
+          ],
+          "correct": 1,
+          "explanation": "At T → ∞, all microstates equally probable. Each spin has 2 states (↑, ↓), so Ω = 2^N, S = k_B ln(2^N) = Nk_B ln 2. At T = 0, all spins align, Ω = 1, S = 0."
+        },{
+          "question": "What is the difference between Maxwell-Boltzmann, Bose-Einstein, and Fermi-Dirac statistics in terms of particle distinguishability?",
+          "options": [
+            "MB: distinguishable; BE/FD: indistinguishable",
+            "All treat particles as indistinguishable",
+            "MB/BE: distinguishable; FD: indistinguishable",
+            "Only MB accounts for indistinguishability"
+          ],
+          "correct": 0,
+          "explanation": "Maxwell-Boltzmann statistics treats particles as distinguishable (classical). Bose-Einstein (bosons) and Fermi-Dirac (fermions) treat particles as indistinguishable (quantum). BE allows multiple occupancy, FD obeys Pauli exclusion."
         }
       ]
     }
