@@ -294,23 +294,58 @@ nav ul a.active1::after {
   transition: all 0.3s;
   font-weight: 500;
 }
+.sim-btn1 {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
 .sim-btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgba(80,80,160,0.8), rgba(120,60,120,0.8));
   color: white;
 }
+
 .sim-btn-secondary {
   background: rgba(255, 255, 255, 0.1);
   color: white;
 }
-.sim-btn:hover {
+
+.sim-btn-primary1 {
+  background: linear-gradient(135deg, rgba(80,80,160,0.8), rgba(120,60,120,0.8));
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.sim-btn-secondary1 {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.sim-btn1:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(8, 8, 8, 0.4);
 }
+
+.sim-btn-primary1:hover{
+  filter: brightness(1.2);
+  color: #ececec;
+}
+
+.sim-btn-secondary1:hover{
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ececec;
+}
+
 .sim-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
+
 .sim-sidebar {
   display: flex;
   flex-direction: column;
@@ -550,7 +585,7 @@ input[type="number"] {
   display: flex;
 }
 .modal-content {
-  background: #1a1a2e;
+  background: #171717;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1rem;
   padding: 2rem;
@@ -575,4 +610,24 @@ input[type="number"] {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
+}
+
+.preset-select {
+    width: 100%;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.25rem;
+    color: white;
+    margin-bottom: 1rem;
+}
+.canvas-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    color: white;
+    font-size: 12px;
+    padding: 5px;
+    background: rgba(0,0,0,0.5);
 }
