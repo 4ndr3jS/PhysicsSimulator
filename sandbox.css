@@ -303,8 +303,8 @@ nav ul a.active1::after {
   color: white;
 }
 .sim-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(8, 8, 8, 0.4);
 }
 .sim-btn:disabled {
   opacity: 0.5;
@@ -356,7 +356,7 @@ nav ul a.active1::after {
 .object-btn.selected {
   background: rgba(102, 126, 234, 0.3);
   border-color: #667eea;
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 0 15px rgb(17, 20, 36);
 }
 .object-icon {
   font-size: 1.5rem;
@@ -466,6 +466,21 @@ input[type="range"]::-moz-range-thumb {
   max-height: 300px;
   overflow-y: auto;
 }
+
+.object-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.object-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.object-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
 .object-item {
   background: rgba(255, 255, 255, 0.05);
   padding: 0.75rem;
@@ -476,13 +491,22 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 98%;
 }
 .object-item:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 .object-item.selected {
-  background: rgba(102, 126, 234, 0.3);
-  border: 1px solid #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid #415094;
+  height: 49px;
+}
+.object-item.selected span {
+  transform: translateX(-1px);
+}
+
+.object-item.selected .delete-btn {
+  transform: translateX(1px);
 }
 .delete-btn {
   background: rgba(255, 59, 48, 0.2);

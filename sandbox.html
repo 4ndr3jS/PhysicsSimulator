@@ -28,7 +28,7 @@
 
     <div class="sim-container">
         <div class="sim-header">
-            <h1>🔧 Physics Sandbox</h1>
+            <h1>Physics Sandbox</h1>
             <p>Create and experiment with custom physics simulations</p>
         </div>
 
@@ -46,7 +46,6 @@
 
                 <div class="sim-panel" style="margin-top: 30px;">
                     <div class="sim-panel-header">
-                        <span>📋</span>
                         <span>Objects in Scene</span>
                     </div>
                     <div class="object-list" id="objectList">
@@ -58,7 +57,6 @@
             <div class="sim-sidebar">
                 <div class="sim-panel">
                     <div class="sim-panel-header">
-                        <span>🎨</span>
                         <span>Add Objects</span>
                     </div>
                     <div class="object-palette">
@@ -83,16 +81,70 @@
 
                 <div class="sim-panel" id="propertiesPanel">
                     <div class="sim-panel-header">
-                        <span>🔧</span>
                         <span>Properties</span>
                     </div>
                     <div class="properties-panel" id="propertiesContent">
                         <div class="no-selection">Select an object to edit its properties</div>
                     </div>
                 </div>
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>⚙️</span>
+                        <span>Global Settings</span>
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Gravity</span>
+                            <span class="sim-control-value"><span id="val-gravity">9.8</span> m/s²</span>
+                        </div>
+                        <input type="range" id="slider-gravity" min="0" max="20" value="9.8" step="0.1" oninput="updateGlobalParam('gravity', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Air Resistance</span>
+                            <span class="sim-control-value"><span id="val-airRes">0.1</span></span>
+                        </div>
+                        <input type="range" id="slider-airRes" min="0" max="1" value="0.1" step="0.01" oninput="updateGlobalParam('airRes', this.value)">
+                    </div>
+                    <div class="sim-divider"></div>
+                    <div class="sim-toggle">
+                        <span>Show Vectors</span>
+                        <div class="sim-toggle-switch active" id="toggle-vectors" onclick="toggleVectors()"></div>
+                    </div>
+                    <div class="sim-toggle">
+                        <span>Show Grid</span>
+                        <div class="sim-toggle-switch" id="toggle-grid" onclick="toggleGrid()"></div>
+                    </div>
+                    <div class="sim-toggle">
+                        <span>Collision Detection</span>
+                        <div class="sim-toggle-switch active" id="toggle-collision" onclick="toggleCollision()"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="modal" id="saveModal">
+        <div class="modal-content">
+            <div class="modal-header">Save Sandbox</div>
+            <input type="text" class="modal-input" id="saveName" placeholder="Enter sandbox name...">
+            <div class="modal-buttons">
+                <button class="sim-btn sim-btn-secondary" onclick="closeSaveModal()">Cancel</button>
+                <button class="sim-btn sim-btn-primary" onclick="saveSandbox()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="loadModal">
+        <div class="modal-content">
+            <div class="modal-header">Load Sandbox</div>
+            <div id="savedList"></div>
+            <div class="modal-buttons">
+                <button class="sim-btn sim-btn-secondary" onclick="closeLoadModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -103,7 +155,17 @@
         let objects = [];
         let selectedTool = null;
         let selectedObject = null;
+        let isRunning = false;
+        let animationId = null;
         let objectIdCounter = 0;
+        let lastTime = 0;
+        let settings = {
+            gravity: 9.8,
+            airRes: 0.1,
+            showVectors: true,
+            showGrid: false,
+            collision: true
+        };
 
         const objectTemplates = {
             ball: {
@@ -134,7 +196,9 @@
                 mass: 1,
                 x: 0,
                 y: 0,
-                color: '#43e97b'
+                color: '#43e97b',
+                attachedTo: null,
+                restitution: 0.3
             },
             wall: {
                 type: 'wall',
@@ -156,7 +220,7 @@
         }
 
         canvas.addEventListener('click', (e) => {
-            if (selectedTool) {
+            if (selectedTool && !isRunning) {
                 const rect = canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
@@ -275,6 +339,10 @@
                         <input type="number" value="${obj.angle.toFixed(2)}" step="0.1" onchange="updateObjProp(${obj.id}, 'angle', this.value)">
                     </div>
                     <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Bounce Factor</span></div>
+                        <input type="number" value="${obj.restitution}" step="0.1" min="0" max="1" onchange="updateObjProp(${obj.id}, 'restitution', this.value)">
+                    </div>
+                    <div class="sim-control-group">
                         <div class="sim-control-label"><span>Attach to Ball</span></div>
                         <select onchange="updateObjProp(${obj.id}, 'attachedTo', this.value === 'none' ? null : parseInt(this.value))" style="width: 100%; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.25rem; color: white;">
                             <option value="none" ${obj.attachedTo === null ? 'selected' : ''}>None</option>
@@ -336,8 +404,72 @@
             }
         }
 
+        function updateGlobalParam(param, value) {
+            settings[param] = parseFloat(value);
+            document.getElementById(`val-${param}`).textContent = value;
+        }
+
+        function toggleVectors() {
+            settings.showVectors = !settings.showVectors;
+            document.getElementById('toggle-vectors').classList.toggle('active');
+            drawScene();
+        }
+
+        function toggleGrid() {
+            settings.showGrid = !settings.showGrid;
+            document.getElementById('toggle-grid').classList.toggle('active');
+            drawScene();
+        }
+
+        function toggleCollision() {
+            settings.collision = !settings.collision;
+            document.getElementById('toggle-collision').classList.toggle('active');
+        }
+
+        function toggleSimulation() {
+            isRunning = !isRunning;
+            document.getElementById('playPauseText').textContent = isRunning ? 'Pause' : 'Start';
+            if (isRunning) {
+                lastTime = performance.now();
+                animate();
+            } else {
+                cancelAnimationFrame(animationId);
+            }
+        }
+
+        function clearCanvas() {
+            if (confirm('Are you sure you want to clear all objects?')) {
+                objects = [];
+                selectedObject = null;
+                objectIdCounter = 0;
+                if (isRunning) {
+                    toggleSimulation();
+                }
+                updateObjectList();
+                document.getElementById('propertiesContent').innerHTML = '<div class="no-selection">Select an object to edit its properties</div>';
+                drawScene();
+            }
+        }
+
         function drawScene() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (settings.showGrid) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x < canvas.width; x += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                for (let y = 0; y < canvas.height; y += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+            }
 
             objects.forEach(obj => {
                 ctx.save();
@@ -347,6 +479,15 @@
                     ctx.beginPath();
                     ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
                     ctx.fill();
+                    
+                    if (settings.showVectors && (obj.vx !== 0 || obj.vy !== 0)) {
+                        ctx.strokeStyle = '#00ff00';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(obj.x, obj.y);
+                        ctx.lineTo(obj.x + obj.vx * 10, obj.y + obj.vy * 10);
+                        ctx.stroke();
+                    }
                 } else if (obj.type === 'pendulum') {
                     let bobX, bobY;
                     
@@ -433,6 +574,404 @@
                 
                 ctx.restore();
             });
+        }
+
+        function checkWallCollision(ball, wall) {
+            const cos = Math.cos(wall.rotation);
+            const sin = Math.sin(wall.rotation);
+            
+            const localX = (ball.x - wall.x) * cos + (ball.y - wall.y) * sin;
+            const localY = -(ball.x - wall.x) * sin + (ball.y - wall.y) * cos;
+            
+            const halfW = wall.width / 2;
+            const halfH = wall.height / 2;
+            
+            const closestX = Math.max(-halfW, Math.min(halfW, localX));
+            const closestY = Math.max(-halfH, Math.min(halfH, localY));
+            
+            const dx = localX - closestX;
+            const dy = localY - closestY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist < ball.radius) {
+                const worldClosestX = wall.x + closestX * cos - closestY * sin;
+                const worldClosestY = wall.y + closestX * sin + closestY * cos;
+                
+                const normalX = (ball.x - worldClosestX) / dist;
+                const normalY = (ball.y - worldClosestY) / dist;
+                
+                const overlap = ball.radius - dist;
+                ball.x += normalX * overlap;
+                ball.y += normalY * overlap;
+                
+                const dotProduct = ball.vx * normalX + ball.vy * normalY;
+                ball.vx -= 2 * dotProduct * normalX * ball.restitution;
+                ball.vy -= 2 * dotProduct * normalY * ball.restitution;
+            }
+        }
+
+        function checkPendulumWallCollision(pendulum, wall) {
+            const bobX = pendulum.x + Math.sin(pendulum.angle) * pendulum.length;
+            const bobY = pendulum.y + Math.cos(pendulum.angle) * pendulum.length;
+            
+            const cos = Math.cos(wall.rotation);
+            const sin = Math.sin(wall.rotation);
+            
+            const localX = (bobX - wall.x) * cos + (bobY - wall.y) * sin;
+            const localY = -(bobX - wall.x) * sin + (bobY - wall.y) * cos;
+            
+            const halfW = wall.width / 2;
+            const halfH = wall.height / 2;
+            
+            const closestX = Math.max(-halfW, Math.min(halfW, localX));
+            const closestY = Math.max(-halfH, Math.min(halfH, localY));
+            
+            const dx = localX - closestX;
+            const dy = localY - closestY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            const bobRadius = 15;
+            
+            if (dist < bobRadius) {
+                const worldClosestX = wall.x + closestX * cos - closestY * sin;
+                const worldClosestY = wall.y + closestX * sin + closestY * cos;
+                
+                const normalX = (bobX - worldClosestX) / dist;
+                const normalY = (bobY - worldClosestY) / dist;
+                
+                const overlap = bobRadius - dist;
+                
+                const newBobX = bobX + normalX * overlap;
+                const newBobY = bobY + normalY * overlap;
+                
+                const dxToPivot = newBobX - pendulum.x;
+                const dyToPivot = newBobY - pendulum.y;
+                const newLength = Math.sqrt(dxToPivot * dxToPivot + dyToPivot * dyToPivot);
+                
+                const bobVelX = Math.cos(pendulum.angle + Math.PI/2) * pendulum.angularVel * pendulum.length;
+                const bobVelY = Math.sin(pendulum.angle + Math.PI/2) * pendulum.angularVel * pendulum.length;
+                
+                const dotProduct = bobVelX * normalX + bobVelY * normalY;
+                
+                if (dotProduct < 0) {
+                    const impulse = -2 * dotProduct * pendulum.restitution;
+                    
+                    const newBobVelX = bobVelX + impulse * normalX;
+                    const newBobVelY = bobVelY + impulse * normalY;
+                    
+                    const tangentX = -normalY;
+                    const tangentY = normalX;
+                    const newTangentialVel = newBobVelX * tangentX + newBobVelY * tangentY;
+                    pendulum.angularVel = newTangentialVel / pendulum.length;
+                    
+                    pendulum.angle = Math.atan2(dxToPivot, dyToPivot);
+                    pendulum.length = newLength;
+                }
+                
+                return true;
+            }
+            return false;
+        }
+
+        function checkBallPendulumCollision(ball, pendulum) {
+            if (pendulum.attachedTo !== null) return false;
+            
+            const bobX = pendulum.x + Math.sin(pendulum.angle) * pendulum.length;
+            const bobY = pendulum.y + Math.cos(pendulum.angle) * pendulum.length;
+            
+            const dx = ball.x - bobX;
+            const dy = ball.y - bobY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const minDist = ball.radius + 15;
+            
+            if (dist < minDist && dist > 0) {
+                const normalX = dx / dist;
+                const normalY = dy / dist;
+                
+                const overlap = minDist - dist;
+                ball.x += normalX * overlap * 0.7;
+                ball.y += normalY * overlap * 0.7;
+                
+                const bobVelX = Math.cos(pendulum.angle + Math.PI/2) * pendulum.angularVel * pendulum.length;
+                const bobVelY = Math.sin(pendulum.angle + Math.PI/2) * pendulum.angularVel * pendulum.length;
+                
+                const relVelX = ball.vx - bobVelX;
+                const relVelY = ball.vy - bobVelY;
+                
+                const dotProduct = relVelX * normalX + relVelY * normalY;
+                
+                if (dotProduct < 0) {
+                    const restitution = Math.min(ball.restitution, pendulum.restitution);
+                    
+                    const impulse = 2 * dotProduct / (ball.mass + pendulum.mass);
+                    
+                    ball.vx -= impulse * pendulum.mass * normalX * restitution;
+                    ball.vy -= impulse * pendulum.mass * normalY * restitution;
+                    
+                    const impulseX = impulse * ball.mass * normalX * restitution;
+                    const impulseY = impulse * ball.mass * normalY * restitution;
+                    
+                    const tangentX = -normalY;
+                    const tangentY = normalX;
+                    const torque = impulseX * tangentX + impulseY * tangentY;
+                    
+                    pendulum.angularVel += torque / pendulum.length;
+                }
+                
+                return true;
+            }
+            return false;
+        }
+
+        function updatePhysics(dt) {
+            dt = Math.min(dt, 0.033);
+            
+            objects.forEach(obj => {
+                if (obj.type === 'ball') {
+                    obj.vy += settings.gravity * dt * 10;
+                    
+                    obj.vx *= (1 - settings.airRes * dt);
+                    obj.vy *= (1 - settings.airRes * dt);
+                    
+                    obj.x += obj.vx * dt * 10;
+                    obj.y += obj.vy * dt * 10;
+
+                    if (obj.x - obj.radius < 0) {
+                        obj.x = obj.radius;
+                        obj.vx = -obj.vx * obj.restitution;
+                    }
+                    if (obj.x + obj.radius > canvas.width) {
+                        obj.x = canvas.width - obj.radius;
+                        obj.vx = -obj.vx * obj.restitution;
+                    }
+                    if (obj.y - obj.radius < 0) {
+                        obj.y = obj.radius;
+                        obj.vy = -obj.vy * obj.restitution;
+                    }
+                    if (obj.y + obj.radius > canvas.height) {
+                        obj.y = canvas.height - obj.radius;
+                        obj.vy = -obj.vy * obj.restitution;
+                    }
+                } else if (obj.type === 'pendulum' && obj.attachedTo === null) {
+                    const g = settings.gravity;
+                    const L = Math.max(obj.length / 50, 0.1);
+                    const angularAcc = -(g / L) * Math.sin(obj.angle);
+                    
+                    const damping = 1 - settings.airRes * dt * 0.5;
+                    
+                    obj.angularVel += angularAcc * dt;
+                    obj.angularVel *= damping;
+                    obj.angle += obj.angularVel * dt;
+                }
+            });
+
+            if (settings.collision) {
+                const balls = objects.filter(o => o.type === 'ball');
+                const walls = objects.filter(o => o.type === 'wall');
+                const pendulums = objects.filter(o => o.type === 'pendulum' && o.attachedTo === null);
+                
+                walls.forEach(wall => {
+                    balls.forEach(ball => {
+                        checkWallCollision(ball, wall);
+                    });
+                });
+
+                pendulums.forEach(pendulum => {
+                    walls.forEach(wall => {
+                        checkPendulumWallCollision(pendulum, wall);
+                    });
+                });
+
+                pendulums.forEach(pendulum => {
+                    balls.forEach(ball => {
+                        checkBallPendulumCollision(ball, pendulum);
+                    });
+                });
+
+                balls.forEach((b1, i) => {
+                    balls.slice(i + 1).forEach(b2 => {
+                        const dx = b2.x - b1.x;
+                        const dy = b2.y - b1.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        const minDist = b1.radius + b2.radius;
+                        
+                        if (dist < minDist && dist > 0.001) {
+                            const nx = dx / dist;
+                            const ny = dy / dist;
+                            
+                            const dvx = b2.vx - b1.vx;
+                            const dvy = b2.vy - b1.vy;
+                            
+                            const dvn = dvx * nx + dvy * ny;
+                            
+                            if (dvn < 0) {
+                                const overlap = minDist - dist;
+                                
+                                const separation = overlap * 0.5;
+                                b1.x -= nx * separation;
+                                b1.y -= ny * separation;
+                                b2.x += nx * separation;
+                                b2.y += ny * separation;
+                                
+                                const restitution = (b1.restitution + b2.restitution) * 0.5;
+                                
+                                const impulse = 2 * dvn / (b1.mass + b2.mass);
+                                
+                                b1.vx += impulse * b2.mass * nx * restitution;
+                                b1.vy += impulse * b2.mass * ny * restitution;
+                                b2.vx -= impulse * b1.mass * nx * restitution;
+                                b2.vy -= impulse * b1.mass * ny * restitution;
+                            }
+                        }
+                    });
+                });
+            }
+
+            const springs = objects.filter(o => o.type === 'spring');
+            springs.forEach(spring => {
+                if (spring.attachedTo !== null) {
+                    const attachedBall = objects.find(o => o.id === spring.attachedTo);
+                    if (attachedBall && attachedBall.type === 'ball') {
+                        const dx = attachedBall.x - spring.x;
+                        const dy = attachedBall.y - spring.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const displacement = dist - spring.length;
+                        const force = spring.k * displacement * 0.01;
+                        
+                        const fx = (dx / dist) * force;
+                        const fy = (dy / dist) * force;
+                        
+                        attachedBall.vx -= fx / attachedBall.mass * dt * 10;
+                        attachedBall.vy -= fy / attachedBall.mass * dt * 10;
+                    }
+                }
+            });
+        }
+
+        function animate(currentTime = 0) {
+            const dt = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+
+            if (dt > 0 && dt < 0.1) {
+                updatePhysics(dt);
+            }
+
+            drawScene();
+
+            if (isRunning) {
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+
+        function showSaveModal() {
+            document.getElementById('saveModal').classList.add('active');
+        }
+
+        function closeSaveModal() {
+            document.getElementById('saveModal').classList.remove('active');
+        }
+
+        function saveSandbox() {
+            const name = document.getElementById('saveName').value.trim();
+            if (!name) {
+                alert('Please enter a name');
+                return;
+            }
+
+            const savedSandboxes = JSON.parse(localStorage.getItem('sandboxes') || '{}');
+            savedSandboxes[name] = {
+                objects: objects.map(obj => {
+                    const cleanObj = { ...obj };
+                    return cleanObj;
+                }),
+                settings: { ...settings },
+                objectIdCounter: objectIdCounter,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('sandboxes', JSON.stringify(savedSandboxes));
+            alert('Sandbox saved!');
+            closeSaveModal();
+        }
+
+        function showLoadModal() {
+            const savedSandboxes = JSON.parse(localStorage.getItem('sandboxes') || '{}');
+            const list = document.getElementById('savedList');
+            
+            if (Object.keys(savedSandboxes).length === 0) {
+                list.innerHTML = '<div class="no-selection">No saved sandboxes</div>';
+            } else {
+                list.innerHTML = Object.keys(savedSandboxes).map(name => `
+                    <div class="object-item">
+                        <div>
+                            <div>${name}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.6;">${new Date(savedSandboxes[name].timestamp).toLocaleString()}</div>
+                        </div>
+                        <div>
+                            <button class="sim-btn sim-btn-primary" style="padding: 0.5rem 1rem; margin-right: 0.5rem;" onclick="loadSandbox('${name}')">Load</button>
+                            <button class="delete-btn" onclick="deleteSandbox('${name}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('loadModal').classList.add('active');
+        }
+
+        function closeLoadModal() {
+            document.getElementById('loadModal').classList.remove('active');
+        }
+
+        function loadSandbox(name) {
+            const savedSandboxes = JSON.parse(localStorage.getItem('sandboxes') || '{}');
+            const sandbox = savedSandboxes[name];
+            
+            if (sandbox) {
+                if (isRunning) {
+                    toggleSimulation();
+                }
+                
+                objects = sandbox.objects.map(obj => {
+                    const newObj = { ...obj };
+                    
+                    if (newObj.type === 'ball') {
+                        newObj.vx = newObj.vx || 0;
+                        newObj.vy = newObj.vy || 0;
+                        if (isNaN(newObj.vx)) newObj.vx = 0;
+                        if (isNaN(newObj.vy)) newObj.vy = 0;
+                        if (Math.abs(newObj.vx) > 1000) newObj.vx = 0;
+                        if (Math.abs(newObj.vy) > 1000) newObj.vy = 0;
+                    } else if (newObj.type === 'pendulum') {
+                        newObj.angularVel = newObj.angularVel || 0;
+                        if (isNaN(newObj.angularVel)) newObj.angularVel = 0;
+                        if (Math.abs(newObj.angularVel) > 100) newObj.angularVel = 0;
+                        newObj.angle = newObj.angle || 0.5;
+                        newObj.restitution = newObj.restitution || 0.3;
+                    }
+                    
+                    return newObj;
+                });
+                
+                settings = { ...sandbox.settings };
+                objectIdCounter = sandbox.objectIdCounter || objects.length;
+
+                document.getElementById('slider-gravity').value = settings.gravity;
+                document.getElementById('val-gravity').textContent = settings.gravity;
+                document.getElementById('slider-airRes').value = settings.airRes;
+                document.getElementById('val-airRes').textContent = settings.airRes;
+                
+                updateObjectList();
+                drawScene();
+                closeLoadModal();
+            }
+        }
+
+        function deleteSandbox(name) {
+            if (confirm(`Delete sandbox "${name}"?`)) {
+                const savedSandboxes = JSON.parse(localStorage.getItem('sandboxes') || '{}');
+                delete savedSandboxes[name];
+                localStorage.setItem('sandboxes', JSON.stringify(savedSandboxes));
+                showLoadModal();
+            }
         }
 
         drawScene();
