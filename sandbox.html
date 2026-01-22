@@ -10,7 +10,7 @@
     <nav>
       <a href="index.html">Physics Simulator</a>
       <ul>
-        <a href="index.html" class="active1">Home</a>
+        <a href="index.html">Home</a>
         <a href="simulations.html">Simulations</a>
         <a href="guide.html">Guide</a>
         <a href="theory.html">Theory</a>
@@ -87,13 +87,17 @@
                     <div class="sim-panel-header">
                         <span>Preset Scenarios</span>
                     </div>
-                    <select class="preset-select" onchange="loadPreset(this.value)">
-                        <option value="">Choose a preset...</option>
-                        <option value="bouncing_balls">Bouncing Balls</option>
-                        <option value="pendulum_wave">Pendulum Wave</option>
-                        <option value="spring_chain">Spring Chain</option>
-                        <option value="collision_demo">Collision Demo</option>
-                    </select>
+                    <div class="dropdown1" id="presetDropdown">
+                        <div class="dropdown-header" onclick="togglePresetDropdown()">
+                            <span id="selectedPreset">Choose a preset...</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="dropdown-list" id="presetList">
+                            <div class="dropdown-item" onclick="selectPreset('bouncing_balls', 'Bouncing Balls')">Bouncing Balls</div>
+                            <div class="dropdown-item" onclick="selectPreset('pendulum_wave', 'Pendulum Wave')">Pendulum Wave</div>
+                            <div class="dropdown-item" onclick="selectPreset('collision_demo', 'Collision Demo')">Collision Demo</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="sim-panel" id="propertiesPanel">
@@ -129,7 +133,7 @@
                     </div>
                     <div class="sim-toggle">
                         <span>Show Grid</span>
-                        <div class="sim-toggle-switch" id="toggle-grid" onclick="toggleGrid()"></div>
+                        <div class="sim-toggle-switch active" id="toggle-grid" onclick="toggleGrid()"></div>
                     </div>
                     <div class="sim-toggle">
                         <span>Show Trails</span>

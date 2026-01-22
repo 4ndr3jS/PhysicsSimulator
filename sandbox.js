@@ -11,6 +11,8 @@ let isRunning = false;
 let animationId = null;
 let objectIdCounter = 0;
 let lastTime = 0;
+let isPresetDropdownOpen = false;
+let openAttachDropdownId = null;
 
 let isDragging = false;
 let dragObject = null;
@@ -20,7 +22,7 @@ let settings = {
     gravity: 9.8,
     airRes: 0.1,
     showVectors: true,
-    showGrid: false,
+    showGrid: true,
     showTrails: false,
     collision: true
 };
@@ -70,19 +72,16 @@ const objectTemplates = {
     }
 };
 
-
 function selectTool(tool) {
     selectedTool = tool;
     document.querySelectorAll('.object-btn').forEach(btn => {
         btn.classList.remove('selected');
     });
-    // Use the event parameter to find the clicked button
     if (event && event.target) {
         const btn = event.target.closest('.object-btn');
         if (btn) btn.classList.add('selected');
     }
 }
-
 
 canvas.addEventListener('click', (e) => {
     if (selectedTool !== 'none' && !isRunning && !isDragging) {
@@ -220,7 +219,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-
 function updateObjectList() {
     const list = document.getElementById('objectList');
     if (objects.length === 0) {
@@ -289,7 +287,6 @@ function showProperties(obj) {
             </div>
         `;
     } else if (obj.type === 'pendulum') {
-        const attachableObjects = objects.filter(o => o.type === 'ball' && o.id !== obj.id);
         html = `
             <div class="sim-control-group">
                 <div class="sim-control-label"><span>Length (px)</span></div>
@@ -307,13 +304,6 @@ function showProperties(obj) {
                 <div class="sim-control-label"><span>Bounce Factor</span></div>
                 <input type="number" value="${obj.restitution}" step="0.1" min="0" max="1" onchange="updateObjProp(${obj.id}, 'restitution', this.value)">
             </div>
-            <div class="sim-control-group">
-                <div class="sim-control-label"><span>Attach to Ball</span></div>
-                <select onchange="updateObjProp(${obj.id}, 'attachedTo', this.value === 'none' ? null : parseInt(this.value))" style="width: 100%; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.25rem; color: white;">
-                    <option value="none" ${obj.attachedTo === null ? 'selected' : ''}>None</option>
-                    ${attachableObjects.map(o => `<option value="${o.id}" ${obj.attachedTo === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
-                </select>
-            </div>
         `;
     } else if (obj.type === 'spring') {
         const attachableObjects = objects.filter(o => o.type === 'ball' && o.id !== obj.id);
@@ -328,10 +318,18 @@ function showProperties(obj) {
             </div>
             <div class="sim-control-group">
                 <div class="sim-control-label"><span>Attach to Ball</span></div>
-                <select onchange="updateObjProp(${obj.id}, 'attachedTo', this.value === 'none' ? null : parseInt(this.value))" style="width: 100%; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.25rem; color: white;">
-                    <option value="none" ${obj.attachedTo === null ? 'selected' : ''}>None</option>
-                    ${attachableObjects.map(o => `<option value="${o.id}" ${obj.attachedTo === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
-                </select>
+                <div class="dropdown1 small" id="attachDropdown_${obj.id}">
+                    <div class="dropdown-header" onclick="toggleAttachDropdown(${obj.id})">
+                        <span id="selectedAttach_${obj.id}">${obj.attachedTo ? objects.find(o => o.id === obj.attachedTo)?.name || 'Select ball...' : 'None'}</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-list" id="attachList_${obj.id}">
+                        <div class="dropdown-item" onclick="selectAttachBall(${obj.id}, null, 'None')">None</div>
+                        ${attachableObjects.map(o => `
+                            <div class="dropdown-item" onclick="selectAttachBall(${obj.id}, ${o.id}, '${o.name}')">${o.name}</div>
+                        `).join('')}
+                    </div>
+                </div>
             </div>
         `;
     } else if (obj.type === 'wall') {
@@ -368,7 +366,6 @@ function updateObjProp(id, prop, value) {
         drawScene();
     }
 }
-
 
 function updateGlobalParam(param, value) {
     settings[param] = parseFloat(value);
@@ -421,6 +418,32 @@ function clearCanvas() {
         document.getElementById('propertiesContent').innerHTML = '<div class="no-selection">Select an object to edit its properties</div>';
         drawScene();
     }
+}
+
+function getPendulumBobPosition(pendulum) {
+    let bobX, bobY;
+    
+    if (pendulum.attachedTo !== null) {
+        const attachedBall = objects.find(o => o.id === pendulum.attachedTo);
+        if (attachedBall && attachedBall.type === 'ball') {
+            bobX = attachedBall.x;
+            bobY = attachedBall.y;
+            
+            const dx = bobX - pendulum.x;
+            const dy = bobY - pendulum.y;
+            pendulum.length = Math.sqrt(dx*dx + dy*dy);
+            pendulum.angle = Math.atan2(dx, dy);
+        } else {
+            pendulum.attachedTo = null;
+            bobX = pendulum.x + Math.sin(pendulum.angle) * pendulum.length;
+            bobY = pendulum.y + Math.cos(pendulum.angle) * pendulum.length;
+        }
+    } else {
+        bobX = pendulum.x + Math.sin(pendulum.angle) * pendulum.length;
+        bobY = pendulum.y + Math.cos(pendulum.angle) * pendulum.length;
+    }
+    
+    return { x: bobX, y: bobY };
 }
 
 function drawScene() {
@@ -481,33 +504,13 @@ function drawScene() {
             }
             
         } else if (obj.type === 'pendulum') {
-            let bobX, bobY;
-            
-            if (obj.attachedTo !== null) {
-                const attachedBall = objects.find(o => o.id === obj.attachedTo);
-                if (attachedBall && attachedBall.type === 'ball') {
-                    bobX = attachedBall.x;
-                    bobY = attachedBall.y;
-                    
-                    const dx = bobX - obj.x;
-                    const dy = bobY - obj.y;
-                    obj.length = Math.sqrt(dx*dx + dy*dy);
-                    obj.angle = Math.atan2(dx, dy);
-                } else {
-                    obj.attachedTo = null;
-                    bobX = obj.x + Math.sin(obj.angle) * obj.length;
-                    bobY = obj.y + Math.cos(obj.angle) * obj.length;
-                }
-            } else {
-                bobX = obj.x + Math.sin(obj.angle) * obj.length;
-                bobY = obj.y + Math.cos(obj.angle) * obj.length;
-            }
+            const bobPos = getPendulumBobPosition(obj);
             
             ctx.strokeStyle = obj.color;
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(obj.x, obj.y);
-            ctx.lineTo(bobX, bobY);
+            ctx.lineTo(bobPos.x, bobPos.y);
             ctx.stroke();
             
             ctx.fillStyle = obj.color;
@@ -517,14 +520,14 @@ function drawScene() {
             
             ctx.fillStyle = obj.color;
             ctx.beginPath();
-            ctx.arc(bobX, bobY, 15, 0, Math.PI * 2);
+            ctx.arc(bobPos.x, bobPos.y, 15, 0, Math.PI * 2);
             ctx.fill();
             
             if (obj === selectedObject) {
                 ctx.strokeStyle = '#ff9900';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.arc(bobX, bobY, 17, 0, Math.PI * 2);
+                ctx.arc(bobPos.x, bobPos.y, 17, 0, Math.PI * 2);
                 ctx.stroke();
             }
             
@@ -609,7 +612,6 @@ function updatePhysics(dt) {
                 if (obj.trail.length > 50) obj.trail.shift();
             }
 
-            // Boundary collisions
             if (obj.x - obj.radius < 0) {
                 obj.x = obj.radius;
                 obj.vx = -obj.vx * obj.restitution;
@@ -640,13 +642,11 @@ function updatePhysics(dt) {
         }
     });
 
-    // Collision detection
     if (settings.collision) {
         const balls = objects.filter(o => o.type === 'ball');
         const walls = objects.filter(o => o.type === 'wall');
-        const pendulums = objects.filter(o => o.type === 'pendulum' && o.attachedTo === null);
+        const pendulums = objects.filter(o => o.type === 'pendulum');
         
-        // Wall collisions for balls
         walls.forEach(wall => {
             balls.forEach(ball => {
                 const cos = Math.cos(wall.rotation);
@@ -681,9 +681,60 @@ function updatePhysics(dt) {
                     ball.vy -= 2 * dotProduct * normalY * ball.restitution;
                 }
             });
+            
+            pendulums.forEach(pendulum => {
+                const bobPos = getPendulumBobPosition(pendulum);
+                const bobRadius = 15;
+                
+                const cos = Math.cos(wall.rotation);
+                const sin = Math.sin(wall.rotation);
+                
+                const localX = (bobPos.x - wall.x) * cos + (bobPos.y - wall.y) * sin;
+                const localY = -(bobPos.x - wall.x) * sin + (bobPos.y - wall.y) * cos;
+                
+                const halfW = wall.width / 2;
+                const halfH = wall.height / 2;
+                
+                const closestX = Math.max(-halfW, Math.min(halfW, localX));
+                const closestY = Math.max(-halfH, Math.min(halfH, localY));
+                
+                const dx = localX - closestX;
+                const dy = localY - closestY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < bobRadius) {
+                    const worldClosestX = wall.x + closestX * cos - closestY * sin;
+                    const worldClosestY = wall.y + closestX * sin + closestY * cos;
+                    
+                    const normalX = (bobPos.x - worldClosestX) / dist;
+                    const normalY = (bobPos.y - worldClosestY) / dist;
+                    
+                    const overlap = bobRadius - dist;
+                    
+                    if (pendulum.attachedTo !== null) {
+                        const attachedBall = objects.find(o => o.id === pendulum.attachedTo);
+                        if (attachedBall && attachedBall.type === 'ball') {
+                            attachedBall.x += normalX * overlap;
+                            attachedBall.y += normalY * overlap;
+                            
+                            const dotProduct = attachedBall.vx * normalX + attachedBall.vy * normalY;
+                            attachedBall.vx -= 2 * dotProduct * normalX * pendulum.restitution;
+                            attachedBall.vy -= 2 * dotProduct * normalY * pendulum.restitution;
+                        }
+                    } else {
+                        const bobVx = Math.cos(pendulum.angle) * pendulum.angularVel * pendulum.length;
+                        const bobVy = -Math.sin(pendulum.angle) * pendulum.angularVel * pendulum.length;
+                        
+                        const dotProduct = bobVx * normalX + bobVy * normalY;
+                        
+                        const impulse = -2 * dotProduct * pendulum.mass * pendulum.restitution;
+                        
+                        pendulum.angularVel += impulse / (pendulum.mass * pendulum.length);
+                    }
+                }
+            });
         });
 
-        // Ball-ball collisions
         balls.forEach((b1, i) => {
             balls.slice(i + 1).forEach(b2 => {
                 const dx = b2.x - b1.x;
@@ -721,9 +772,74 @@ function updatePhysics(dt) {
                 }
             });
         });
+
+        balls.forEach(ball => {
+            pendulums.forEach(pendulum => {
+                const bobPos = getPendulumBobPosition(pendulum);
+                const bobRadius = 15;
+                const ballRadius = ball.radius;
+                
+                const dx = bobPos.x - ball.x;
+                const dy = bobPos.y - ball.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                const minDist = ballRadius + bobRadius;
+                
+                if (dist < minDist && dist > 0.001) {
+                    const nx = dx / dist;
+                    const ny = dy / dist;
+                    
+                    if (pendulum.attachedTo !== null) {
+                        const attachedBall = objects.find(o => o.id === pendulum.attachedTo);
+                        if (attachedBall && attachedBall.type === 'ball') {
+                            const dvx = attachedBall.vx - ball.vx;
+                            const dvy = attachedBall.vy - ball.vy;
+                            const dvn = dvx * nx + dvy * ny;
+                            
+                            if (dvn < 0) {
+                                const overlap = minDist - dist;
+                                const separation = overlap * 0.5;
+                                ball.x -= nx * separation;
+                                ball.y -= ny * separation;
+                                attachedBall.x += nx * separation;
+                                attachedBall.y += ny * separation;
+                                
+                                const restitution = (ball.restitution + pendulum.restitution) * 0.5;
+                                const impulse = 2 * dvn / (ball.mass + pendulum.mass);
+                                
+                                ball.vx += impulse * pendulum.mass * nx * restitution;
+                                ball.vy += impulse * pendulum.mass * ny * restitution;
+                                attachedBall.vx -= impulse * ball.mass * nx * restitution;
+                                attachedBall.vy -= impulse * ball.mass * ny * restitution;
+                            }
+                        }
+                    } else {
+                        const bobVx = Math.cos(pendulum.angle) * pendulum.angularVel * pendulum.length;
+                        const bobVy = -Math.sin(pendulum.angle) * pendulum.angularVel * pendulum.length;
+                        
+                        const dvx = bobVx - ball.vx;
+                        const dvy = bobVy - ball.vy;
+                        const dvn = dvx * nx + dvy * ny;
+                        
+                        if (dvn < 0) {
+                            const overlap = minDist - dist;
+                            const separation = overlap * 0.5;
+                            ball.x -= nx * separation;
+                            ball.y -= ny * separation;
+                            
+                            const restitution = (ball.restitution + pendulum.restitution) * 0.5;
+                            const impulse = 2 * dvn / (ball.mass + pendulum.mass);
+                            
+                            ball.vx += impulse * pendulum.mass * nx * restitution;
+                            ball.vy += impulse * pendulum.mass * ny * restitution;
+                            
+                            pendulum.angularVel -= impulse / (pendulum.mass * pendulum.length);
+                        }
+                    }
+                }
+            });
+        });
     }
 
-    // Spring forces
     const springs = objects.filter(o => o.type === 'spring');
     springs.forEach(spring => {
         if (spring.attachedTo !== null) {
@@ -760,7 +876,6 @@ function animate(currentTime = 0) {
     }
 }
 
-
 function loadPreset(name) {
     clearCanvas();
     
@@ -769,8 +884,8 @@ function loadPreset(name) {
             const ball = JSON.parse(JSON.stringify(objectTemplates.ball));
             ball.x = 100 + i * 80;
             ball.y = 100 + Math.random() * 100;
-            ball.vx = Math.random() * 5 - 2.5;
-            ball.vy = Math.random() * 5 - 2.5;
+            ball.vx = Math.random() * 250 - 2.5;
+            ball.vy = Math.random() * 250 - 2.5;
             ball.color = `hsl(${i * 72}, 70%, 60%)`;
             ball.id = objectIdCounter++;
             ball.name = `ball_${ball.id}`;
@@ -778,42 +893,27 @@ function loadPreset(name) {
             objects.push(ball);
         }
     } else if (name === 'pendulum_wave') {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 10; i++) {
             const pendulum = JSON.parse(JSON.stringify(objectTemplates.pendulum));
-            pendulum.x = 200 + i * 100;
+            pendulum.x = 200 + i * 75;
             pendulum.y = 100;
-            pendulum.length = 150 + i * 10;
+            pendulum.length = 250;
             pendulum.angle = 0.5;
             pendulum.id = objectIdCounter++;
             pendulum.name = `pendulum_${pendulum.id}`;
             objects.push(pendulum);
-        }
-    } else if (name === 'spring_chain') {
-        for (let i = 0; i < 4; i++) {
-            const ball = JSON.parse(JSON.stringify(objectTemplates.ball));
-            ball.x = 200 + i * 80;
-            ball.y = 200;
-            ball.id = objectIdCounter++;
-            ball.name = `ball_${ball.id}`;
-            ball.trail = [];
-            objects.push(ball);
-            
-            if (i > 0) {
-                const spring = JSON.parse(JSON.stringify(objectTemplates.spring));
-                spring.x = objects[objects.length-2].x;
-                spring.y = objects[objects.length-2].y;
-                spring.attachedTo = ball.id;
-                spring.id = objectIdCounter++;
-                spring.name = `spring_${spring.id}`;
-                objects.push(spring);
-            }
+            updateGlobalParam("gravity", 20);
         }
     } else if (name === 'collision_demo') {
         for (let i = 0; i < 3; i++) {
             const ball = JSON.parse(JSON.stringify(objectTemplates.ball));
+            const wall = JSON.parse(JSON.stringify(objectTemplates.wall));
+            wall.x = 700;
+            wall.y = 500;
+            wall.rotation = 3.14/2;
             ball.x = 100 + i * 120;
-            ball.y = 300;
-            ball.vx = 3;
+            ball.y = 580;
+            ball.vx = 300;
             ball.mass = 1 + i * 0.5;
             ball.radius = 15 + i * 5;
             ball.color = `hsl(${i * 90}, 70%, 60%)`;
@@ -821,12 +921,101 @@ function loadPreset(name) {
             ball.name = `ball_${ball.id}`;
             ball.trail = [];
             objects.push(ball);
+            objects.push(wall);
         }
-    } 
+    }
     
     updateObjectList();
     drawScene();
 }
+
+function togglePresetDropdown() {
+    isPresetDropdownOpen = !isPresetDropdownOpen;
+    const dropdownList = document.getElementById('presetList');
+    const dropdown = document.getElementById('presetDropdown');
+    
+    if (isPresetDropdownOpen) {
+        dropdownList.classList.add('open');
+        dropdown.classList.add('open');
+    } else {
+        dropdownList.classList.remove('open');
+        dropdown.classList.remove('open');
+    }
+}
+
+function selectPreset(presetId, presetName) {
+    document.getElementById('selectedPreset').textContent = presetName;
+    loadPreset(presetId);
+    togglePresetDropdown();
+    
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('presetDropdown');
+    if (isPresetDropdownOpen && !dropdown.contains(e.target)) {
+        togglePresetDropdown();
+    }
+});
+
+function toggleAttachDropdown(objId) {
+    if (openAttachDropdownId === objId) {
+        const dropdownList = document.getElementById(`attachList_${objId}`);
+        const dropdown = document.getElementById(`attachDropdown_${objId}`);
+        dropdownList.classList.remove('open');
+        dropdown.classList.remove('open');
+        openAttachDropdownId = null;
+    } else {
+        if (openAttachDropdownId !== null) {
+            const prevDropdownList = document.getElementById(`attachList_${openAttachDropdownId}`);
+            const prevDropdown = document.getElementById(`attachDropdown_${openAttachDropdownId}`);
+            if (prevDropdownList) {
+                prevDropdownList.classList.remove('open');
+            }
+            if (prevDropdown) {
+                prevDropdown.classList.remove('open');
+            }
+        }
+        
+        const dropdownList = document.getElementById(`attachList_${objId}`);
+        const dropdown = document.getElementById(`attachDropdown_${objId}`);
+        dropdownList.classList.add('open');
+        dropdown.classList.add('open');
+        openAttachDropdownId = objId;
+    }
+    
+    event.stopPropagation();
+}
+
+function selectAttachBall(objId, ballId, ballName) {
+    const obj = objects.find(o => o.id === objId);
+    if (obj) {
+        updateObjProp(objId, 'attachedTo', ballId);
+    }
+    
+    document.getElementById(`selectedAttach_${objId}`).textContent = ballName;
+    toggleAttachDropdown(objId);
+    
+    const dropdownList = document.getElementById(`attachList_${objId}`);
+    if (dropdownList) {
+        dropdownList.querySelectorAll('.dropdown-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+}
+
+document.addEventListener('click', (e) => {
+    if (openAttachDropdownId !== null) {
+        const dropdown = document.getElementById(`attachDropdown_${openAttachDropdownId}`);
+        if (dropdown && !dropdown.contains(e.target)) {
+            toggleAttachDropdown(openAttachDropdownId);
+        }
+    }
+});
 
 function showSaveModal() {
     document.getElementById('saveModal').classList.add('active');
@@ -872,7 +1061,7 @@ function showLoadModal() {
                     <div style="font-size: 0.8rem; opacity: 0.6;">${new Date(savedSandboxes[name].timestamp).toLocaleString()}</div>
                 </div>
                 <div>
-                    <button class="sim-btn sim-btn-primary" style="padding: 0.5rem 1rem; margin-right: 0.5rem;" onclick="loadSandbox('${name}')">Load</button>
+                    <button class="sim-btn sim-btn-primary" style="padding: 0.3rem 1rem; margin-right: 0.5rem; font-size: 14px" onclick="loadSandbox('${name}')">Load</button>
                     <button class="delete-btn" onclick="deleteSandbox('${name}')">Delete</button>
                 </div>
             </div>
