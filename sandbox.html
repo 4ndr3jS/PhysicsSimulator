@@ -3,140 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sandbox</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        .sandbox-thing {
-            background: rgba(20, 20, 20, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            width: 1000px;
-            margin: 0 auto;
-            height: 500px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-        
-        .sandbox-thing:hover{
-            cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            height: 498px;
-            width: 998px;
-        }
-        
-        .helper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0.5;
-            transition: opacity 0.3s;
-            margin-bottom: 20px;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        .container5, .container6 {
-            max-width: 1400px;
-            margin: 80px auto 0;
-            padding: 2rem;
-            padding-top: 0;
-        }
-        
-        .sim-canvas-wrapper {
-            background: rgba(20, 20, 20, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            width: 100%;
-            height: 700px;
-        }
-        
-        .sim-canvas {
-            width: 100%;
-            height: 700px;
-            border-radius: 0.5rem;
-            background: #0a0a0a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #666;
-            font-size: 1.2rem;
-        }
-        
-        @media (max-width: 1200px) {
-            .sandbox-thing {
-                width: 90%;
-                max-width: 900px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .sandbox-thing {
-                height: 400px;
-                padding: 1rem;
-            }
-            
-            .helper span {
-                font-size: 60px;
-            }
-        }
-    </style>
+    <title>Sandbox - Physics Simulator</title>
+    <link rel="stylesheet" href="sandbox.css">
 </head>
 <body>
     <nav>
-        <a href="index.html">Physics Simulator</a>
-        <ul>
-            <a href="index.html">Home</a>
-            <a href="simulations.html">Simulations</a>
-            <a href="guide.html">Guide</a>
-            <a href="theory.html">Theory</a>
-            <a href="learn.html">Learn Physics</a>
-            <div class="dropdown">
-                <a href="#">Extras <span style="font-size: 16px;">▼</span></a>
-                <div class="dropdown-content">
-                    <a href="sandbox.html">Sandbox</a>
-                    <a href="quizzes.html" class="active2">Quizzes</a>
-                    <a href="suggestions.html">Suggestions</a>
-                </div>
-            </div>
-        </ul>
+      <a href="index.html">Physics Simulator</a>
+      <ul>
+        <a href="index.html" class="active1">Home</a>
+        <a href="simulations.html">Simulations</a>
+        <a href="guide.html">Guide</a>
+        <a href="theory.html">Theory</a>
+        <a href="learn.html">Learn Physics</a>
+        <div class="dropdown">
+          <a href="#">Extras <span style="font-size: 16px">▼</span></a>
+          <div class="dropdown-content">
+            <a href="sandbox.html" class="active2">Sandbox</a>
+            <a href="quizzes.html">Quizzes</a>
+            <a href="suggestions.html">Suggestions</a>
+          </div>
+        </div>
+      </ul>
     </nav>
 
-    <div class="container5" id="createSandboxContainer">
-        <h1 class="page-title">Sandbox</h1>
-        <p class="subtitle">An open environment where you can build, design, tweak parameters and test your own physics experiments from scratch</p>
+    <div class="sim-container">
+        <div class="sim-header">
+            <h1>🔧 Physics Sandbox</h1>
+            <p>Create and experiment with custom physics simulations</p>
+        </div>
 
-        <div class="sandbox-thing" id="createSandboxBtn">
-            <div class="helper">
-                <span style="font-size: 100px;">+</span>
-                <p style="margin-top: 0; transform: translateY(-10px);">Create your first sandbox</p>
+        <div class="sim-layout">
+            <div class="sim-canvas-section">
+                <div class="sim-canvas-wrapper">
+                    <canvas id="canvas" class="sim-canvas"></canvas>
+                    <div class="sim-controls">
+                        <button class="sim-btn sim-btn-primary" onclick="toggleSimulation()">▶️ <span id="playPauseText">Start</span></button>
+                        <button class="sim-btn sim-btn-secondary" onclick="clearCanvas()">🗑️ Clear All</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="showSaveModal()">💾 Save</button>
+                        <button class="sim-btn sim-btn-secondary" onclick="showLoadModal()">📂 Load</button>
+                    </div>
+                </div>
+
+                <div class="sim-panel" style="margin-top: 30px;">
+                    <div class="sim-panel-header">
+                        <span>📋</span>
+                        <span>Objects in Scene</span>
+                    </div>
+                    <div class="object-list" id="objectList">
+                        <div class="no-selection">No objects yet. Click an object type and then click on the canvas to add it.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sim-sidebar">
+                <div class="sim-panel">
+                    <div class="sim-panel-header">
+                        <span>🎨</span>
+                        <span>Add Objects</span>
+                    </div>
+                    <div class="object-palette">
+                        <div class="object-btn" onclick="selectTool('ball')">
+                            <span class="object-icon">⚫</span>
+                            Ball
+                        </div>
+                        <div class="object-btn" onclick="selectTool('spring')">
+                            <span class="object-icon">〰️</span>
+                            Spring
+                        </div>
+                        <div class="object-btn" onclick="selectTool('pendulum')">
+                            <span class="object-icon">🎯</span>
+                            Pendulum
+                        </div>
+                        <div class="object-btn" onclick="selectTool('wall')">
+                            <span class="object-icon">🧱</span>
+                            Wall
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-panel" id="propertiesPanel">
+                    <div class="sim-panel-header">
+                        <span>🔧</span>
+                        <span>Properties</span>
+                    </div>
+                    <div class="properties-panel" id="propertiesContent">
+                        <div class="no-selection">Select an object to edit its properties</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="container6 hidden" id="sandboxCanvasContainer">
-        <div class="sim-canvas-wrapper">
-            <div class="sim-canvas" id="sandboxCanvas">
-                <p>Drag and drop objects here to build your experiment</p>
-            </div>
-        </div>
-    </div>
-    
     <script>
-        const createSandboxBtn = document.getElementById('createSandboxBtn');
-        const createSandboxContainer = document.getElementById('createSandboxContainer');
-        const sandboxCanvasContainer = document.getElementById('sandboxCanvasContainer');
-        
-        createSandboxBtn.addEventListener('click', () => {
-            createSandboxContainer.classList.add('hidden');
-            sandboxCanvasContainer.classList.remove('hidden');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        let objects = [];
+        let selectedTool = null;
+        let selectedObject = null;
+        let objectIdCounter = 0;
+
+        const objectTemplates = {
+            ball: {
+                type: 'ball',
+                mass: 1,
+                radius: 20,
+                x: 0,
+                y: 0,
+                vx: 0,
+                vy: 0,
+                color: '#667eea',
+                restitution: 0.8
+            },
+            spring: {
+                type: 'spring',
+                k: 50,
+                length: 100,
+                x: 0,
+                y: 0,
+                attachedTo: null,
+                color: '#4facfe'
+            },
+            pendulum: {
+                type: 'pendulum',
+                length: 150,
+                angle: 0.5,
+                angularVel: 0,
+                mass: 1,
+                x: 0,
+                y: 0,
+                color: '#43e97b'
+            },
+            wall: {
+                type: 'wall',
+                x: 0,
+                y: 0,
+                width: 200,
+                height: 20,
+                rotation: 0,
+                color: '#fa709a'
+            }
+        };
+
+        function selectTool(tool) {
+            selectedTool = tool;
+            document.querySelectorAll('.object-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.object-btn').classList.add('selected');
+        }
+
+        canvas.addEventListener('click', (e) => {
+            if (selectedTool) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const newObj = JSON.parse(JSON.stringify(objectTemplates[selectedTool]));
+                newObj.x = x;
+                newObj.y = y;
+                newObj.id = objectIdCounter++;
+                newObj.name = `${selectedTool}_${newObj.id}`;
+                
+                objects.push(newObj);
+                updateObjectList();
+                drawScene();
+            }
         });
+
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            for (let i = objects.length - 1; i >= 0; i--) {
+                const obj = objects[i];
+                const dx = x - obj.x;
+                const dy = y - obj.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (dist < (obj.radius || 30)) {
+                    selectObject(obj);
+                    return;
+                }
+            }
+        });
+
+        function updateObjectList() {
+            const list = document.getElementById('objectList');
+            if (objects.length === 0) {
+                list.innerHTML = '<div class="no-selection">No objects yet. Click an object type and then click on the canvas to add it.</div>';
+                return;
+            }
+
+            list.innerHTML = objects.map(obj => `
+                <div class="object-item ${selectedObject === obj ? 'selected' : ''}" onclick="selectObjectById(${obj.id})">
+                    <span>${obj.name}</span>
+                    <button class="delete-btn" onclick="deleteObject(${obj.id}); event.stopPropagation();">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function selectObject(obj) {
+            selectedObject = obj;
+            updateObjectList();
+            showProperties(obj);
+            drawScene();
+        }
+
+        function selectObjectById(id) {
+            const obj = objects.find(o => o.id === id);
+            if (obj) selectObject(obj);
+        }
+
+        function deleteObject(id) {
+            objects = objects.filter(o => o.id !== id);
+            objects.forEach(o => {
+                if (o.attachedTo === id) o.attachedTo = null;
+            });
+            if (selectedObject && selectedObject.id === id) {
+                selectedObject = null;
+                document.getElementById('propertiesContent').innerHTML = '<div class="no-selection">Select an object to edit its properties</div>';
+            }
+            updateObjectList();
+            drawScene();
+        }
+
+        function showProperties(obj) {
+            const content = document.getElementById('propertiesContent');
+            let html = '';
+
+            if (obj.type === 'ball') {
+                html = `
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Mass (kg)</span></div>
+                        <input type="number" value="${obj.mass}" step="0.1" onchange="updateObjProp(${obj.id}, 'mass', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Radius (px)</span></div>
+                        <input type="number" value="${obj.radius}" onchange="updateObjProp(${obj.id}, 'radius', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Velocity X (m/s)</span></div>
+                        <input type="number" value="${obj.vx.toFixed(2)}" step="0.5" onchange="updateObjProp(${obj.id}, 'vx', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Velocity Y (m/s)</span></div>
+                        <input type="number" value="${obj.vy.toFixed(2)}" step="0.5" onchange="updateObjProp(${obj.id}, 'vy', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Restitution</span></div>
+                        <input type="number" value="${obj.restitution}" step="0.1" min="0" max="1" onchange="updateObjProp(${obj.id}, 'restitution', this.value)">
+                    </div>
+                `;
+            } else if (obj.type === 'pendulum') {
+                const attachableObjects = objects.filter(o => o.type === 'ball' && o.id !== obj.id);
+                html = `
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Length (px)</span></div>
+                        <input type="number" value="${obj.length}" onchange="updateObjProp(${obj.id}, 'length', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Mass (kg)</span></div>
+                        <input type="number" value="${obj.mass}" step="0.1" onchange="updateObjProp(${obj.id}, 'mass', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Initial Angle (rad)</span></div>
+                        <input type="number" value="${obj.angle.toFixed(2)}" step="0.1" onchange="updateObjProp(${obj.id}, 'angle', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Attach to Ball</span></div>
+                        <select onchange="updateObjProp(${obj.id}, 'attachedTo', this.value === 'none' ? null : parseInt(this.value))" style="width: 100%; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.25rem; color: white;">
+                            <option value="none" ${obj.attachedTo === null ? 'selected' : ''}>None</option>
+                            ${attachableObjects.map(o => `<option value="${o.id}" ${obj.attachedTo === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            } else if (obj.type === 'spring') {
+                const attachableObjects = objects.filter(o => o.type === 'ball' && o.id !== obj.id);
+                html = `
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Spring Constant (N/m)</span></div>
+                        <input type="number" value="${obj.k}" onchange="updateObjProp(${obj.id}, 'k', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Rest Length (px)</span></div>
+                        <input type="number" value="${obj.length}" onchange="updateObjProp(${obj.id}, 'length', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Attach to Ball</span></div>
+                        <select onchange="updateObjProp(${obj.id}, 'attachedTo', this.value === 'none' ? null : parseInt(this.value))" style="width: 100%; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.25rem; color: white;">
+                            <option value="none" ${obj.attachedTo === null ? 'selected' : ''}>None</option>
+                            ${attachableObjects.map(o => `<option value="${o.id}" ${obj.attachedTo === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            } else if (obj.type === 'wall') {
+                html = `
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Width (px)</span></div>
+                        <input type="number" value="${obj.width}" onchange="updateObjProp(${obj.id}, 'width', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label"><span>Height (px)</span></div>
+                        <input type="number" value="${obj.height}" onchange="updateObjProp(${obj.id}, 'height', this.value)">
+                    </div>
+                    <div class="sim-control-group">
+                        <div class="sim-control-label">
+                            <span>Rotation (degrees)</span>
+                            <span class="sim-control-value">${Math.round(obj.rotation * 180 / Math.PI)}°</span>
+                        </div>
+                        <input type="range" min="0" max="${Math.PI * 2}" step="0.01" value="${obj.rotation}" oninput="updateObjProp(${obj.id}, 'rotation', this.value); document.querySelector('.sim-control-value').textContent = Math.round(this.value * 180 / Math.PI) + '°'">
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+        }
+
+        function updateObjProp(id, prop, value) {
+            const obj = objects.find(o => o.id === id);
+            if (obj) {
+                if (value === null || value === 'null') {
+                    obj[prop] = null;
+                } else {
+                    obj[prop] = parseFloat(value);
+                }
+                drawScene();
+            }
+        }
+
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            objects.forEach(obj => {
+                ctx.save();
+                
+                if (obj.type === 'ball') {
+                    ctx.fillStyle = obj === selectedObject ? '#fff' : obj.color;
+                    ctx.beginPath();
+                    ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (obj.type === 'pendulum') {
+                    let bobX, bobY;
+                    
+                    if (obj.attachedTo !== null) {
+                        const attachedBall = objects.find(o => o.id === obj.attachedTo);
+                        if (attachedBall && attachedBall.type === 'ball') {
+                            bobX = attachedBall.x;
+                            bobY = attachedBall.y;
+                            
+                            const dx = bobX - obj.x;
+                            const dy = bobY - obj.y;
+                            obj.length = Math.sqrt(dx*dx + dy*dy);
+                            obj.angle = Math.atan2(dx, dy);
+                        } else {
+                            obj.attachedTo = null;
+                            bobX = obj.x + Math.sin(obj.angle) * obj.length;
+                            bobY = obj.y + Math.cos(obj.angle) * obj.length;
+                        }
+                    } else {
+                        bobX = obj.x + Math.sin(obj.angle) * obj.length;
+                        bobY = obj.y + Math.cos(obj.angle) * obj.length;
+                    }
+                    
+                    ctx.strokeStyle = obj.color;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(obj.x, obj.y);
+                    ctx.lineTo(bobX, bobY);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = obj.color;
+                    ctx.beginPath();
+                    ctx.arc(obj.x, obj.y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = obj.color;
+                    ctx.beginPath();
+                    ctx.arc(bobX, bobY, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (obj.type === 'spring') {
+                    let endX, endY;
+                    
+                    if (obj.attachedTo !== null) {
+                        const attachedBall = objects.find(o => o.id === obj.attachedTo);
+                        if (attachedBall && attachedBall.type === 'ball') {
+                            endX = attachedBall.x;
+                            endY = attachedBall.y;
+                        } else {
+                            obj.attachedTo = null;
+                            endX = obj.x;
+                            endY = obj.y + obj.length;
+                        }
+                    } else {
+                        endX = obj.x;
+                        endY = obj.y + obj.length;
+                    }
+                    
+                    if (endX !== undefined && endY !== undefined) {
+                        ctx.strokeStyle = obj.color;
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.moveTo(obj.x, obj.y);
+                        
+                        const dx = endX - obj.x;
+                        const dy = endY - obj.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const coils = 10;
+                        const coilWidth = 20;
+                        
+                        for (let i = 0; i <= coils; i++) {
+                            const t = i / coils;
+                            const x = obj.x + dx * t + (i % 2 === 0 ? -coilWidth : coilWidth) * (dy / dist);
+                            const y = obj.y + dy * t - (i % 2 === 0 ? -coilWidth : coilWidth) * (dx / dist);
+                            ctx.lineTo(x, y);
+                        }
+                        ctx.stroke();
+                    }
+                } else if (obj.type === 'wall') {
+                    ctx.translate(obj.x, obj.y);
+                    ctx.rotate(obj.rotation);
+                    ctx.fillStyle = obj.color;
+                    ctx.fillRect(-obj.width/2, -obj.height/2, obj.width, obj.height);
+                }
+                
+                ctx.restore();
+            });
+        }
+
+        drawScene();
     </script>
 </body>
 </html>
